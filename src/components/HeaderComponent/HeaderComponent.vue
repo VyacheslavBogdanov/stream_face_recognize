@@ -12,9 +12,14 @@ const status = ref<'active' | 'inactive'>('inactive');
 
 const checkHealth = async () => {
 	try {
-		const response = await fetch(`${config.host}/health`);
-		status.value = response.ok ? 'active' : 'inactive';
-	} catch {
+		const response = await fetch(`${config.host}`);
+		if (!response.ok) {
+			console.error('Ошибка ответа сервера:', response.status);
+		}
+		const data = await response.json();
+		status.value = data.status || 'inactive';
+	} catch (error) {
+		console.error('Ошибка подключения:', error);
 		status.value = 'inactive';
 	}
 };
@@ -22,7 +27,7 @@ const checkHealth = async () => {
 let interval: number;
 onMounted(() => {
 	checkHealth();
-	interval = setInterval(checkHealth, 15000);
+	interval = setInterval(checkHealth, 5000);
 });
 onUnmounted(() => {
 	clearInterval(interval);
