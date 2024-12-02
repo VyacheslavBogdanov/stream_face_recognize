@@ -13,8 +13,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { fetchData } from '../mocks/db.js';
-import { MessageTypes } from './utils/types.js';
+import { fetchData } from '../mocks/db';
+import { MessageTypes } from './utils/types';
 import Inform from './Inform/Inform.vue';
 
 const theme = ref<string>('informer--light');

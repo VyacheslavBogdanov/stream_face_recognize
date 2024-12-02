@@ -1,5 +1,5 @@
 <template>
-	<div v-for="(type, index) in messageTypes" :key="index" :class="['inform', type.class]">
+	<div v-for="(type, index) in props.messageTypes" :key="index" :class="['inform', type.class]">
 		<div :class="getTextColorModifier(props.theme, type.class)">
 			<div class="inform__icon">ⓘ</div>
 			{{ type.message }}
@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { MessageTypes } from '../utils/types.js';
-import { getTextColorModifier } from '../utils/getTextColorModifier.ts';
+import { getTextColorModifier } from '../utils/getTextColorModifier.js';
 
 const props = defineProps<{
 	theme: string;

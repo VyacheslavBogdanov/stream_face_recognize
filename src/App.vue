@@ -1,19 +1,22 @@
 <template>
 	<div id="app">
-		<h1>FIRE DETECTOR APP INTERFACE</h1>
-		<HeaderComponent />
+		<h1>FIRE-DETECTOR APP INTERFACE</h1>
+		<Info />
 		<div class="app__main">
 			<FileUploaderComponent @file-selected="onFileSelected" />
 			<DetectionResultComponent :result="result" />
 		</div>
+		<button>Обнаружить огонь</button>
+		<Informer />
 	</div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import HeaderComponent from './components/HeaderComponent/HeaderComponent.vue';
-import FileUploaderComponent from './components/FileUploaderComponent/FileUploaderComponent.vue';
-import DetectionResultComponent from './components/DetectionResultComponent/DetectionResultComponent.vue';
+import Info from '@/components/HeaderComponent/Info.vue';
+import FileUploaderComponent from '@/components/FileUploaderComponent/FileUploaderComponent.vue';
+import DetectionResultComponent from '@/components/DetectionResultComponent/DetectionResultComponent.vue';
+import Informer from '@/components/Informer/Informer.vue';
 
 const result = ref<null | { type: string }>(null);
 
@@ -58,10 +61,16 @@ const toBase64 = (file: File) =>
 
 h1 {
 	text-align: center;
-	padding-top: 3%;
+	padding-top: 2%;
+	padding-bottom: 1.5%;
+	color: rgba(100, 71, 14, 0.768);
 }
 
-.app {
+#app {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+
 	&__main {
 		display: flex;
 		flex-direction: column;
