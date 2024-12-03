@@ -70,6 +70,7 @@ h1 {
 	display: flex;
 	align-items: center;
 	flex-direction: column;
+	font-family: sans-serif;
 
 	&__main {
 		display: flex;
