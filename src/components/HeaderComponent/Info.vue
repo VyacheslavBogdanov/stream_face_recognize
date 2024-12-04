@@ -1,11 +1,10 @@
 <template>
 	<div>
-		<div v-for="(type, index) in messageTypes" :key="index" :class="['inform', type.class]">
-			<!-- <HeaderComponent
-				:status="status"
-				:statusMessage="type.message"
-				v-if="type.class.includes(statusClass)"
-			/> -->
+		<div
+			v-for="(type, index) in filteredMessageTypes"
+			:key="index"
+			:class="['inform', type.class]"
+		>
 			<div class="inform__icon">ⓘ</div>
 			<span>{{ type.message }}</span>
 		</div>
@@ -14,7 +13,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue';
-// import HeaderComponent from './HeaderComponent/HeaderComponent.vue';
 import { fetchData, type MessageType } from '../mocks/db';
 import config from '../../config/config';
 
@@ -36,19 +34,21 @@ const checkHealth = async () => {
 	}
 };
 
+const filteredMessageTypes = computed(() => {
+	return status.value === 'active'
+		? [{ class: 'inform--success', message: 'Модуль детектора огня работает корректно' }]
+		: [{ class: 'inform--warning', message: 'Модуль детектора огня отключен' }];
+});
+
 let interval: number;
 onMounted(async () => {
 	messageTypes.value = await fetchData('/message-types');
-	// checkHealth();
+	checkHealth();
 	interval = setInterval(checkHealth, 5000);
 });
 onUnmounted(() => {
 	clearInterval(interval);
 });
-
-// const statusClass = computed(() =>
-// 	status.value === 'active' ? 'inform--success' : 'inform--warning',
-// );
 </script>
 
 <style lang="scss" scoped>
