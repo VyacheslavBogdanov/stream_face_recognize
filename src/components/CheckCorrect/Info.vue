@@ -1,20 +1,26 @@
 <template>
-	<div v-for="(type, index) in messageTypes" :key="index" :class="['inform', type.class]">
-		<div :class="getTextColorModifier(props.theme, type.class)">
+	<div>
+		<div
+			v-for="(type, index) in filteredMessageTypes"
+			:key="index"
+			:class="['inform', type.class]"
+		>
 			<div class="inform__icon">ⓘ</div>
-			{{ type.message }}
+			<span>{{ type.message }}</span>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { MessageTypes } from '../utils/types.js';
-import { getTextColorModifier } from '../utils/getTextColorModifier.ts';
+import { computed } from 'vue';
+import { useHealthCheck } from './useHealthCheck';
+const { status } = useHealthCheck();
 
-const props = defineProps<{
-	theme: string;
-	messageTypes: MessageTypes[];
-}>();
+const filteredMessageTypes = computed(() => {
+	return status.value === 'active'
+		? [{ class: 'inform--success', message: 'Модуль детектора огня работает корректно' }]
+		: [{ class: 'inform--warning', message: 'Модуль детектора огня отключен' }];
+});
 </script>
 
 <style lang="scss" scoped>
@@ -48,25 +54,6 @@ const props = defineProps<{
 	&--warning {
 		background-color: #f9ebd8;
 		color: #d77417;
-	}
-
-	&--error {
-		background-color: #f2dee0;
-		color: #db1428;
-	}
-
-	&--info {
-		background-color: #e3e3ff;
-		color: #1052ec;
-	}
-
-	&--default {
-		background-color: #cecece;
-		color: #000;
-	}
-
-	&--dark-theme-text {
-		color: $color-white;
 	}
 }
 </style>
