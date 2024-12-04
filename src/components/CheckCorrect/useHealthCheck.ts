@@ -24,7 +24,7 @@ export function useHealthCheck() {
 
 	onMounted(() => {
 		checkHealth();
-		interval = setInterval(checkHealth, 5000);
+		interval = setInterval(checkHealth, 15000);
 	});
 
 	onUnmounted(() => {
