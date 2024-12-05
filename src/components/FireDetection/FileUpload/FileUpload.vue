@@ -1,5 +1,5 @@
 <template>
-	<div class="upload" @dragover.prevent @drop.prevent>
+	<div :class="['upload', { 'upload--active': fileName }]" @dragover.prevent @drop.prevent>
 		<input class="upload__input" type="file" accept="image/*" @change="onFileChange" />
 		<span class="upload__text">
 			{{ fileName || 'Загрузить изображение...' }}
@@ -23,14 +23,16 @@ const onFileChange = (event: Event) => {
 </script>
 
 <style scoped lang="scss">
+@import '../../../styles/main.scss';
+
 .upload {
 	width: 200px;
-	height: auto;
+	height: 32px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	padding: 10px;
-	border: 1px dashed #ccc;
+	border: 1.5px dashed #ccc;
 	border-radius: 5px;
 	background-color: #fdfdfd;
 	text-align: center;
@@ -39,13 +41,14 @@ const onFileChange = (event: Event) => {
 		background-color 0.3s ease;
 	position: relative;
 	cursor: pointer;
+	margin: 20px 10px 20px 0;
 
 	&:hover {
-		border-color: #6c63ff;
+		border-color: $all-border-color;
 	}
 
-	&:active {
-		border-color: #6c63ff;
+	&--active {
+		border-color: $all-border-color;
 	}
 
 	&__input {

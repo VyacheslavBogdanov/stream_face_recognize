@@ -1,6 +1,8 @@
 <template>
-	<FileUpload />
-	<FireSearchBtn @sendRequest="sendRequest" />
+	<div class="middle-elements">
+		<FileUpload />
+		<FireSearchBtn @sendRequest="sendRequest" />
+	</div>
 	<div :class="['result', resultClass]">
 		<div class="result__icon">ⓘ</div>
 		<span>{{ message }}</span>
@@ -63,8 +65,15 @@ const sendRequest = async () => {
 </script>
 
 <style lang="scss" scoped>
-@import '../utils/variables.scss';
+@import '../../styles/main.scss';
 
+.middle-elements {
+	height: 50px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin: 40px 0 40px 0;
+}
 .result {
 	position: relative;
 	display: flex;

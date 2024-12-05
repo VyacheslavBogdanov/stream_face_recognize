@@ -11,17 +11,20 @@ const emit = defineEmits<{
 </script>
 
 <style lang="scss" scoped>
+@import '../../../styles/main.scss';
 .fire-search {
 	position: relative;
 	height: 50px;
 	padding: 0 30px;
-	border: 2px solid #000;
+	color: #513d3d;
+	border: $all-border-width solid #513d3d;
 	background-color: #fdfdfd;
+	border-radius: $all-border-radius;
 	user-select: none;
 	white-space: nowrap;
 	transition: all 0.05s linear;
 	font-family: inherit;
-	margin: 20px 0;
+	margin: 20px 0 20px 10px;
 
 	&:before,
 	&:after {
@@ -47,8 +50,8 @@ const emit = defineEmits<{
 
 	&:hover {
 		cursor: pointer;
-		border-color: #c7451a;
-		color: #c7451a;
+		border-color: $all-border-color;
+		color: $all-border-color;
 
 		&:before {
 			height: calc(100% - 32px);

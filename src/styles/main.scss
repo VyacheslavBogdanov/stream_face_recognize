@@ -1,10 +1,17 @@
 
-$font-stack: 'Arial', sans-serif;
+$font-stack: 'sans-serif';
 $color-primary: #3498db;
 $color-success: #2ecc71;
 $color-error: #e74c3c;
 $color-bg: #f9f9f9;
 $color-text: #333;
+$all-border-color: #007bff;
+$all-border-width: 1.5px;
+$all-border-radius: 8px;
+$border-radius: 8px;
+$color-white: #fff;
+$color-dark-gray: #484747;
+
 
 body {
   font-family: $font-stack;

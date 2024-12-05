@@ -4,7 +4,6 @@
 		<Info />
 
 		<FireDetection />
-
 	</div>
 </template>
 
@@ -12,11 +11,11 @@
 import Info from '@/components/CheckCorrect/Info.vue';
 
 import FireDetection from '@/components/FireDetection/FireDetection.vue';
-
 </script>
 
 <style lang="scss" scoped>
 @import './styles/main.scss';
+
 .title {
 	margin: 1%;
 	color: rgba(100, 95, 95, 0.711);
@@ -32,7 +31,7 @@ import FireDetection from '@/components/FireDetection/FireDetection.vue';
 	background-color: #fdfdfd;
 	margin: 1%;
 	padding: 20px;
-	border: 2px solid rgba(100, 95, 95, 0.711);
-	border-radius: 3px;
+	border: $all-border-width solid $all-border-color;
+	border-radius: $all-border-radius;
 }
 </style>
