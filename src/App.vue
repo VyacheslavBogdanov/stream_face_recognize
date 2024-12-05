@@ -2,13 +2,17 @@
 	<h1 class="title">FIRE-DETECTOR</h1>
 	<div id="app">
 		<Info />
+
 		<FireDetection />
+
 	</div>
 </template>
 
 <script setup lang="ts">
 import Info from '@/components/CheckCorrect/Info.vue';
+
 import FireDetection from '@/components/FireDetection/FireDetection.vue';
+
 </script>
 
 <style lang="scss" scoped>
