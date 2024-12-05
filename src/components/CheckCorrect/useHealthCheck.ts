@@ -28,9 +28,11 @@ export function useHealthCheck() {
     interval = setInterval(checkHealth, 10000);
   };
 
+
   const stopHealthCheck = () => {
     clearInterval(interval);
   };
+
 
   onMounted(startHealthCheck);
   onUnmounted(stopHealthCheck);

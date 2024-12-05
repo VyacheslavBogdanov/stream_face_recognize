@@ -51,6 +51,7 @@ onMounted(loadMessageTypes);
 	font-size: 23px;
 	height: 40px;
 	opacity: 0.85;
+	margin: 20px 0;
 
 	&__icon {
 		display: flex;

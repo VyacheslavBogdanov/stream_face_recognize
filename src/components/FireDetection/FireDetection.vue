@@ -1,14 +1,16 @@
 <template>
-	<div>
-		<button @click="sendRequest">Проверить огонь</button>
-		<div class="result" :class="resultClass">
-			{{ message }}
-		</div>
+	<FileUpload />
+	<FireSearchBtn @sendRequest="sendRequest" />
+	<div :class="['result', resultClass]">
+		<div class="result__icon">ⓘ</div>
+		<span>{{ message }}</span>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import FireSearchBtn from './FireSearchBtn/FireSearchBtn.vue';
+import FileUpload from './FileUpload/FileUpload.vue';
 
 const result = ref<{ type: string } | null>(null);
 
@@ -60,32 +62,38 @@ const sendRequest = async () => {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import '../utils/variables.scss';
+
 .result {
-	font-size: 1.5em;
-	margin-top: 20px;
-}
+	position: relative;
+	display: flex;
+	align-items: center;
+	padding: 10px 30px 10px 40px;
+	border-radius: $border-radius;
+	max-width: fit-content;
+	word-wrap: break-word;
+	font-size: 23px;
+	height: 40px;
+	opacity: 0.85;
+	margin: 20px 0;
 
-.result--fire {
-	color: red;
-}
+	&__icon {
+		display: flex;
+		position: absolute;
+		transform: rotate(180deg);
+		left: 10px;
+		height: 30px;
+	}
 
-.result--no-fire {
-	color: green;
-}
-</style>
+	&--fire {
+		background-color: #e0fde7;
+		color: #2a9b44;
+	}
 
-<style scoped>
-.result {
-	font-size: 1.5em;
-	margin-top: 20px;
-}
-
-.result--fire {
-	color: red;
-}
-
-.result--no-fire {
-	color: green;
+	&--no-fire {
+		background-color: #f2dee0;
+		color: #db1428;
+	}
 }
 </style>
