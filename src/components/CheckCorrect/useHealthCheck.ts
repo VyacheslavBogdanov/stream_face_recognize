@@ -1,35 +1,39 @@
+
 import { ref, onMounted, onUnmounted } from 'vue';
-import config from '../../config/config';
+import  config  from './config';
 
 export function useHealthCheck() {
-	const status = ref<'active' | 'inactive'>('inactive');
-	let interval: number;
+  const status = ref<'active' | 'inactive'>('inactive');
+  let interval: number;
 
-	const checkHealth = async () => {
-		console.log('Отправка запроса на:', config.host);
-		try {
-			const response = await fetch(`${config.host}`);
-			if (response.ok) {
-				const data = await response.json();
-				console.log('Данные сервера:', data);
-				status.value = data.status; // Прямое обновление статуса
-			} else {
-				status.value = 'inactive';
-			}
-		} catch (error) {
-			console.error('Ошибка подключения:', error);
-			status.value = 'inactive';
-		}
-	};
+  const checkHealth = async () => {
+    try {
+      const response = await fetch(`${config.host}/health`);
+      if (response.status === 200) {
+        const data = await response.json();
+        if (data.status === 'active' || data.status === 'inactive') {
+          status.value = data.status;
+        } else {
+          status.value = 'inactive';
+        }
+      }
+    } catch (error) {
+      console.error('Ошибка подключения:', error);
+      status.value = 'inactive';
+    }
+  };
 
-	onMounted(() => {
-		checkHealth();
-		interval = setInterval(checkHealth, 5000);
-	});
+  const startHealthCheck = () => {
+    checkHealth();
+    interval = setInterval(checkHealth, 10000);
+  };
 
-	onUnmounted(() => {
-		clearInterval(interval);
-	});
+  const stopHealthCheck = () => {
+    clearInterval(interval);
+  };
 
-	return { status };
+  onMounted(startHealthCheck);
+  onUnmounted(stopHealthCheck);
+
+  return { status };
 }

@@ -12,16 +12,30 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useHealthCheck } from './useHealthCheck';
+import { fetchData } from '../mocks/db';
+const messageTypes = ref<{ class: string; message: string }[]>([]);
+const loadMessageTypes = async () => {
+	try {
+		messageTypes.value = await fetchData('/message-types');
+	} catch (error) {
+		console.error('Ошибка загрузки сообщений из моков:', error);
+	}
+};
+
 const { status } = useHealthCheck();
 
 const filteredMessageTypes = computed(() => {
-	return status.value === 'active'
-		? [{ class: 'inform--success', message: 'Модуль детектора огня работает корректно' }]
-		: [{ class: 'inform--warning', message: 'Модуль детектора огня отключен' }];
+	if (status.value === 'active') {
+		return messageTypes.value.filter((type) => type.class === 'inform--success');
+	}
+	return messageTypes.value.filter((type) => type.class === 'inform--warning');
 });
+
+onMounted(loadMessageTypes);
 </script>
+``
 
 <style lang="scss" scoped>
 @import '../utils/variables.scss';

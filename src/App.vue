@@ -5,7 +5,7 @@
 			<!-- <FileUploaderComponent @file-selected="onFileSelected" />
 			<DetectionResultComponent :result="result" /> -->
 		</div>
-		<ButtonFireDetected />
+		<!-- <ButtonFireDetected /> -->
 		<!-- <Informer /> -->
 	</div>
 </template>
@@ -15,7 +15,7 @@ import Info from '@/components/CheckCorrect/Info.vue';
 // import FileUploaderComponent from '@/components/FileUploaderComponent/FileUploaderComponent.vue';
 // import DetectionResultComponent from '@/components/DetectionResultComponent/DetectionResultComponent.vue';
 // import Informer from '@/components/Informer/Informer.vue';
-import ButtonFireDetected from './components/FireDetection/ButtonFireDetected.vue';
+// import ButtonFireDetected from './components/FireDetection/ButtonFireDetected.vue';
 </script>
 
 <style lang="scss" scoped>
