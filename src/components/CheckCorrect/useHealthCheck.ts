@@ -8,14 +8,16 @@ export function useHealthCheck() {
 	const checkHealth = async () => {
 		try {
 			const response = await fetch(`${config.host}/health`);
-			if (response.status === 200) {
-				const data = await response.json();
-				if (data.status === 'active' || data.status === 'inactive') {
-					status.value = data.status;
-				} else {
-					status.value = 'inactive';
-				}
+			// if (response.status === 200) {
+			const data = await response.json();
+			console.log('DATA', data);
+
+			if (data.status === 'active' || data.status === 'inactive') {
+				status.value = data.status;
+			} else {
+				status.value = 'inactive';
 			}
+			// }
 		} catch (error) {
 			console.error('Ошибка подключения:', error);
 			status.value = 'inactive';
@@ -24,7 +26,7 @@ export function useHealthCheck() {
 
 	const startHealthCheck = () => {
 		checkHealth();
-		interval = setInterval(checkHealth, 1000);
+		interval = setInterval(checkHealth, 15000);
 	};
 
 	const stopHealthCheck = () => {

@@ -1,3 +1,3 @@
 export default {
-	host: 'http://localhost:4000',
+	host: 'http://81.94.156.176:5011',
 };
