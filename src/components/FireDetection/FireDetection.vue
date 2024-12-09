@@ -31,59 +31,57 @@ const updateImage = (base64: string) => {
 };
 
 const sendRequest = async () => {
-	if (!imageBase64.value) {
-		console.error('Изображение не выбрано');
-		return;
-	}
+  if (!imageBase64.value) {
+    console.error('Изображение не выбрано');
+    return;
+  }
 
-	const requestId = uuidv4();
+  const base64Image = imageBase64.value.replace(/^data:image\/[a-z]+;base64,/, '');
 
-	console.log('requestId', requestId);
-	console.log('imageBase64.value', imageBase64.value);
+  const requestId = uuidv4();
 
-	try {
-		const response = await fetch('/api/predict', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				thresholds: [
-					{
-						move_confidence: 0.2,
-						move_velocity: 0.3,
-						static_confidence: 0.7,
-						type: 'person',
-					},
-					{
-						move_confidence: 0.2,
-						move_velocity: 0.3,
-						static_confidence: 0.7,
-						type: 'vehicle',
-					},
-				],
-				sabotage_threshold: 22,
-				requestId: requestId,
-				image: imageBase64.value,
-			}),
-		});
+  console.log('requestId:', requestId);
+  console.log('base64Image:', base64Image);
 
-		if (!response.ok) {
-			throw new Error(`Ошибка: ${response.status} ${response.statusText}`);
-		}
+  try {
+    const response = await fetch('/api/predict', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        thresholds: [
+          {
+            move_confidence: 0.2,
+            move_velocity: 0.3,
+            static_confidence: 0.7,
+            type: 'person',
+          },
+        ],
+        sabotage_threshold: 22,
+        requestId: requestId,
+        image: base64Image,
+      }),
+    });
 
-		const data = await response.json();
-		console.log('Ответ от сервера:', data);
-		if (data.objects && data.objects.length > 0) {
-			result.value = { type: data.objects[0].type };
-		} else {
-			throw new Error('Некорректный формат ответа');
-		}
-	} catch (error) {
-		console.error('Ошибка при запросе:', error);
-		result.value = { type: 'no_fire' };
-	}
+    if (!response.ok) {
+      throw new Error(`Ошибка: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log('Ответ от сервера:', data);
+
+    if (data.objects && data.objects.length > 0) {
+      result.value = { type: data.objects[0].type };
+    } else {
+      result.value = { type: 'no_fire' };
+    }
+  } catch (error) {
+    console.error('Ошибка при запросе:', error);
+    result.value = { type: 'no_fire' };
+  }
 };
+
 </script>
 
 <style lang="scss" scoped>
