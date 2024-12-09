@@ -35,7 +35,6 @@ const filteredMessageTypes = computed(() => {
 
 onMounted(loadMessageTypes);
 </script>
-``
 
 <style lang="scss" scoped>
 @import '../utils/variables.scss';
