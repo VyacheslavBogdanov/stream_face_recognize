@@ -1,6 +1,6 @@
 <template>
 	<div class="middle-elements">
-		<FileUpload />
+		<FileUpload @fileSelected="updateImage" />
 		<FireSearchBtn @sendRequest="sendRequest" />
 	</div>
 	<div :class="['result', resultClass]">
@@ -11,10 +11,12 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { v4 as uuidv4 } from 'uuid';
 import FireSearchBtn from './FireSearchBtn/FireSearchBtn.vue';
 import FileUpload from './FileUpload/FileUpload.vue';
 
 const result = ref<{ type: string } | null>(null);
+const imageBase64 = ref<string | null>(null);
 
 const message = computed(() =>
 	result.value?.type === 'fire' ? 'Огонь обнаружен' : 'Огонь не обнаружен',
@@ -24,9 +26,23 @@ const resultClass = computed(() =>
 	result.value?.type === 'fire' ? 'result--fire' : 'result--no-fire',
 );
 
+const updateImage = (base64: string) => {
+	imageBase64.value = base64;
+};
+
 const sendRequest = async () => {
+	if (!imageBase64.value) {
+		console.error('Изображение не выбрано');
+		return;
+	}
+
+	const requestId = uuidv4();
+
+	console.log('requestId', requestId);
+	console.log('imageBase64.value', imageBase64.value);
+
 	try {
-		const response = await fetch('http://localhost:4000/predict', {
+		const response = await fetch('/api/predict', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -37,12 +53,18 @@ const sendRequest = async () => {
 						move_confidence: 0.2,
 						move_velocity: 0.3,
 						static_confidence: 0.7,
-						type: 'fire',
+						type: 'person',
+					},
+					{
+						move_confidence: 0.2,
+						move_velocity: 0.3,
+						static_confidence: 0.7,
+						type: 'vehicle',
 					},
 				],
 				sabotage_threshold: 22,
-				requestId: '',
-				image: '',
+				requestId: requestId,
+				image: imageBase64.value,
 			}),
 		});
 

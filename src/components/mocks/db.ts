@@ -1,19 +1,17 @@
-
 export interface MessageType {
 	class: string;
 	message: string;
+}
+interface MockAPIResponse {
+	error?: string;
+	status?: number;
+	data?: MessageType[];
 }
 
 const messageTypes: MessageType[] = [
 	{ class: 'inform--success', message: 'Модуль детектора огня работает корректно' },
 	{ class: 'inform--warning', message: 'Модуль детектора огня отключен' },
 ];
-
-interface MockAPIResponse {
-	error?: string;
-	status?: number;
-	data?: MessageType[];
-}
 
 const mockAPI = (endpoint: string): Promise<MockAPIResponse> => {
 	return new Promise((resolve, reject) => {
