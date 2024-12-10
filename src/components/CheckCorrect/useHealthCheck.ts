@@ -1,5 +1,4 @@
 import { ref, onMounted, onUnmounted } from 'vue';
-import config from './config';
 
 export function useHealthCheck() {
 	const status = ref<'active' | 'inactive'>('inactive');
@@ -7,17 +6,20 @@ export function useHealthCheck() {
 
 	const checkHealth = async () => {
 		try {
-			const response = await fetch(`${config.host}/health`);
-			// if (response.status === 200) {
-			const data = await response.json();
-			console.log('DATA', data);
+			const response = await fetch('/api/health');
 
-			if (data.status === 'active' || data.status === 'inactive') {
-				status.value = data.status;
+			if (response.ok) {
+				const data = await response.json();
+
+				if (data.result === 1) {
+					status.value = 'active';
+				} else {
+					status.value = 'inactive';
+				}
 			} else {
+				console.error('Ошибка ответа от сервера:', response.status);
 				status.value = 'inactive';
 			}
-			// }
 		} catch (error) {
 			console.error('Ошибка подключения:', error);
 			status.value = 'inactive';

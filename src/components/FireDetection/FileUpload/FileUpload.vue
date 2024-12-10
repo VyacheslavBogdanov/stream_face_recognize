@@ -10,12 +10,24 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+const emit = defineEmits<{
+	(event: 'fileSelected', base64: string): void;
+}>();
+
 const fileName = ref<string | null>(null);
 
 const onFileChange = (event: Event) => {
 	const input = event.target as HTMLInputElement;
 	if (input.files && input.files[0]) {
 		fileName.value = input.files[0].name;
+
+		const reader = new FileReader();
+		reader.onload = () => {
+			if (reader.result) {
+				emit('fileSelected', reader.result.toString());
+			}
+		};
+		reader.readAsDataURL(input.files[0]);
 	} else {
 		fileName.value = null;
 	}

@@ -1,6 +1,6 @@
 <template>
 	<div class="middle-elements">
-		<FileUpload />
+		<FileUpload @fileSelected="updateImage" />
 		<FireSearchBtn @sendRequest="sendRequest" />
 	</div>
 	<div :class="['result', resultClass]">
@@ -11,10 +11,12 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { v4 as uuidv4 } from 'uuid';
 import FireSearchBtn from './FireSearchBtn/FireSearchBtn.vue';
 import FileUpload from './FileUpload/FileUpload.vue';
 
 const result = ref<{ type: string } | null>(null);
+const imageBase64 = ref<string | null>(null);
 
 const message = computed(() =>
 	result.value?.type === 'fire' ? 'Огонь обнаружен' : 'Огонь не обнаружен',
@@ -24,26 +26,91 @@ const resultClass = computed(() =>
 	result.value?.type === 'fire' ? 'result--fire' : 'result--no-fire',
 );
 
+const updateImage = (base64: string) => {
+	imageBase64.value = base64;
+};
+
+// const sendRequest = async () => {
+// 	if (!imageBase64.value) {
+// 		console.error('Изображение не выбрано');
+// 		return;
+// 	}
+
+// 	const requestId = uuidv4();
+
+// 	console.log('requestId', requestId);
+// 	console.log('imageBase64.value', imageBase64.value);
+
+// 	try {
+// 		const response = await fetch('/api/predict', {
+// 			method: 'POST',
+// 			headers: {
+// 				'Content-Type': 'application/json',
+// 			},
+// 			body: JSON.stringify({
+// 				thresholds: [
+// 					{
+// 						move_confidence: 0.2,
+// 						move_velocity: 0.3,
+// 						static_confidence: 0.7,
+// 						type: 'fire',
+// 					},
+// 				],
+// 				sabotage_threshold: 22,
+// 				requestId: requestId,
+// 				image: imageBase64.value,
+// 			}),
+// 		});
+
+// 		if (!response.ok) {
+// 			throw new Error(`Ошибка: ${response.status} ${response.statusText}`);
+// 		}
+
+// 		const data = await response.json();
+// 		console.log('Ответ от сервера:', data);
+// 		if (data.objects && data.objects.length > 0) {
+// 			result.value = { type: data.objects[0].type };
+// 		} else {
+// 			throw new Error('Некорректный формат ответа');
+// 		}
+// 	} catch (error) {
+// 		console.error('Ошибка при запросе:', error);
+// 		result.value = { type: 'no_fire' };
+// 	}
+// };
+
 const sendRequest = async () => {
 	try {
-		const response = await fetch('http://localhost:4000/predict', {
+		if (!imageBase64.value) {
+			throw new Error('Изображение не выбрано или не закодировано.');
+		}
+
+		const requestData = {
+			thresholds: [
+				{
+					move_confidence: 0.2,
+					move_velocity: 0.3,
+					static_confidence: 0.7,
+					type: 'person',
+				},
+				{
+					move_confidence: 0.2,
+					move_velocity: 0.3,
+					static_confidence: 0.7,
+					type: 'vehicle',
+				},
+			],
+			sabotage_threshold: 22,
+			requestId: uuidv4(), // Генерация уникального ID
+			image: imageBase64, // Код изображения Base64
+		};
+
+		const response = await fetch('/api/predict', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({
-				thresholds: [
-					{
-						move_confidence: 0.2,
-						move_velocity: 0.3,
-						static_confidence: 0.7,
-						type: 'fire',
-					},
-				],
-				sabotage_threshold: 22,
-				requestId: '',
-				image: '',
-			}),
+			body: JSON.stringify(requestData),
 		});
 
 		if (!response.ok) {
@@ -52,14 +119,8 @@ const sendRequest = async () => {
 
 		const data = await response.json();
 		console.log('Ответ от сервера:', data);
-		if (data.objects && data.objects.length > 0) {
-			result.value = { type: data.objects[0].type };
-		} else {
-			throw new Error('Некорректный формат ответа');
-		}
 	} catch (error) {
 		console.error('Ошибка при запросе:', error);
-		result.value = { type: 'no_fire' };
 	}
 };
 </script>

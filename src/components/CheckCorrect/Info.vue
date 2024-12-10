@@ -15,7 +15,10 @@
 import { ref, computed, onMounted } from 'vue';
 import { useHealthCheck } from './useHealthCheck';
 import { fetchData } from '../mocks/db';
+
 const messageTypes = ref<{ class: string; message: string }[]>([]);
+const { status } = useHealthCheck();
+
 const loadMessageTypes = async () => {
 	try {
 		messageTypes.value = await fetchData('/message-types');
@@ -23,8 +26,6 @@ const loadMessageTypes = async () => {
 		console.error('Ошибка загрузки сообщений из моков:', error);
 	}
 };
-
-const { status } = useHealthCheck();
 
 const filteredMessageTypes = computed(() => {
 	if (status.value === 'active') {
@@ -35,7 +36,6 @@ const filteredMessageTypes = computed(() => {
 
 onMounted(loadMessageTypes);
 </script>
-``
 
 <style lang="scss" scoped>
 @import '../utils/variables.scss';
