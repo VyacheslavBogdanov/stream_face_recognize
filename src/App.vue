@@ -1,13 +1,13 @@
 <template>
-	<h1 class="title">FIRE-DETECTOR</h1>
+	<h1 class="title">Детектор огня</h1>
 	<div id="app">
-		<Info />
+		<CheckHealth />
 		<FireDetection />
 	</div>
 </template>
 
 <script setup lang="ts">
-import Info from '@/components/CheckCorrect/Info.vue';
+import CheckHealth from '@/components/CheckHealth/CheckHealth.vue';
 import FireDetection from '@/components/FireDetection/FireDetection.vue';
 </script>
 

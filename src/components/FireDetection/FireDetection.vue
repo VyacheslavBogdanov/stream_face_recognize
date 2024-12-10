@@ -1,7 +1,7 @@
 <template>
 	<div class="middle-elements">
 		<FileUpload @fileSelected="updateImage" />
-		<FireSearchBtn @sendRequest="sendRequest" />
+		<FireDetectionBtn @sendRequest="sendRequest" />
 	</div>
 	<div :class="['result', resultClass]">
 		<div class="result__icon">ⓘ</div>
@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import FireSearchBtn from './FireSearchBtn/FireSearchBtn.vue';
+import FireDetectionBtn from './FireDetectionBtn/FireDetectionBtn.vue';
 import FileUpload from './FileUpload/FileUpload.vue';
 
 const result = ref<{ type: string } | null>(null);
