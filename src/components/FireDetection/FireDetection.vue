@@ -30,6 +30,7 @@ const updateImage = (base64: string) => {
 	imageBase64.value = base64;
 };
 
+
 const sendRequest = async () => {
   if (!imageBase64.value) {
     console.error('Изображение не выбрано');
@@ -80,6 +81,7 @@ const sendRequest = async () => {
     console.error('Ошибка при запросе:', error);
     result.value = { type: 'no_fire' };
   }
+
 };
 
 </script>
