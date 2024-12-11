@@ -112,6 +112,11 @@ const sendRequest = async () => {
 	flex-direction: row;
 	align-items: center;
 	margin: 40px 0 40px 0;
+
+	@media (max-width: 1250px) {
+		flex-direction: column;
+		height: 110px;
+	}
 }
 .result {
 	position: relative;
@@ -125,6 +130,10 @@ const sendRequest = async () => {
 	height: 40px;
 	opacity: 0.85;
 	margin: 20px 0;
+
+	@media (max-width: 835px) {
+		font-size: 17px;
+	}
 
 	&__icon {
 		display: flex;
