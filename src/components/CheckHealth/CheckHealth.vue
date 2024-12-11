@@ -14,9 +14,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useHealthCheck } from './useHealthCheck';
+import type { MessageType } from '../utils/types';
 
 const props = defineProps<{
-	messageTypes: { class: string; message: string }[];
+	messageTypes: MessageType[];
 }>();
 
 const { status } = useHealthCheck();
@@ -30,7 +31,7 @@ const filteredMessageTypes = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '../utils/variables.scss';
+@import '../../styles/main.scss';
 
 .health {
 	position: relative;

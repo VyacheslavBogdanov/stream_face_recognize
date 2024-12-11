@@ -11,8 +11,9 @@ import CheckHealth from '@/components/CheckHealth/CheckHealth.vue';
 import FireDetection from '@/components/FireDetection/FireDetection.vue';
 import { ref, onMounted } from 'vue';
 import { fetchData } from './components/mocks/db';
+import type { MessgeType } from './components/utils/types.ts';
 
-const messageTypes = ref<{ class: string; message: string }[]>([]);
+const messageTypes = ref<MessgeType[]>([]);
 
 const loadMessageTypes = async () => {
 	try {

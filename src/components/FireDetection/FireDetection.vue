@@ -14,9 +14,10 @@ import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import FileUpload from './FileUpload/FileUpload.vue';
 import FireDetectionBtn from './FireDetectionBtn/FireDetectionBtn.vue';
+import type { MessageType } from '../utils/types';
 
 const props = defineProps<{
-	messageTypes: { class: string; message: string }[];
+	messageTypes: MessageType[];
 }>();
 
 const result = ref<{ type: string } | null>(null);
