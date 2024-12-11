@@ -3,44 +3,36 @@
 		<div
 			v-for="(type, index) in filteredMessageTypes"
 			:key="index"
-			:class="['inform', type.class]"
+			:class="['health', type.class]"
 		>
-			<div class="inform__icon">ⓘ</div>
+			<div class="health__icon">ⓘ</div>
 			<span>{{ type.message }}</span>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { computed } from 'vue';
 import { useHealthCheck } from './useHealthCheck';
-import { fetchData } from '../mocks/db';
 
-const messageTypes = ref<{ class: string; message: string }[]>([]);
+const props = defineProps<{
+	messageTypes: { class: string; message: string }[];
+}>();
+
 const { status } = useHealthCheck();
-
-const loadMessageTypes = async () => {
-	try {
-		messageTypes.value = await fetchData('/message-types');
-	} catch (error) {
-		console.error('Ошибка загрузки сообщений из моков:', error);
-	}
-};
 
 const filteredMessageTypes = computed(() => {
 	if (status.value === 'active') {
-		return messageTypes.value.filter((type) => type.class === 'inform--success');
+		return props.messageTypes.filter((type) => type.class === 'health--success');
 	}
-	return messageTypes.value.filter((type) => type.class === 'inform--warning');
+	return props.messageTypes.filter((type) => type.class === 'health--warning');
 });
-
-onMounted(loadMessageTypes);
 </script>
 
 <style lang="scss" scoped>
 @import '../utils/variables.scss';
 
-.inform {
+.health {
 	position: relative;
 	display: flex;
 	align-items: center;

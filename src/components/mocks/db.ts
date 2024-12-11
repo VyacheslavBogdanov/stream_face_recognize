@@ -9,8 +9,10 @@ interface MockAPIResponse {
 }
 
 const messageTypes: MessageType[] = [
-	{ class: 'inform--success', message: 'Модуль детектора огня работает корректно' },
-	{ class: 'inform--warning', message: 'Модуль детектора огня отключен' },
+	{ class: 'health--success', message: 'Модуль детектора огня работает корректно' },
+	{ class: 'health--warning', message: 'Модуль детектора огня отключен' },
+	{ class: 'result--fire', message: 'Огонь обнаружен' },
+	{ class: 'result--no-fire', message: 'Огонь не обнаружен' },
 ];
 
 const mockAPI = (endpoint: string): Promise<MockAPIResponse> => {

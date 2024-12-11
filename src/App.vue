@@ -1,14 +1,28 @@
 <template>
 	<h1 class="title">Детектор огня</h1>
 	<div id="app">
-		<CheckHealth />
-		<FireDetection />
+		<CheckHealth :messageTypes="messageTypes" />
+		<FireDetection :messageTypes="messageTypes" />
 	</div>
 </template>
 
 <script setup lang="ts">
 import CheckHealth from '@/components/CheckHealth/CheckHealth.vue';
 import FireDetection from '@/components/FireDetection/FireDetection.vue';
+import { ref, onMounted } from 'vue';
+import { fetchData } from './components/mocks/db';
+
+const messageTypes = ref<{ class: string; message: string }[]>([]);
+
+const loadMessageTypes = async () => {
+	try {
+		messageTypes.value = await fetchData('/message-types');
+	} catch (error) {
+		console.error('Ошибка загрузки:', error);
+	}
+};
+
+onMounted(loadMessageTypes);
 </script>
 
 <style lang="scss" scoped>

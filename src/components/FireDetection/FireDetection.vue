@@ -15,16 +15,32 @@ import { v4 as uuidv4 } from 'uuid';
 import FireDetectionBtn from './FireDetectionBtn/FireDetectionBtn.vue';
 import FileUpload from './FileUpload/FileUpload.vue';
 
+const props = defineProps<{
+	messageTypes: { class: string; message: string }[];
+}>();
+
 const result = ref<{ type: string } | null>(null);
 const imageBase64 = ref<string | null>(null);
 
-const message = computed(() =>
-	result.value?.type === 'fire' ? 'Огонь обнаружен' : 'Огонь не обнаружен',
-);
+const message = computed(() => {
+	if (result.value?.type === 'fire') {
+		const newArr = props.messageTypes.filter((type) => type.class === 'result--fire');
+		return newArr.length > 0 ? newArr[0].message : 'Статус не определен';
+	} else {
+		const newArr = props.messageTypes.filter((type) => type.class === 'result--no-fire');
+		return newArr.length > 0 ? newArr[0].message : 'Статус не определен';
+	}
+});
 
-const resultClass = computed(() =>
-	result.value?.type === 'fire' ? 'result--fire' : 'result--no-fire',
-);
+const resultClass = computed(() => {
+	if (result.value?.type === 'fire') {
+		const newArr = props.messageTypes.filter((type) => type.class === 'result--fire');
+		return newArr.length > 0 ? newArr[0].class : 'result--info';
+	} else {
+		const newArr = props.messageTypes.filter((type) => type.class === 'result--no-fire');
+		return newArr.length > 0 ? newArr[0].class : 'result--info';
+	}
+});
 
 const updateImage = (base64: string) => {
 	imageBase64.value = base64;
@@ -39,9 +55,6 @@ const sendRequest = async () => {
 	const base64Image = imageBase64.value.replace(/^data:image\/[a-z]+;base64,/, '');
 
 	const requestId = uuidv4();
-
-	console.log('requestId:', requestId);
-	console.log('base64Image:', base64Image);
 
 	try {
 		const response = await fetch('/api/predict', {
@@ -128,6 +141,11 @@ const sendRequest = async () => {
 	&--no-fire {
 		background-color: #f2dee0;
 		color: #db1428;
+	}
+
+	&--info {
+		background-color: #e3e3ff;
+		color: #1052ec;
 	}
 }
 </style>
