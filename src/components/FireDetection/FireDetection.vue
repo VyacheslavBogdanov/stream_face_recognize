@@ -12,8 +12,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import FireDetectionBtn from './FireDetectionBtn/FireDetectionBtn.vue';
 import FileUpload from './FileUpload/FileUpload.vue';
+import FireDetectionBtn from './FireDetectionBtn/FireDetectionBtn.vue';
 
 const props = defineProps<{
 	messageTypes: { class: string; message: string }[];
