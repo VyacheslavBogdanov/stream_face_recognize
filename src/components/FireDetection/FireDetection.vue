@@ -136,17 +136,17 @@ const sendRequest = async () => {
 
 	&--fire {
 		background-color: #e0fde7;
-		color: #2a9b44;
+		color: $color-success;
 	}
 
 	&--no-fire {
 		background-color: #f2dee0;
-		color: #db1428;
+		color: $color-error;
 	}
 
 	&--info {
 		background-color: #e3e3ff;
-		color: #1052ec;
+		color: $color-primary;
 	}
 }
 </style>

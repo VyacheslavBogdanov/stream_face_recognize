@@ -56,12 +56,12 @@ const filteredMessageTypes = computed(() => {
 
 	&--success {
 		background-color: #e0fde7;
-		color: #2a9b44;
+		color: $color-success;
 	}
 
 	&--warning {
 		background-color: #f9ebd8;
-		color: #d77417;
+		color: $color-warning;
 	}
 }
 </style>

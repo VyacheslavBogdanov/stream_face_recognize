@@ -44,9 +44,9 @@ const onFileChange = (event: Event) => {
 	justify-content: center;
 	align-items: center;
 	padding: 10px;
-	border: 1.5px dashed #ccc;
-	border-radius: 5px;
-	background-color: #fdfdfd;
+	border: $border-width dashed #ccc;
+	border-radius: $border-radius;
+	background-color: $color-bg;
 	text-align: center;
 	transition:
 		border-color 0.3s ease,
@@ -56,11 +56,11 @@ const onFileChange = (event: Event) => {
 	margin: 20px 10px 20px 0;
 
 	&:hover {
-		border-color: $all-border-color;
+		border-color: $border-color;
 	}
 
 	&--active {
-		border-color: $all-border-color;
+		border-color: $border-color;
 	}
 
 	&__input {

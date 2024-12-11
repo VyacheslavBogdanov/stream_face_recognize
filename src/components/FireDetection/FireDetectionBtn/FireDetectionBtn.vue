@@ -17,9 +17,9 @@ const emit = defineEmits<{
 	height: 50px;
 	padding: 0 30px;
 	color: #513d3d;
-	border: $all-border-width solid #513d3d;
-	background-color: #fdfdfd;
-	border-radius: $all-border-radius;
+	border: $border-color solid #513d3d;
+	background-color: $color-bg;
+	border-radius: $border-radius;
 	user-select: none;
 	white-space: nowrap;
 	transition: all 0.05s linear;
@@ -30,7 +30,7 @@ const emit = defineEmits<{
 	&:after {
 		content: '';
 		position: absolute;
-		background-color: #fdfdfd;
+		background-color: $color-bg;
 		transition: all 0.2s linear;
 	}
 
@@ -50,8 +50,8 @@ const emit = defineEmits<{
 
 	&:hover {
 		cursor: pointer;
-		border-color: $all-border-color;
-		color: $all-border-color;
+		border-color: $border-color;
+		color: $border-color;
 
 		&:before {
 			height: calc(100% - 32px);
