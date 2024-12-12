@@ -12,11 +12,12 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import FireDetectionBtn from './FireDetectionBtn/FireDetectionBtn.vue';
 import FileUpload from './FileUpload/FileUpload.vue';
+import FireDetectionBtn from './FireDetectionBtn/FireDetectionBtn.vue';
+import type { MessageType } from '../utils/types';
 
 const props = defineProps<{
-	messageTypes: { class: string; message: string }[];
+	messageTypes: MessageType[];
 }>();
 
 const result = ref<{ type: string } | null>(null);
@@ -135,17 +136,17 @@ const sendRequest = async () => {
 
 	&--fire {
 		background-color: #e0fde7;
-		color: #2a9b44;
+		color: $color-success;
 	}
 
 	&--no-fire {
 		background-color: #f2dee0;
-		color: #db1428;
+		color: $color-error;
 	}
 
 	&--info {
 		background-color: #e3e3ff;
-		color: #1052ec;
+		color: $color-primary;
 	}
 }
 </style>

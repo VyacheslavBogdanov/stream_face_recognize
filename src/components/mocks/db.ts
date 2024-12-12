@@ -1,12 +1,4 @@
-export interface MessageType {
-	class: string;
-	message: string;
-}
-interface MockAPIResponse {
-	error?: string;
-	status?: number;
-	data?: MessageType[];
-}
+import type { MessageType, MockAPIResponse } from '../utils/types';
 
 const messageTypes: MessageType[] = [
 	{ class: 'health--success', message: 'Модуль детектора огня работает корректно' },
