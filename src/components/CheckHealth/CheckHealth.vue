@@ -46,6 +46,10 @@ const filteredMessageTypes = computed(() => {
 	opacity: 0.85;
 	margin: 20px 0;
 
+	@media (max-width: 835px) {
+		font-size: 17px;
+	}
+
 	&__icon {
 		display: flex;
 		position: absolute;
