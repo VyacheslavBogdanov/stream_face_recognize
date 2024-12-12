@@ -17,7 +17,7 @@ const emit = defineEmits<{
 	height: 50px;
 	padding: 0 30px;
 	color: #513d3d;
-	border: $border-color solid #513d3d;
+	border: $border-width solid #513d3d;
 	background-color: $color-bg;
 	border-radius: $border-radius;
 	user-select: none;
