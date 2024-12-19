@@ -26,10 +26,10 @@ const imageBase64 = ref<string | null>(null);
 const message = computed(() => {
 	if (result.value?.type === 'fire') {
 		const newArr = props.messageTypes.filter((type) => type.class === 'result--fire');
-		return newArr.length > 0 ? newArr[0].message : 'Статус не определен';
+		return newArr.length > 0 ? newArr[0].message : 'Статус огня не определен';
 	} else {
 		const newArr = props.messageTypes.filter((type) => type.class === 'result--no-fire');
-		return newArr.length > 0 ? newArr[0].message : 'Статус не определен';
+		return newArr.length > 0 ? newArr[0].message : 'Статус огня не определен';
 	}
 });
 

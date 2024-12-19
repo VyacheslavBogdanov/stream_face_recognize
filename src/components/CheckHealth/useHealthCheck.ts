@@ -6,10 +6,11 @@ export function useHealthCheck() {
 
 	const checkHealth = async () => {
 		try {
-			const response = await fetch('/api/health');
+			const response = await fetch('http://81.94.156.176:5011/health');
 
 			if (response.ok) {
 				const data = await response.json();
+				console.log(data);
 
 				if (data.result === 1) {
 					status.value = 'active';
