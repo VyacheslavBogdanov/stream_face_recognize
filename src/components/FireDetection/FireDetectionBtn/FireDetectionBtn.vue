@@ -1,13 +1,24 @@
 <template>
-	<button class="fire-search" @click="emit('sendRequest')">
+	<button
+		:class="['fire-search', { 'fire-search--disabled': isDisabled }]"
+		@click="emit('sendRequest')"
+		:disabled="isDisabled"
+	>
 		<span class="fire-search__name">Обнаружить огонь</span>
 	</button>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useHealthCheck } from '@/components/CheckHealth/useHealthCheck';
+
 const emit = defineEmits<{
 	(event: 'sendRequest'): void;
 }>();
+
+const { status } = useHealthCheck();
+
+const isDisabled = computed(() => status.value === 'inactive');
 </script>
 
 <style lang="scss" scoped>
@@ -25,6 +36,19 @@ const emit = defineEmits<{
 	transition: all 0.05s linear;
 	font-family: inherit;
 	margin: 20px 0 20px 10px;
+
+	&--disabled {
+		border-color: #aaa;
+		border-style: solid;
+		cursor: not-allowed;
+		color: #bbb;
+		background-color: #f5f5f5;
+
+		&:before,
+		&:after {
+			display: none;
+		}
+	}
 
 	&:before,
 	&:after {
