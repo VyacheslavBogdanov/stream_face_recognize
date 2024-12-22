@@ -1,9 +1,12 @@
 <template>
 	<div class="middle-elements">
-		<FileUpload @fileSelected="updateImage" />
-		<FireDetectionBtn @sendRequest="sendRequest" />
+		<FileUpload @fileSelected="updateImage" @fileUrl="updateImageSrc" />
+		<FireDetectionBtn v-if="imageSrc" @sendRequest="sendRequest" />
 	</div>
-	<div :class="['result', resultClass]">
+	<div v-if="imageSrc" class="preview">
+		<img class="preview__img" :src="imageSrc" alt="Загруженное изображение" />
+	</div>
+	<div v-if="result?.type" :class="['result', resultClass]">
 		<div class="result__icon">ⓘ</div>
 		<span>{{ message }}</span>
 	</div>
@@ -20,6 +23,7 @@ const props = defineProps<{
 	messageTypes: MessageType[];
 }>();
 
+const imageSrc = ref<string | null>(null);
 const result = ref<{ type: string } | null>(null);
 const imageBase64 = ref<string | null>(null);
 
@@ -45,6 +49,10 @@ const resultClass = computed(() => {
 
 const updateImage = (base64: string) => {
 	imageBase64.value = base64;
+};
+
+const updateImageSrc = (url: string) => {
+	imageSrc.value = url;
 };
 
 const sendRequest = async () => {
@@ -118,6 +126,24 @@ const sendRequest = async () => {
 		height: 110px;
 	}
 }
+
+.preview {
+	width: auto;
+	height: 400px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+	border: 1px solid #ddd;
+	border-radius: $border-radius;
+
+	&__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}
+
 .result {
 	position: relative;
 	display: flex;

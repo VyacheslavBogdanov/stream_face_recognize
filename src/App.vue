@@ -35,8 +35,8 @@ onMounted(loadMessageTypes);
 }
 
 #app {
-	width: 40%;
-	height: 500px;
+	width: 50%;
+	height: 750px;
 	display: flex;
 	align-items: center;
 	flex-direction: column;
