@@ -9,8 +9,8 @@ export function useHealthCheck() {
 			const response = await fetch('http://81.94.156.176:5011/health');
 
 			if (response.ok) {
-				const data = await response.json();
-				// const data = { result: 0 };
+				// const data = await response.json();
+				const data = { result: 0 };
 				console.log(data);
 
 				if (data.result === 1) {
