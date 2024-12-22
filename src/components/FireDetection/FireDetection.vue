@@ -1,7 +1,7 @@
 <template>
 	<div class="middle-elements">
-		<FileUpload @fileSelected="updateImage" @fileUrl="updateImageSrc" />
-		<FireDetectionBtn v-if="imageSrc" @sendRequest="sendRequest" />
+		<FileUpload @fileSelected="updateImage" @fileUrl="updateImageSrc" :status="props.status" />
+		<FireDetectionBtn v-if="imageSrc" @sendRequest="sendRequest" :status="props.status" />
 	</div>
 	<div v-if="imageSrc" class="preview">
 		<img class="preview__img" :src="imageSrc" alt="Загруженное изображение" />
@@ -21,6 +21,7 @@ import type { MessageType } from '../utils/types';
 
 const props = defineProps<{
 	messageTypes: MessageType[];
+	status: string;
 }>();
 
 const imageSrc = ref<string | null>(null);

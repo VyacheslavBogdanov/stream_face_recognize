@@ -19,21 +19,21 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useHealthCheck } from '@/components/CheckHealth/useHealthCheck';
+
+const props = defineProps<{
+	status: string;
+}>();
 
 const emit = defineEmits<{
 	(event: 'fileSelected', base64: string): void;
 	(event: 'fileUrl', url: string): void;
 }>();
 
-const { status } = useHealthCheck();
-
-const isDisabled = computed(() => status.value === 'inactive');
+const isDisabled = computed(() => props.status === 'inactive');
 
 const fileName = ref<string | null>(null);
 
 const onFileChange = (event: Event) => {
-	console.log('input', event);
 	const input = event.target as HTMLInputElement;
 	if (input.files && input.files[0]) {
 		fileName.value = input.files[0].name;

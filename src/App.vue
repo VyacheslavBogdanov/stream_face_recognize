@@ -1,8 +1,8 @@
 <template>
 	<h1 class="title">Детектор огня</h1>
 	<div id="app">
-		<CheckHealth :messageTypes="messageTypes" />
-		<FireDetection :messageTypes="messageTypes" />
+		<CheckHealth :messageTypes="messageTypes" :status="status" />
+		<FireDetection :messageTypes="messageTypes" :status="status" />
 	</div>
 </template>
 
@@ -11,8 +11,10 @@ import CheckHealth from '@/components/CheckHealth/CheckHealth.vue';
 import FireDetection from '@/components/FireDetection/FireDetection.vue';
 import { ref, onMounted } from 'vue';
 import { fetchData } from './components/mocks/db';
+import { useHealthCheck } from './components/utils/useHealthCheck';
 import type { MessageType } from './components/utils/types.ts';
 
+const { status } = useHealthCheck();
 const messageTypes = ref<MessageType[]>([]);
 
 const loadMessageTypes = async () => {

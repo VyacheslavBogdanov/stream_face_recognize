@@ -10,15 +10,16 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useHealthCheck } from '@/components/CheckHealth/useHealthCheck';
+
+const props = defineProps<{
+	status: string;
+}>();
 
 const emit = defineEmits<{
 	(event: 'sendRequest'): void;
 }>();
 
-const { status } = useHealthCheck();
-
-const isDisabled = computed(() => status.value === 'inactive');
+const isDisabled = computed(() => props.status === 'inactive');
 </script>
 
 <style lang="scss" scoped>
