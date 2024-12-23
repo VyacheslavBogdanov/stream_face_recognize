@@ -1,5 +1,5 @@
 <template>
-	<button v-if="fireRect" class="clear" @click="emit('sendRequest')">
+	<button v-if="fireRect" class="clear" @click="emit('clearPreview')">
 		<span class="clear__name">Очистить изображение</span>
 	</button>
 	<button v-else class="fire-detect" @click="emit('sendRequest')">
@@ -17,6 +17,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
 	(event: 'sendRequest'): void;
+	(event: 'clearPreview'): void;
 }>();
 
 const isDisabled = computed(() => props.status === 'inactive');
@@ -38,42 +39,10 @@ const isDisabled = computed(() => props.status === 'inactive');
 	font-family: inherit;
 	margin: 20px 0 20px 10px;
 
-	// &:before,
-	// &:after {
-	// 	content: '';
-	// 	position: absolute;
-	// 	background-color: $color-bg;
-	// 	transition: all 0.2s linear;
-	// }
-
-	// &:before {
-	// 	width: calc(100% + 6px);
-	// 	height: calc(100% - 16px);
-	// 	top: 8px;
-	// 	left: -3px;
-	// }
-
-	// &:after {
-	// 	width: calc(100% - 16px);
-	// 	height: calc(100% + 6px);
-	// 	top: -3px;
-	// 	left: 8px;
-	// }
-
 	&:hover {
 		cursor: pointer;
 		border-color: $border-color;
 		color: $border-color;
-
-		// &:before {
-		// 	height: calc(100% - 32px);
-		// 	top: 16px;
-		// }
-
-		// &:after {
-		// 	width: calc(100% - 32px);
-		// 	left: 16px;
-		// }
 	}
 
 	&:active {

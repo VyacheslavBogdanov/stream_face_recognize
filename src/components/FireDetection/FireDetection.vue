@@ -4,6 +4,7 @@
 		<FireDetectionBtn
 			v-if="imageSrc"
 			@sendRequest="sendRequest"
+			@clearPreview="clearPreview"
 			:status="props.status"
 			:fireRect="fireRect"
 		/>
@@ -84,6 +85,11 @@ const updateImage = (base64: string) => {
 
 const updateImageSrc = (url: string) => {
 	imageSrc.value = url;
+};
+
+const clearPreview = () => {
+	fireRect.value = null;
+	confidence.value = null;
 };
 
 const sendRequest = async () => {
