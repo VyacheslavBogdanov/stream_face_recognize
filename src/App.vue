@@ -1,8 +1,9 @@
 <template>
-	<h1 class="title">Детектор огня</h1>
 	<div id="app">
-		<CheckHealth :messageTypes="messageTypes" :status="status" />
-		<FireDetection :messageTypes="messageTypes" :status="status" />
+		<div class="app">
+			<CheckHealth :messageTypes="messageTypes" :status="status" />
+			<FireDetection :messageTypes="messageTypes" :status="status" />
+		</div>
 	</div>
 </template>
 
@@ -31,22 +32,25 @@ onMounted(loadMessageTypes);
 <style lang="scss" scoped>
 @import './styles/main.scss';
 
-.title {
-	margin: 1%;
-	color: rgba(100, 95, 95, 0.711);
-}
-
 #app {
-	width: 50%;
-	height: 750px;
+	width: auto;
+	height: 800px;
 	display: flex;
-	align-items: center;
 	flex-direction: column;
-	font-family: sans-serif;
-	background-color: $color-bg;
-	margin: 1%;
-	padding: 20px;
-	border: $border-width solid $border-color;
-	border-radius: $border-radius;
+	align-items: center;
+
+	.app {
+		width: 50%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+		font-family: sans-serif;
+		background-color: $color-bg;
+		margin: 1%;
+		padding: 20px;
+		border: $border-width solid $border-color;
+		border-radius: $border-radius;
+	}
 }
 </style>
