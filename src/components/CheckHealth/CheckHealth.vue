@@ -13,17 +13,15 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useHealthCheck } from './useHealthCheck';
 import type { MessageType } from '../utils/types';
 
 const props = defineProps<{
 	messageTypes: MessageType[];
+	status: string;
 }>();
 
-const { status } = useHealthCheck();
-
 const filteredMessageTypes = computed(() => {
-	if (status.value === 'active') {
+	if (props.status === 'active') {
 		return props.messageTypes.filter((type) => type.class === 'health--success');
 	}
 	return props.messageTypes.filter((type) => type.class === 'health--warning');
