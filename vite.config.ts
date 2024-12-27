@@ -9,13 +9,13 @@ export default defineConfig({
 			'@': '/src',
 		},
 	},
-	server: {
-		proxy: {
-			'/api': {
-				target: 'http://81.94.156.176:5011',
-				changeOrigin: true,
-				rewrite: (path) => path.replace(/^\/api/, ''),
-			},
-		},
-	},
+	// server: {
+	// 	proxy: {
+	// 		'/api': {
+	// 			target: 'http://81.94.156.176:5011',
+	// 			changeOrigin: true,
+	// 			rewrite: (path) => path.replace(/^\/api/, ''),
+	// 		},
+	// 	},
+	// },
 });
