@@ -101,9 +101,10 @@ const sendRequest = async () => {
 	const base64Image = imageBase64.value.replace(/^data:image\/[a-z]+;base64,/, '');
 
 	const requestId = uuidv4();
+	const Url = import.meta.env.VITE_SERVER_URL;
 
 	try {
-		const response = await fetch('/api/predict', {
+		const response = await fetch(`${Url}/predict`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
