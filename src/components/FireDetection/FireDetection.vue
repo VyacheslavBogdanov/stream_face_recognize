@@ -1,16 +1,47 @@
 <template>
 	<div class="middle-elements">
-		<FileUpload @fileSelected="updateImage" />
-		<FireDetectionBtn @sendRequest="sendRequest" />
+		<FileUpload @fileSelected="updateImage" @fileUrl="updateImageSrc" :status="props.status" />
+		<FireDetectionBtn
+			v-if="imageSrc"
+			@sendRequest="sendRequest"
+			@clearPreview="clearPreview"
+			:status="props.status"
+			:fireRect="fireRect"
+		/>
 	</div>
-	<div :class="['result', resultClass]">
+	<div v-if="imageSrc" class="preview">
+		<img ref="imageElement" class="preview__img" :src="imageSrc" alt="Изображение" />
+
+		<div
+			v-if="fireRect"
+			class="preview__rect"
+			:style="{
+				top: fireRect.top + 'px',
+				left: fireRect.left + 'px',
+				width: fireRect.width + 'px',
+				height: fireRect.height + 'px',
+			}"
+		>
+			<div
+				v-if="confidence !== null"
+				class="preview__confidence"
+				:style="{
+					top: '-3px',
+					left: '0',
+				}"
+			>
+				{{ confidence }}%
+			</div>
+		</div>
+	</div>
+	<div v-if="result?.type" :class="['result', resultClass]">
 		<div class="result__icon">ⓘ</div>
 		<span>{{ message }}</span>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import FileUpload from './FileUpload/FileUpload.vue';
 import FireDetectionBtn from './FireDetectionBtn/FireDetectionBtn.vue';
@@ -18,18 +49,23 @@ import type { MessageType } from '../utils/types';
 
 const props = defineProps<{
 	messageTypes: MessageType[];
+	status: string;
 }>();
 
+const imageSrc = ref<string | null>(null);
 const result = ref<{ type: string } | null>(null);
+const fireRect = ref<{ top: number; left: number; width: number; height: number } | null>(null);
+const confidence = ref<number | null>(null);
 const imageBase64 = ref<string | null>(null);
+const imageElement = ref<HTMLImageElement | null>(null);
 
 const message = computed(() => {
 	if (result.value?.type === 'fire') {
 		const newArr = props.messageTypes.filter((type) => type.class === 'result--fire');
-		return newArr.length > 0 ? newArr[0].message : 'Статус не определен';
+		return newArr.length > 0 ? newArr[0].message : 'Статус огня не определен';
 	} else {
 		const newArr = props.messageTypes.filter((type) => type.class === 'result--no-fire');
-		return newArr.length > 0 ? newArr[0].message : 'Статус не определен';
+		return newArr.length > 0 ? newArr[0].message : 'Статус огня не определен';
 	}
 });
 
@@ -45,6 +81,15 @@ const resultClass = computed(() => {
 
 const updateImage = (base64: string) => {
 	imageBase64.value = base64;
+};
+
+const updateImageSrc = (url: string) => {
+	imageSrc.value = url;
+};
+
+const clearPreview = () => {
+	fireRect.value = null;
+	confidence.value = null;
 };
 
 const sendRequest = async () => {
@@ -92,15 +137,42 @@ const sendRequest = async () => {
 		console.log('Ответ от сервера:', data);
 
 		if (data.objects && data.objects.length > 0) {
-			result.value = { type: data.objects[0].type };
+			const fireObject = data.objects[0];
+			result.value = { type: fireObject.type };
+
+			const [x, y, w, h] = fireObject.rect;
+			const img = imageElement.value;
+
+			if (img) {
+				const scaleX = img.clientWidth / img.naturalWidth;
+				const scaleY = img.clientHeight / img.naturalHeight;
+
+				fireRect.value = {
+					left: x * scaleX,
+					top: y * scaleY,
+					width: w * scaleX,
+					height: h * scaleY,
+				};
+				confidence.value = Math.round(fireObject.confidence * 100);
+			}
 		} else {
 			result.value = { type: 'no_fire' };
+			fireRect.value = null;
+			confidence.value = null;
 		}
 	} catch (error) {
 		console.error('Ошибка при запросе:', error);
 		result.value = { type: 'no_fire' };
+		fireRect.value = null;
+		confidence.value = null;
 	}
 };
+
+watch(imageSrc, () => {
+	fireRect.value = null;
+	confidence.value = null;
+	result.value = null;
+});
 </script>
 
 <style lang="scss" scoped>
@@ -118,6 +190,42 @@ const sendRequest = async () => {
 		height: 110px;
 	}
 }
+
+.preview {
+	max-width: 740px;
+	height: 400px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	overflow: hidden;
+	border: 1px solid #ddd;
+	border-radius: $border-radius;
+
+	&__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	&__rect {
+		position: absolute;
+		border: 2px solid red;
+		box-sizing: border-box;
+	}
+
+	&__confidence {
+		position: absolute;
+		text-align: center;
+		font-size: 12px;
+		background: rgba(255, 255, 255, 0.8);
+		color: red;
+		padding: 2px 4px;
+		border-radius: 4px;
+		transform: translateY(-100%);
+	}
+}
+
 .result {
 	position: relative;
 	display: flex;

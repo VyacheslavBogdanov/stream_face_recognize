@@ -1,18 +1,63 @@
 <template>
-	<button class="fire-search" @click="emit('sendRequest')">
-		<span class="fire-search__name">Обнаружить огонь</span>
+	<button v-if="fireRect" class="clear" @click="emit('clearPreview')">
+		<span class="clear__name">Очистить изображение</span>
+	</button>
+	<button v-else class="fire-detect" @click="emit('sendRequest')">
+		<span class="fire-detect__name">Обнаружить огонь</span>
 	</button>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
+const props = defineProps<{
+	status: string;
+	fireRect: { top: number; left: number; width: number; height: number } | null;
+}>();
+
 const emit = defineEmits<{
 	(event: 'sendRequest'): void;
+	(event: 'clearPreview'): void;
 }>();
+
+const isDisabled = computed(() => props.status === 'inactive');
 </script>
 
 <style lang="scss" scoped>
 @import '../../../styles/main.scss';
-.fire-search {
+.clear {
+	position: relative;
+	height: 50px;
+	padding: 0 30px;
+	color: #513d3d;
+	border: $border-width solid #513d3d;
+	background-color: $color-bg;
+	border-radius: $border-radius;
+	user-select: none;
+	white-space: nowrap;
+	transition: all 0.05s linear;
+	font-family: inherit;
+	margin: 20px 0 20px 10px;
+
+	&:hover {
+		cursor: pointer;
+		border-color: $border-color;
+		color: $border-color;
+	}
+
+	&:active {
+		transform: scale(0.97);
+	}
+
+	&__name {
+		font-size: 25px;
+		z-index: 3;
+		position: relative;
+		font-weight: 500;
+	}
+}
+
+.fire-detect {
 	position: relative;
 	height: 50px;
 	padding: 0 30px;
@@ -50,8 +95,8 @@ const emit = defineEmits<{
 
 	&:hover {
 		cursor: pointer;
-		border-color: $border-color;
-		color: $border-color;
+		border-color: rgb(227, 52, 25);
+		color: rgb(227, 52, 25);
 
 		&:before {
 			height: calc(100% - 32px);

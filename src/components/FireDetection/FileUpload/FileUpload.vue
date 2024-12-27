@@ -1,6 +1,16 @@
 <template>
-	<div :class="['upload', { 'upload--active': fileName }]" @dragover.prevent @drop.prevent>
-		<input class="upload__input" type="file" accept="image/*" @change="onFileChange" />
+	<div
+		:class="['upload', { 'upload--active': fileName, 'upload--disabled': isDisabled }]"
+		@dragover.prevent
+		@drop.prevent
+	>
+		<input
+			class="upload__input"
+			type="file"
+			accept="image/*"
+			@change="onFileChange"
+			:disabled="isDisabled"
+		/>
 		<span class="upload__text">
 			{{ fileName || 'Загрузить изображение...' }}
 		</span>
@@ -8,11 +18,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+
+const props = defineProps<{
+	status: string;
+}>();
 
 const emit = defineEmits<{
 	(event: 'fileSelected', base64: string): void;
+	(event: 'fileUrl', url: string): void;
 }>();
+
+const isDisabled = computed(() => props.status === 'inactive');
 
 const fileName = ref<string | null>(null);
 
@@ -20,6 +37,9 @@ const onFileChange = (event: Event) => {
 	const input = event.target as HTMLInputElement;
 	if (input.files && input.files[0]) {
 		fileName.value = input.files[0].name;
+
+		const fileUrl = URL.createObjectURL(input.files[0]);
+		emit('fileUrl', fileUrl);
 
 		const reader = new FileReader();
 		reader.onload = () => {
@@ -44,7 +64,7 @@ const onFileChange = (event: Event) => {
 	justify-content: center;
 	align-items: center;
 	padding: 10px;
-	border: $border-width dashed #ccc;
+	border: $border-width dashed #513d3d;
 	border-radius: $border-radius;
 	background-color: $color-bg;
 	text-align: center;
@@ -61,6 +81,19 @@ const onFileChange = (event: Event) => {
 
 	&--active {
 		border-color: $border-color;
+	}
+
+	&--disabled {
+		background-color: #f5f5f5;
+		border-color: #ddd;
+
+		&:hover {
+			border-color: #ddd;
+		}
+
+		.upload__text {
+			color: #aaa;
+		}
 	}
 
 	&__input {
