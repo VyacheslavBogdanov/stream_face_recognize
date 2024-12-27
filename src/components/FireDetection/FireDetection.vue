@@ -192,7 +192,7 @@ watch(imageSrc, () => {
 }
 
 .preview {
-	width: auto;
+	max-width: 740px;
 	height: 400px;
 	display: flex;
 	justify-content: center;

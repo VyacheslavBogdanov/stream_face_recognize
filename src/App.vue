@@ -33,7 +33,7 @@ onMounted(loadMessageTypes);
 @import './styles/main.scss';
 
 #app {
-	width: auto;
+	min-width: 1550px;
 	height: 800px;
 	display: flex;
 	flex-direction: column;
