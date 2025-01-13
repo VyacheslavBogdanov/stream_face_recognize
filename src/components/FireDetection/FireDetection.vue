@@ -6,31 +6,31 @@
 			@sendRequest="sendRequest"
 			@clearPreview="clearPreview"
 			:status="props.status"
-			:fireRect="fireRect"
+			:fireRects="fireRects"
 		/>
 	</div>
 	<div v-if="imageSrc" class="preview">
 		<img ref="imageElement" class="preview__img" :src="imageSrc" alt="Изображение" />
-
 		<div
-			v-if="fireRect"
+			v-for="(rect, index) in fireRects"
+			:key="index"
 			class="preview__rect"
 			:style="{
-				top: fireRect.top + 'px',
-				left: fireRect.left + 'px',
-				width: fireRect.width + 'px',
-				height: fireRect.height + 'px',
+				top: rect.top + 'px',
+				left: rect.left + 'px',
+				width: rect.width + 'px',
+				height: rect.height + 'px',
 			}"
 		>
 			<div
-				v-if="confidence !== null"
+				v-if="rect.confidence !== null"
 				class="preview__confidence"
 				:style="{
 					top: '-3px',
 					left: '0',
 				}"
 			>
-				{{ confidence }}%
+				{{ rect.confidence }}%
 			</div>
 		</div>
 	</div>
@@ -54,8 +54,9 @@ const props = defineProps<{
 
 const imageSrc = ref<string | null>(null);
 const result = ref<{ type: string } | null>(null);
-const fireRect = ref<{ top: number; left: number; width: number; height: number } | null>(null);
-const confidence = ref<number | null>(null);
+const fireRects = ref<
+	{ top: number; left: number; width: number; height: number; confidence: number | null }[]
+>([]);
 const imageBase64 = ref<string | null>(null);
 const imageElement = ref<HTMLImageElement | null>(null);
 
@@ -88,8 +89,8 @@ const updateImageSrc = (url: string) => {
 };
 
 const clearPreview = () => {
-	fireRect.value = null;
-	confidence.value = null;
+	fireRects.value = [];
+	result.value = null;
 };
 
 const sendRequest = async () => {
@@ -137,42 +138,40 @@ const sendRequest = async () => {
 		const data = await response.json();
 		console.log('Ответ от сервера:', data);
 
-		if (data.objects && data.objects.length > 0) {
-			const fireObject = data.objects[0];
-			result.value = { type: fireObject.type };
+		const fireObjects = data.objects.filter((obj: any) => obj.type === 'fire');
 
-			const [x, y, w, h] = fireObject.rect;
+		if (fireObjects.length > 0) {
+			result.value = { type: 'fire' };
 			const img = imageElement.value;
 
 			if (img) {
 				const scaleX = img.clientWidth / img.naturalWidth;
 				const scaleY = img.clientHeight / img.naturalHeight;
 
-				fireRect.value = {
-					left: x * scaleX,
-					top: y * scaleY,
-					width: w * scaleX,
-					height: h * scaleY,
-				};
-				confidence.value = Math.round(fireObject.confidence * 100);
+				fireRects.value = fireObjects.map((fireObject: any) => {
+					const [x, y, w, h] = fireObject.rect;
+					return {
+						left: x * scaleX,
+						top: y * scaleY,
+						width: w * scaleX,
+						height: h * scaleY,
+						confidence: Math.round(fireObject.confidence * 100),
+					};
+				});
 			}
 		} else {
 			result.value = { type: 'no_fire' };
-			fireRect.value = null;
-			confidence.value = null;
+			fireRects.value = [];
 		}
 	} catch (error) {
 		console.error('Ошибка при запросе:', error);
 		result.value = { type: 'no_fire' };
-		fireRect.value = null;
-		confidence.value = null;
+		fireRects.value = [];
 	}
 };
 
 watch(imageSrc, () => {
-	fireRect.value = null;
-	confidence.value = null;
-	result.value = null;
+	clearPreview();
 });
 </script>
 

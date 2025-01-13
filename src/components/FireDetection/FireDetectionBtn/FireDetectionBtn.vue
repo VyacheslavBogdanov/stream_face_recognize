@@ -1,5 +1,5 @@
 <template>
-	<button v-if="fireRect" class="clear" @click="emit('clearPreview')">
+	<button v-if="hasFireRects" class="clear" @click="emit('clearPreview')">
 		<span class="clear__name">Очистить изображение</span>
 	</button>
 	<button v-else class="fire-detect" @click="emit('sendRequest')">
@@ -12,7 +12,7 @@ import { computed } from 'vue';
 
 const props = defineProps<{
 	status: string;
-	fireRect: { top: number; left: number; width: number; height: number } | null;
+	fireRects: { top: number; left: number; width: number; height: number }[];
 }>();
 
 const emit = defineEmits<{
@@ -20,11 +20,12 @@ const emit = defineEmits<{
 	(event: 'clearPreview'): void;
 }>();
 
-const isDisabled = computed(() => props.status === 'inactive');
+const hasFireRects = computed(() => props.fireRects.length > 0);
 </script>
 
 <style lang="scss" scoped>
 @import '../../../styles/main.scss';
+
 .clear {
 	position: relative;
 	height: 50px;
