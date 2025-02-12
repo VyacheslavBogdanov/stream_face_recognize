@@ -2,7 +2,8 @@
 	<div id="app">
 		<div class="app">
 			<CheckHealth :messageTypes="messageTypes" :status="status" />
-			<FireDetection :messageTypes="messageTypes" :status="status" />
+			<!-- <FireDetection :messageTypes="messageTypes" :status="status" /> -->
+			<router-view />
 		</div>
 	</div>
 </template>
