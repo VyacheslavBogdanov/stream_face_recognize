@@ -3,7 +3,7 @@
 		<span class="clear__name">Очистить изображение</span>
 	</button>
 	<button v-else class="fire-detect" @click="emit('sendRequest')">
-		<span class="fire-detect__name">Обнаружить огонь</span>
+		<span class="fire-detect__name">Поиск</span>
 	</button>
 </template>
 
