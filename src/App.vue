@@ -2,14 +2,13 @@
 	<div id="app">
 		<div class="app">
 			<CheckHealth :messageTypes="messageTypes" :status="status" />
-			<FireDetection :messageTypes="messageTypes" :status="status" />
+			<router-view :messageTypes="messageTypes" :status="status" />
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import CheckHealth from '@/components/CheckHealth/CheckHealth.vue';
-import FireDetection from '@/components/FireDetection/FireDetection.vue';
 import { ref, onMounted } from 'vue';
 import { fetchData } from './components/mocks/db';
 import { useHealthCheck } from './components/utils/useHealthCheck';

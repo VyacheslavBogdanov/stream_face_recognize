@@ -1,5 +1,12 @@
 <template>
 	<div>
+		<nav class="header">
+			<router-link to="/" class="header__link">Поиск по фото</router-link>
+			<router-link to="/comparison-of-two-photos" class="header__link"
+				>Сравнение двух фото</router-link
+			>
+			<router-link to="/data-base" class="header__link">База данных</router-link>
+		</nav>
 		<div
 			v-for="(type, index) in filteredMessageTypes"
 			:key="index"
@@ -30,6 +37,27 @@ const filteredMessageTypes = computed(() => {
 
 <style lang="scss" scoped>
 @import '../../styles/main.scss';
+
+.header {
+	display: flex;
+	gap: 1rem;
+
+	&__link {
+		color: rgb(0, 0, 0);
+		text-decoration: none;
+		padding: 0.5rem 1rem;
+		border-radius: 5px;
+		transition: background 0.3s ease;
+
+		// &:hover {
+		// 	background: rgba(255, 255, 255, 0.2);
+		// }
+
+		&.router-link-active {
+			background: #1f2c5649;
+		}
+	}
+}
 
 .health {
 	position: relative;
