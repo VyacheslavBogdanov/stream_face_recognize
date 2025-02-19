@@ -20,7 +20,7 @@
 				:disabled="isDisabled"
 			/>
 			<div v-if="previewSrc1" class="upload__preview">
-				<img :src="previewSrc1" alt="Предпросмотр изображения" />
+				<img :src="previewSrc1" alt="Не удалось загрузить" />
 			</div>
 			<span v-else class="upload__text">
 				{{ fileName1 || 'Загрузить изображение...' }}
@@ -47,7 +47,7 @@
 				:disabled="isDisabled"
 			/>
 			<div v-if="previewSrc2" class="upload__preview">
-				<img :src="previewSrc2" alt="Предпросмотр изображения" />
+				<img :src="previewSrc2" alt="Не удалось загрузить" />
 			</div>
 			<span v-else class="upload__text">
 				{{ fileName2 || 'Загрузить изображение...' }}
@@ -111,11 +111,10 @@ const onFileChange = (id: number, event: Event) => {
 
 .upload-container {
 	display: flex;
-	gap: 20px;
 }
 
 .upload {
-	width: 300px;
+	width: 400px;
 	height: 400px;
 	display: flex;
 	justify-content: center;
@@ -184,7 +183,7 @@ const onFileChange = (id: number, event: Event) => {
 		img {
 			width: 100%;
 			height: 100%;
-			object-fit: contain;
+			object-fit: cover;
 			border-radius: $border-radius;
 		}
 	}
