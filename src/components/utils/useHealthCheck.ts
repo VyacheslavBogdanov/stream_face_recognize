@@ -2,47 +2,49 @@ import { ref, onMounted, onUnmounted } from 'vue';
 
 export function useHealthCheck() {
 	const status = ref<'active' | 'inactive'>('inactive');
-	let intervalId: number | undefined;
+	// let intervalId: number | undefined;
 
-	const checkHealth = async () => {
-		const Url = import.meta.env.VITE_SERVER_URL;
-		try {
-			const response = await fetch(`${Url}/health`);
+	// const checkHealth = async () => {
+	// 	const Url = import.meta.env.VITE_SERVER_URL;
+	// 	try {
+	// 		const response = await fetch(`${Url}/health`);
 
-			if (response.ok) {
-				const data = await response.json();
-				// Для тестирования
-				// const data = { result: 0 };
-				console.log(data);
+	// 		console.log('health', response);
 
-				if (data.result === 1) {
-					status.value = 'active';
-				} else {
-					status.value = 'inactive';
-				}
-			} else {
-				console.error('Ошибка ответа от сервера:', response.status);
-				status.value = 'inactive';
-			}
-		} catch (error) {
-			console.error('Ошибка подключения:', error);
-			status.value = 'inactive';
-		}
-	};
+	// 		if (response.ok) {
+	// 			const data = await response.json();
+	// 			// Для тестирования
+	// 			// const data = { result: 0 };
+	// 			console.log(data);
 
-	const startHealthCheck = () => {
-		checkHealth();
-		intervalId = window.setInterval(checkHealth, 15000);
-	};
+	// 			if (data.result === 1) {
+	// 				status.value = 'active';
+	// 			} else {
+	// 				status.value = 'inactive';
+	// 			}
+	// 		} else {
+	// 			console.error('Ошибка ответа от сервера:', response.status);
+	// 			status.value = 'inactive';
+	// 		}
+	// 	} catch (error) {
+	// 		console.error('Ошибка подключения:', error);
+	// 		status.value = 'inactive';
+	// 	}
+	// };
 
-	const stopHealthCheck = () => {
-		if (intervalId !== undefined) {
-			clearInterval(intervalId);
-		}
-	};
+	// const startHealthCheck = () => {
+	// 	checkHealth();
+	// 	intervalId = window.setInterval(checkHealth, 30000);
+	// };
 
-	onMounted(startHealthCheck);
-	onUnmounted(stopHealthCheck);
+	// const stopHealthCheck = () => {
+	// 	if (intervalId !== undefined) {
+	// 		clearInterval(intervalId);
+	// 	}
+	// };
+
+	// onMounted(startHealthCheck);
+	// onUnmounted(stopHealthCheck);
 
 	return { status };
 }
