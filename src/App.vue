@@ -37,19 +37,5 @@ onMounted(loadMessageTypes);
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-
-	.app {
-		width: 50%;
-		height: 100%;
-		display: flex;
-		align-items: center;
-		flex-direction: column;
-		font-family: sans-serif;
-		background-color: $color-bg;
-		margin: 1%;
-		padding: 20px;
-		border: $border-width solid $border-color;
-		border-radius: $border-radius;
-	}
 }
 </style>
