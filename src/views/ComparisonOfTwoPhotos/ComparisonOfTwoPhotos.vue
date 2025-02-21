@@ -31,7 +31,7 @@
 				</div>
 
 				<input
-					:ref="(el) => setFileInputRef(id, el)"
+					ref="fileInputRefs"
 					class="upload__input"
 					type="file"
 					accept="image/*"
@@ -44,76 +44,82 @@
 				</span>
 			</div>
 		</div>
+
+		<ButtonCompareFace :imagesBase64="imagesBase64" />
 	</div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import ButtonCompareFace from './ButtonCompareFace.vue';
 
 const props = defineProps<{ status: string }>();
-const emit = defineEmits<{
-	(event: 'fileSelected', base64: string, id: number): void;
-	(event: 'fileUrl', url: string, id: number): void;
-}>();
-
 const isDisabled = computed(() => props.status === 'inactive');
-const fileNames = ref<{ [key: number]: string | null }>({ 1: null, 2: null });
-const previewSrcs = ref<{ [key: number]: string | null }>({ 1: null, 2: null });
-const imageUrls = ref<{ [key: number]: string }>({ 1: '', 2: '' });
-const fileInputRefs = ref<{ [key: number]: HTMLInputElement | null }>({ 1: null, 2: null });
-const isInvalidUrl = ref<{ [key: number]: boolean }>({ 1: false, 2: false });
+
+const fileNames = ref<Record<number, string | null>>({ 1: null, 2: null });
+const previewSrcs = ref<Record<number, string | null>>({ 1: null, 2: null });
+const imageUrls = ref<Record<number, string>>({ 1: '', 2: '' });
+const fileInputRefs = ref<Record<number, HTMLInputElement | null>>({ 1: null, 2: null });
+const isInvalidUrl = ref<Record<number, boolean>>({ 1: false, 2: false });
+const imagesBase64 = ref<Record<number, string>>({ 1: '', 2: '' });
+
 const clearUpload = (id: number) => {
 	imageUrls.value[id] = '';
 	previewSrcs.value[id] = null;
 	fileNames.value[id] = null;
 	isInvalidUrl.value[id] = false;
+	imagesBase64.value[id] = '';
 	if (fileInputRefs.value[id]) {
-		fileInputRefs.value[id].value = '';
+		fileInputRefs.value[id]!.value = '';
 	}
 };
 
 const onFileChange = (id: number, event: Event) => {
 	const input = event.target as HTMLInputElement;
-	if (input.files && input.files[0]) {
-		imageUrls.value[id] = '';
-		isInvalidUrl.value[id] = false;
-		fileNames.value[id] = input.files[0].name;
-
+	if (input.files?.[0]) {
 		const file = input.files[0];
-		const fileUrl = URL.createObjectURL(file);
-
 		const reader = new FileReader();
 		reader.onload = () => {
 			if (reader.result) {
-				previewSrcs.value[id] = fileUrl;
-				emit('fileSelected', reader.result.toString(), id);
+				const base64 = reader.result.toString();
+				previewSrcs.value[id] = base64;
+				fileNames.value[id] = file.name;
+				imageUrls.value[id] = '';
+				isInvalidUrl.value[id] = false;
+				imagesBase64.value[id] = base64;
 			}
 		};
 		reader.readAsDataURL(file);
 	} else {
-		resetFileInput(id);
+		clearUpload(id);
 	}
 };
 
-const onUrlChange = (id: number) => {
+const onUrlChange = async (id: number) => {
 	const url = imageUrls.value[id];
-	if (url) {
-		const img = new Image();
-		img.onload = () => {
-			previewSrcs.value[id] = url;
-			isInvalidUrl.value[id] = false;
-			fileNames.value[id] = null;
-			emit('fileUrl', url, id);
+	if (!url) {
+		clearUpload(id);
+		return;
+	}
+
+	try {
+		const response = await fetch(url);
+		const blob = await response.blob();
+		const reader = new FileReader();
+		reader.onload = () => {
+			if (reader.result) {
+				const base64 = reader.result.toString();
+				previewSrcs.value[id] = base64;
+				fileNames.value[id] = null;
+				isInvalidUrl.value[id] = false;
+				imagesBase64.value[id] = base64;
+			}
 		};
-		img.onerror = () => {
-			isInvalidUrl.value[id] = true;
-			previewSrcs.value[id] = null;
-			fileNames.value[id] = null;
-			emit('fileUrl', '', id);
-		};
-		img.src = url;
-	} else {
-		resetFileInput(id);
+		reader.readAsDataURL(blob);
+	} catch {
+		isInvalidUrl.value[id] = true;
+		previewSrcs.value[id] = null;
+		fileNames.value[id] = null;
 	}
 };
 
@@ -121,16 +127,7 @@ const handleImageError = (id: number) => {
 	isInvalidUrl.value[id] = true;
 	previewSrcs.value[id] = null;
 	fileNames.value[id] = null;
-};
-
-const resetFileInput = (id: number) => {
-	fileNames.value[id] = null;
-	previewSrcs.value[id] = null;
-	isInvalidUrl.value[id] = false;
-};
-
-const setFileInputRef = (id: number, el: HTMLInputElement | null) => {
-	if (el) fileInputRefs.value[id] = el;
+	imagesBase64.value[id] = '';
 };
 </script>
 
