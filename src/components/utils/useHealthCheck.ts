@@ -1,7 +1,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 
 export function useHealthCheck() {
-	const status = ref<'active' | 'inactive'>('inactive');
+	const status = ref<'active' | 'inactive'>('active');
 	// let intervalId: number | undefined;
 
 	// const checkHealth = async () => {

@@ -79,6 +79,7 @@ const onFileChange = (id: number, event: Event) => {
 	if (input.files?.[0]) {
 		const file = input.files[0];
 		const reader = new FileReader();
+		console.log('reader', reader);
 		reader.onload = () => {
 			if (reader.result) {
 				const base64 = reader.result.toString();
