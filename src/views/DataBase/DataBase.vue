@@ -73,7 +73,8 @@
 import { ref, onMounted } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
-const Url = import.meta.env.VITE_SERVER_URL;
+const URL = import.meta.env.VITE_SERVER_URL;
+const SERVER = 'http://localhost:3003/people';
 
 interface Face {
 	id: string;
@@ -81,7 +82,7 @@ interface Face {
 	photoUrl: string;
 }
 
-const faces = ref<Face[]>([{ id: '', name: '', photoUrl: '' }]);
+const faces = ref<Face[]>([]);
 const newFace = ref<Face>({ id: '', name: '', photoUrl: '' });
 const editingFace = ref<Face | null>(null);
 
@@ -105,20 +106,28 @@ const urlToBase64 = async (imageUrl: string): Promise<string> => {
 };
 
 const fetchFaces = async () => {
-	const requestId = uuidv4();
+	// const requestId = uuidv4();
 
-	const requestBody = {
-		request_id: requestId,
-	};
+	// const requestBody = {
+	// 	request_id: requestId,
+	// };
+
+	// try {
+	// 	const response = await fetch(`${URL}/get_all_keys`, {
+	// 		method: 'POST',
+	// 		headers: { 'Content-Type': 'application/json' },
+	// 		body: JSON.stringify(requestBody),
+	// 	});
+	// 	if (!response.ok) throw new Error('Ошибка загрузки базы');
+	// 	console.log('get_all_keys', await response.json());
+	// } catch (error) {
+	// 	console.error(error);
+	// }
 
 	try {
-		const response = await fetch(`${Url}/get_all_keys`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestBody),
-		});
+		const response = await fetch(SERVER);
 		if (!response.ok) throw new Error('Ошибка загрузки базы');
-		console.log('get_all_keys', await response.json());
+		faces.value = await response.json();
 	} catch (error) {
 		console.error(error);
 	}
@@ -140,30 +149,40 @@ const addFace = async () => {
 			image: imageBase64,
 		};
 
-		const response = await fetch(`${Url}/add_new_face`, {
+		const response = await fetch(`${URL}/add_new_face`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(requestBody),
 		});
 
 		if (response.ok) {
-			faces.value.push({
-				id: faceId,
-				name: newFace.value.name,
-				photoUrl: newFace.value.photoUrl,
-			});
-			newFace.value = { id: '', name: '', photoUrl: '' };
+			// faces.value.push({
+			// 	id: faceId,
+			// 	name: newFace.value.name,
+			// 	photoUrl: newFace.value.photoUrl,
+			// });
+			// newFace.value = { id: '', name: '', photoUrl: '' };
 			console.log('Ответ сервера:', await response.json());
 		} else {
 			const errorData = await response.json();
 			console.error('Ошибка добавления:', errorData);
 		}
+
+		const DB = await fetch(SERVER, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				id: faceId,
+				name: newFace.value.name,
+				photoUrl: newFace.value.photoUrl,
+			}),
+		});
+		faces.value = await DB.json();
 	} catch (error) {
 		console.error('Ошибка при добавлении:', error);
 	}
 };
 
-/** Удаление лица по ID */
 const deleteFace = async (id: string) => {
 	try {
 		const requestBody = {
@@ -171,7 +190,7 @@ const deleteFace = async (id: string) => {
 			items: [id],
 		};
 
-		const response = await fetch(`${Url}/delete_face`, {
+		const response = await fetch(`${URL}/delete_face`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(requestBody),
@@ -187,12 +206,11 @@ const deleteFace = async (id: string) => {
 	}
 };
 
-/** Очистка всей базы */
 const clearDatabase = async () => {
 	try {
 		const requestBody = { request_id: uuidv4() };
 
-		const response = await fetch(`${Url}/clear_db`, {
+		const response = await fetch(`${URL}/clear_db`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(requestBody),
@@ -208,12 +226,10 @@ const clearDatabase = async () => {
 	}
 };
 
-/** Редактирование лица */
 const editFace = (face: Face) => {
 	editingFace.value = { ...face };
 };
 
-/** Сохранение изменений */
 const updateFace = async () => {
 	if (!editingFace.value) return;
 
@@ -225,7 +241,7 @@ const updateFace = async () => {
 			photoUrl: editingFace.value.photoUrl,
 		};
 
-		const response = await fetch(`${Url}/update_face`, {
+		const response = await fetch(`${URL}/update_face`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(requestBody),
@@ -243,7 +259,6 @@ const updateFace = async () => {
 	}
 };
 
-/** Отмена редактирования */
 const cancelEdit = () => {
 	editingFace.value = null;
 };
