@@ -85,7 +85,6 @@ const faces = ref<Face[]>([{ id: '', name: '', photoUrl: '' }]);
 const newFace = ref<Face>({ id: '', name: '', photoUrl: '' });
 const editingFace = ref<Face | null>(null);
 
-/** Преобразование URL изображения в base64 */
 const urlToBase64 = async (imageUrl: string): Promise<string> => {
 	try {
 		const response = await fetch(imageUrl);
@@ -105,18 +104,26 @@ const urlToBase64 = async (imageUrl: string): Promise<string> => {
 	}
 };
 
-/** Загрузка лиц при монтировании */
 const fetchFaces = async () => {
-	// try {
-	// 	const response = await fetch(`${Url}/get_faces`);
-	// 	if (!response.ok) throw new Error('Ошибка загрузки базы');
-	// 	faces.value = await response.json();
-	// } catch (error) {
-	// 	console.error(error);
-	// }
+	const requestId = uuidv4();
+
+	const requestBody = {
+		request_id: requestId,
+	};
+
+	try {
+		const response = await fetch(`${Url}/get_all_keys`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestBody),
+		});
+		if (!response.ok) throw new Error('Ошибка загрузки базы');
+		console.log('get_all_keys', await response.json());
+	} catch (error) {
+		console.error(error);
+	}
 };
 
-/** Добавление нового лица */
 const addFace = async () => {
 	if (!newFace.value.name || !newFace.value.photoUrl) return;
 
@@ -126,8 +133,6 @@ const addFace = async () => {
 	try {
 		const base64Image = await urlToBase64(newFace.value.photoUrl);
 		const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
-
-		console.log('imageBase64', imageBase64);
 
 		const requestBody = {
 			request_id: requestId,
@@ -148,6 +153,7 @@ const addFace = async () => {
 				photoUrl: newFace.value.photoUrl,
 			});
 			newFace.value = { id: '', name: '', photoUrl: '' };
+			console.log('Ответ сервера:', await response.json());
 		} else {
 			const errorData = await response.json();
 			console.error('Ошибка добавления:', errorData);
