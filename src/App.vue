@@ -31,11 +31,12 @@ onMounted(loadMessageTypes);
 <style lang="scss" scoped>
 @import './styles/main.scss';
 
-#app {
-	min-width: 1550px;
-	height: 800px;
+.app {
+	width: 100%;
+	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	background: #f4f6fb;
 }
 </style>
