@@ -51,7 +51,7 @@
 			@click="clearDatabase"
 			class="database__button database__button--danger"
 		>
-			Удалить все записи
+			Удалить все из БД
 		</button>
 
 		<!-- <div v-if="editingFace" class="database__modal">
@@ -158,7 +158,6 @@ const addFace = async () => {
 
 const deleteFace = async (id: string) => {
 	try {
-		// Удаление с основного сервера
 		const response = await fetch(`${URL}/delete_face`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -167,14 +166,12 @@ const deleteFace = async (id: string) => {
 
 		if (!response.ok) throw new Error('Ошибка удаления с основного сервера');
 
-		// Удаление из JSON Server
 		const jsonServerResponse = await fetch(`${SERVER}/${id}`, {
 			method: 'DELETE',
 		});
 
 		if (!jsonServerResponse.ok) throw new Error('Ошибка удаления из JSON Server');
 
-		// Обновление локального состояния
 		faces.value = faces.value.filter((face) => face.id !== id);
 	} catch (error) {
 		console.error('Ошибка удаления:', error);
@@ -183,7 +180,6 @@ const deleteFace = async (id: string) => {
 
 const clearDatabase = async () => {
 	try {
-		// Очистка на основном сервере
 		const response = await fetch(`${URL}/clear_db`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -192,7 +188,6 @@ const clearDatabase = async () => {
 
 		if (!response.ok) throw new Error('Ошибка очистки на основном сервере');
 
-		// Очистка в JSON Server: удаление всех записей
 		await Promise.all(
 			faces.value.map((face) =>
 				fetch(`${SERVER}/${face.id}`, {
@@ -201,7 +196,6 @@ const clearDatabase = async () => {
 			),
 		);
 
-		// Очистка локального массива
 		faces.value = [];
 	} catch (error) {
 		console.error('Ошибка очистки базы:', error);
