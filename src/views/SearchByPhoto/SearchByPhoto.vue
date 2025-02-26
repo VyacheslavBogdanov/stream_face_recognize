@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
 	<div class="middle-elements">
 		<FileUpload @fileSelected="updateImage" @fileUrl="updateImageSrc" :status="props.status" />
 		<FireDetectionBtn
@@ -266,4 +266,8 @@ watch(imageSrc, () => {
 		color: $color-primary;
 	}
 }
-</style>
+</style> -->
+
+<template></template>
+
+<script setup lang="ts"></script>
