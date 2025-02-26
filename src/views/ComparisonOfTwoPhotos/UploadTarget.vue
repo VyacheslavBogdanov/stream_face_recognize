@@ -22,9 +22,24 @@
 			@drop.prevent
 		>
 			<div v-if="previewSrc" class="upload__preview">
-				<img :src="previewSrc" @error="handleImageError" alt="Не удалось загрузить" />
+				<img
+					ref="imageElement"
+					:src="previewSrc"
+					@error="handleImageError"
+					alt="Не удалось загрузить"
+				/>
 
-				<div v-if="bboxes && bboxes.length" class="bbox" :style="getBoxStyle(bboxes)"></div>
+				<div
+					v-for="(bbox, index) in scaledBboxes"
+					:key="index"
+					class="upload__bbox"
+					:style="{
+						top: bbox.top + 'px',
+						left: bbox.left + 'px',
+						width: bbox.width + 'px',
+						height: bbox.height + 'px',
+					}"
+				></div>
 			</div>
 			<input
 				ref="fileInputRef"
@@ -40,22 +55,55 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineEmits, defineProps } from 'vue';
+import { ref, computed, watch, defineEmits, defineProps } from 'vue';
 
 const emit = defineEmits(['update:imageData']);
 const props = defineProps<{
 	status: string;
 	bboxes: number[];
 }>();
-const bboxes = computed(() => props.bboxes);
+
+const localBboxes = ref<number[]>(props.bboxes);
 const isDisabled = computed(() => props.status === 'inactive');
 
 const fileName = ref<string | null>(null);
 const previewSrc = ref<string | null>(null);
 const imageUrl = ref<string>('');
 const fileInputRef = ref<HTMLInputElement | null>(null);
+const imageElement = ref<HTMLImageElement | null>(null);
 const isInvalidUrl = ref<boolean>(false);
 const imageBase64 = ref<string>('');
+
+const bboxesArray = computed(() => {
+	const result = [];
+	for (let i = 0; i < localBboxes.value.length; i += 4) {
+		result.push(localBboxes.value.slice(i, i + 4));
+	}
+	return result;
+});
+
+const scaledBboxes = computed(() => {
+	if (!imageElement.value) return [];
+
+	const img = imageElement.value;
+	const scaleX = img.clientWidth / img.naturalWidth;
+	const scaleY = img.clientHeight / img.naturalHeight;
+
+	return bboxesArray.value.map(([x, y, width, height]) => ({
+		left: x * scaleX,
+		top: y * scaleY,
+		width: width * scaleX,
+		height: height * scaleY,
+	}));
+});
+
+watch(
+	() => props.bboxes,
+	(newBboxes) => {
+		localBboxes.value = [...newBboxes];
+	},
+	{ deep: true },
+);
 
 const clearUpload = () => {
 	imageUrl.value = '';
@@ -63,8 +111,9 @@ const clearUpload = () => {
 	fileName.value = null;
 	isInvalidUrl.value = false;
 	imageBase64.value = '';
+	localBboxes.value = [];
+
 	if (fileInputRef.value) fileInputRef.value.value = '';
-	bboxes.value = [];
 
 	emit('update:imageData', '');
 };
@@ -75,7 +124,7 @@ const onFileChange = (event: Event) => {
 		const file = input.files[0];
 		const reader = new FileReader();
 
-		reader.onload = () => {
+		reader.onload = async () => {
 			if (reader.result) {
 				const base64 = reader.result.toString();
 				previewSrc.value = base64;
@@ -83,7 +132,7 @@ const onFileChange = (event: Event) => {
 				imageUrl.value = '';
 				isInvalidUrl.value = false;
 				imageBase64.value = base64;
-				bboxes.value = [];
+				localBboxes.value = [];
 
 				emit('update:imageData', base64);
 			}
@@ -105,14 +154,14 @@ const onUrlChange = async () => {
 		const blob = await response.blob();
 		const reader = new FileReader();
 
-		reader.onload = () => {
+		reader.onload = async () => {
 			if (reader.result) {
 				const base64 = reader.result.toString();
 				previewSrc.value = base64;
 				fileName.value = null;
 				isInvalidUrl.value = false;
 				imageBase64.value = base64;
-				bboxes.value = [];
+				localBboxes.value = [];
 
 				emit('update:imageData', base64);
 			}
@@ -122,7 +171,7 @@ const onUrlChange = async () => {
 		isInvalidUrl.value = true;
 		previewSrc.value = null;
 		fileName.value = null;
-		bboxes.value = [];
+		localBboxes.value = [];
 
 		emit('update:imageData', '');
 	}
@@ -133,25 +182,9 @@ const handleImageError = () => {
 	previewSrc.value = null;
 	fileName.value = null;
 	imageBase64.value = '';
-	bboxes.value = [];
+	localBboxes.value = [];
 
 	emit('update:imageData', '');
-};
-
-const getBoxStyle = (bbox: number[]) => {
-	if (bbox.length === 4) {
-		const [x, y, width, height] = bbox;
-		return {
-			position: 'absolute',
-			left: `${x}px`,
-			top: `${y}px`,
-			width: `${width}px`,
-			height: `${height}px`,
-			border: '2px solid red',
-			boxSizing: 'border-box',
-		};
-	}
-	return {};
 };
 </script>
 
@@ -159,11 +192,9 @@ const getBoxStyle = (bbox: number[]) => {
 @import '../../styles/main.scss';
 @import './Style/UploadStyle.scss';
 
-.bbox {
+.upload__bbox {
 	position: absolute;
 	border: 2px solid red;
-}
-.upload__preview {
-	position: relative;
+	box-sizing: border-box;
 }
 </style>
