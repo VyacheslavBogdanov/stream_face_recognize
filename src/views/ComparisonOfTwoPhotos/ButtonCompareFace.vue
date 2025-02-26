@@ -1,123 +1,76 @@
 <template>
-	<div class="compare-container">
-		<button @click="compareFaces" :disabled="isLoading || !imagesBase64[1] || !imagesBase64[2]">
-			{{ isLoading ? 'Сравнение...' : 'Сравнить' }}
-		</button>
-		<div v-if="result" class="result-container">
-			<p v-if="result.error" class="error">{{ result.error }}</p>
-			<div v-else>
-				<p v-if="result.message">{{ result.message }}</p>
-				<div
-					v-for="(face, index) in result.detected_faces"
-					:key="index"
-					class="face-result"
-				></div>
-			</div>
-		</div>
-	</div>
+	<button class="compare-button" @click="emit('compare')" :disabled="isDisabled">Сравнить</button>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import { v4 as uuidv4 } from 'uuid';
-
-const props = defineProps<{ imagesBase64: Record<number, string> }>();
-const isLoading = ref(false);
-const result = ref<{ detected_faces?: any[]; message?: string; error?: string } | null>(null);
-
-const images = computed(() => props.imagesBase64);
-
-watch(images, (newValue) => {
-	console.log('Изображения обновлены:', newValue);
-});
-
-const compareFaces = async () => {
-	if (!images.value[1] || !images.value[2]) {
-		result.value = { error: 'Необходимо загрузить оба изображения' };
-		return;
-	}
-
-	isLoading.value = true;
-	result.value = null;
-
-	try {
-		const requestId = uuidv4();
-		const base64Source = images.value[1].split(',')[1];
-		const base64Target = images.value[2].split(',')[1];
-
-		const response = await fetch('http://81.94.156.176:5511/recognize_one_by_image', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				request_id: requestId,
-				rec_threshold: 1,
-				source_image: base64Source,
-				target_image: base64Target,
-			}),
-		});
-
-		const responseText = await response.text();
-
-		if (!response.ok) {
-			result.value = { error: `Ошибка сервера: ${response.status} ${responseText}` };
-			return;
-		}
-
-		const data = JSON.parse(responseText);
-		processResponse(data);
-	} catch (error) {
-		result.value = { error: 'Ошибка при сравнении изображений' };
-	} finally {
-		isLoading.value = false;
-	}
-};
-
-const processResponse = (data: any) => {
-	if (!data.detected_faces || data.detected_faces.length === 0) {
-		result.value = { error: 'На одной из фотографий лиц не обнаружено' };
-		return;
-	}
-
-	let realFaceDetected = false;
-	let dist = 1;
-	data.detected_faces.forEach((face: any) => {
-		if (!face.real) realFaceDetected = true;
-		dist = face.dist;
-	});
-
-	if (realFaceDetected) {
-		result.value = { message: 'Попытка обмана системы' };
-		return;
-	}
-
-	result.value = {
-		detected_faces: data.detected_faces,
-		message: dist > 0.25 ? 'Скорее всего, это один и тот же человек' : 'Это разные люди',
-	};
-};
+defineProps<{ isDisabled: boolean }>();
+const emit = defineEmits<{
+	(event: 'compare'): void;
+}>();
 </script>
 
-<style scoped>
-.compare-container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-button {
-	padding: 10px 20px;
-	font-size: 16px;
-	cursor: pointer;
-	margin-bottom: 20px;
-}
-.result-container {
-	text-align: center;
-}
-.error {
-	color: red;
-}
-.face-result {
-	border: 1px solid #ccc;
-	padding: 10px;
-	margin-top: 10px;
+<style scoped lang="scss">
+@import '../../styles/main.scss';
+.compare-button {
+	position: relative;
+	height: 50px;
+	padding: 0 30px;
+	color: #513d3d;
+	border: $border-width solid #513d3d;
+	background-color: $color-bg;
+	border-radius: $border-radius;
+	user-select: none;
+	white-space: nowrap;
+	transition: all 0.05s linear;
+	font-family: inherit;
+	margin: 20px 0 20px 10px;
+
+	&:before,
+	&:after {
+		content: '';
+		position: absolute;
+
+		transition: all 0.2s linear;
+	}
+
+	&:before {
+		width: calc(100% + 6px);
+		height: calc(100% - 16px);
+		top: 8px;
+		left: -3px;
+	}
+
+	&:after {
+		width: calc(100% - 16px);
+		height: calc(100% + 6px);
+		top: -3px;
+		left: 8px;
+	}
+
+	&:hover {
+		cursor: pointer;
+		border-color: rgb(3, 2, 2);
+		color: rgb(11, 11, 11);
+
+		&:before {
+			height: calc(100% - 32px);
+			top: 16px;
+		}
+
+		&:after {
+			width: calc(100% - 32px);
+			left: 16px;
+		}
+	}
+
+	&:active {
+		transform: scale(0.97);
+	}
+	&__name {
+		font-size: 25px;
+		z-index: 0;
+		position: relative;
+		font-weight: 500;
+	}
 }
 </style>
