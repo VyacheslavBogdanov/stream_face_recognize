@@ -1,13 +1,13 @@
 <template>
 	<div class="comparison-of-photos">
 		<div class="upload-container">
-			<UploadTarget
+			<UploadSource
 				@update:imageData="updateTargetImage"
 				:status="status"
 				:bboxes="targetBboxes"
 			/>
 
-			<UploadSource @update:imageData="updateSourceImage" :status="status" />
+			<UploadTarget @update:imageData="updateSourceImage" :status="status" />
 		</div>
 
 		<ButtonCompareFace :isDisabled="isDisabled" @compare="comparePhotos" />
@@ -59,7 +59,7 @@ const targetImageBase64 = ref<string | null>(null);
 const sourceImageBase64 = ref<string | null>(null);
 
 const comparisonResult = ref<ComparisonResult | null>(null);
-const targetBboxes = ref<number[]>([]); // Теперь это массив чисел, а не массив массивов
+const targetBboxes = ref<number[]>([]);
 
 const updateTargetImage = (imageData: string) => {
 	targetImageBase64.value = imageData;

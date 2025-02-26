@@ -12,7 +12,7 @@
 				@input="onUrlChange"
 				:disabled="isDisabled"
 				:class="{ 'upload__url--active': imageUrl && !isInvalidUrl }"
-			/>s
+			/>
 			<button class="upload__clear" @click="clearUpload">🗑</button>
 		</div>
 		<div
