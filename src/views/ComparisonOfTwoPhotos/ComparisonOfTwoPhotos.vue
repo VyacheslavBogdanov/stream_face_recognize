@@ -1,11 +1,15 @@
 <template>
 	<div class="comparison-of-photos">
-		<UploadTarget
-			@update:imageData="updateTargetImage"
-			:status="status"
-			:bboxes="targetBboxes"
-		/>
-		<UploadSource @update:imageData="updateSourceImage" :status="status" />
+		<div class="upload-container">
+			<UploadTarget
+				@update:imageData="updateTargetImage"
+				:status="status"
+				:bboxes="targetBboxes"
+			/>
+
+			<UploadSource @update:imageData="updateSourceImage" :status="status" />
+		</div>
+
 		<ButtonCompareFace :isDisabled="isDisabled" @compare="comparePhotos" />
 
 		<div v-if="comparisonResult" class="comparison-result">
@@ -17,16 +21,12 @@
 					v-for="(face, index) in comparisonResult.detected_faces"
 					:key="index"
 					class="face-details"
-				>
-					<p>Лицо {{ index + 1 }}:</p>
-					<p>bbox: {{ face.bbox }}</p>
-					<p>Real: {{ face.real ? 'Yes' : 'No' }}</p>
-					<p>Dist: {{ face.dist }}</p>
-				</div>
+				></div>
 			</div>
 		</div>
 	</div>
 </template>
+
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
@@ -35,12 +35,14 @@ import UploadSource from './UploadSource.vue';
 import ButtonCompareFace from './ButtonCompareFace.vue';
 
 interface Face {
-	bbox: string;
-	real: boolean;
+	bbox: number[];
 	dist: number;
+	real: boolean;
+	score: number;
 }
 
 interface ComparisonResponse {
+	request_id: string;
 	detected_faces?: Face[];
 	message?: string;
 }
@@ -57,7 +59,7 @@ const targetImageBase64 = ref<string | null>(null);
 const sourceImageBase64 = ref<string | null>(null);
 
 const comparisonResult = ref<ComparisonResult | null>(null);
-const targetBboxes = ref<string[]>([]);
+const targetBboxes = ref<number[]>([]); // Теперь это массив чисел, а не массив массивов
 
 const updateTargetImage = (imageData: string) => {
 	targetImageBase64.value = imageData;
@@ -104,7 +106,8 @@ const comparePhotos = async () => {
 		const result: ComparisonResponse = await response.json();
 		if (result.detected_faces && result.detected_faces.length > 0) {
 			comparisonResult.value = processComparisonResult(result);
-			targetBboxes.value = result.detected_faces.map((face: Face) => face.bbox);
+
+			targetBboxes.value = result.detected_faces[0]?.bbox || [];
 		} else {
 			comparisonResult.value = { message: 'На одной из фотографий лиц не обнаружено.' };
 		}
@@ -127,6 +130,8 @@ const processComparisonResult = (result: ComparisonResponse): ComparisonResult =
 
 	if (detected_faces && detected_faces.length > 0) {
 		const dist = detected_faces[0]?.dist || 0;
+		const score = detected_faces[0]?.score || 0;
+
 		if (dist > 0.25) {
 			message = 'Скорее всего, это один и тот же человек';
 		} else {
@@ -136,6 +141,8 @@ const processComparisonResult = (result: ComparisonResponse): ComparisonResult =
 		if (detected_faces.some((face: Face) => face.real === false)) {
 			message = 'Попытка обмана системы';
 		}
+
+		message += ` (Оценка достоверности: ${score.toFixed(2)})`;
 	} else {
 		message = 'На одной из фотографий лиц не обнаружено.';
 	}
@@ -154,11 +161,9 @@ const processComparisonResult = (result: ComparisonResponse): ComparisonResult =
 	gap: 20px;
 }
 
-.comparison-result {
-	margin-top: 20px;
-	padding: 10px;
-	border: 1px solid #ccc;
-	border-radius: 8px;
+.upload-container {
+	display: flex;
+	gap: 20px;
 }
 
 .comparison-message {

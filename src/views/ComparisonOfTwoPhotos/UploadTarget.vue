@@ -12,7 +12,7 @@
 				@input="onUrlChange"
 				:disabled="isDisabled"
 				:class="{ 'upload__url--active': imageUrl && !isInvalidUrl }"
-			/>
+			/>s
 			<button class="upload__clear" @click="clearUpload">🗑</button>
 		</div>
 		<div
@@ -23,6 +23,8 @@
 		>
 			<div v-if="previewSrc" class="upload__preview">
 				<img :src="previewSrc" @error="handleImageError" alt="Не удалось загрузить" />
+
+				<div v-if="bboxes && bboxes.length" class="bbox" :style="getBoxStyle(bboxes)"></div>
 			</div>
 			<input
 				ref="fileInputRef"
@@ -43,7 +45,9 @@ import { ref, computed, defineEmits, defineProps } from 'vue';
 const emit = defineEmits(['update:imageData']);
 const props = defineProps<{
 	status: string;
+	bboxes: number[];
 }>();
+const bboxes = computed(() => props.bboxes);
 const isDisabled = computed(() => props.status === 'inactive');
 
 const fileName = ref<string | null>(null);
@@ -60,6 +64,7 @@ const clearUpload = () => {
 	isInvalidUrl.value = false;
 	imageBase64.value = '';
 	if (fileInputRef.value) fileInputRef.value.value = '';
+	bboxes.value = [];
 
 	emit('update:imageData', '');
 };
@@ -78,6 +83,7 @@ const onFileChange = (event: Event) => {
 				imageUrl.value = '';
 				isInvalidUrl.value = false;
 				imageBase64.value = base64;
+				bboxes.value = [];
 
 				emit('update:imageData', base64);
 			}
@@ -106,6 +112,7 @@ const onUrlChange = async () => {
 				fileName.value = null;
 				isInvalidUrl.value = false;
 				imageBase64.value = base64;
+				bboxes.value = [];
 
 				emit('update:imageData', base64);
 			}
@@ -115,6 +122,7 @@ const onUrlChange = async () => {
 		isInvalidUrl.value = true;
 		previewSrc.value = null;
 		fileName.value = null;
+		bboxes.value = [];
 
 		emit('update:imageData', '');
 	}
@@ -125,12 +133,37 @@ const handleImageError = () => {
 	previewSrc.value = null;
 	fileName.value = null;
 	imageBase64.value = '';
+	bboxes.value = [];
 
 	emit('update:imageData', '');
+};
+
+const getBoxStyle = (bbox: number[]) => {
+	if (bbox.length === 4) {
+		const [x, y, width, height] = bbox;
+		return {
+			position: 'absolute',
+			left: `${x}px`,
+			top: `${y}px`,
+			width: `${width}px`,
+			height: `${height}px`,
+			border: '2px solid red',
+			boxSizing: 'border-box',
+		};
+	}
+	return {};
 };
 </script>
 
 <style scoped lang="scss">
 @import '../../styles/main.scss';
 @import './Style/UploadStyle.scss';
+
+.bbox {
+	position: absolute;
+	border: 2px solid red;
+}
+.upload__preview {
+	position: relative;
+}
 </style>
