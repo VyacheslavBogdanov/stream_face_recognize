@@ -1,13 +1,13 @@
 <template>
 	<div class="comparison-of-photos">
 		<div class="upload-container">
-			<UploadSource
-				@update:imageData="updateTargetImage"
+			<UploadSource @update:imageData="updateTargetImage" :status="status" />
+
+			<UploadTarget
+				@update:imageData="updateSourceImage"
 				:status="status"
 				:bboxes="targetBboxes"
 			/>
-
-			<UploadTarget @update:imageData="updateSourceImage" :status="status" />
 		</div>
 
 		<ButtonCompareFace :isDisabled="isDisabled" @compare="comparePhotos" />
