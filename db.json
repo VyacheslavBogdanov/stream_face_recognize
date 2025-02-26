@@ -1,19 +1,204 @@
 {
-  "posts": [
+  "people": [
     {
-      "id": 1,
-      "title": "json-server",
-      "author": "typicode"
-    }
-  ],
-  "comments": [
+      "id": "4001b1c2-bfaa-4619-aa06-9fb4c6953f43",
+      "name": "вфывыф",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
     {
-      "id": 1,
-      "body": "some comment",
-      "postId": 1
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "4001b1c2-bfaa-4619-aa06-9fb4c6953f43",
+      "name": "вфывыф",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "4001b1c2-bfaa-4619-aa06-9fb4c6953f43",
+      "name": "вфывыф",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "4001b1c2-bfaa-4619-aa06-9fb4c6953f43",
+      "name": "вфывыф",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "4001b1c2-bfaa-4619-aa06-9fb4c6953f43",
+      "name": "вфывыф",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "4001b1c2-bfaa-4619-aa06-9fb4c6953f43",
+      "name": "вфывыф",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "4001b1c2-bfaa-4619-aa06-9fb4c6953f43",
+      "name": "вфывыф",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "4001b1c2-bfaa-4619-aa06-9fb4c6953f43",
+      "name": "вфывыф",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "4001b1c2-bfaa-4619-aa06-9fb4c6953f43",
+      "name": "вфывыф",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "4001b1c2-bfaa-4619-aa06-9fb4c6953f43",
+      "name": "вфывыф",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "93736cbc-5983-4754-a46e-00f5dba0bfc1",
+      "name": "цйу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
+    },
+    {
+      "id": "d68a8606-621c-4fa7-ac5c-f2d0e5c80e91",
+      "name": "йцу",
+      "photoUrl": "https://s.ura.news/images/news/figures/689/95/1ff1d44a-38bf-4430-96fc-24d7e2bfdd64/5ocx27/M-760.1.5.jpg"
     }
-  ],
-  "profile": {
-    "name": "typicode"
-  }
+  ]
 }

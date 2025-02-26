@@ -1,12 +1,5 @@
 <template>
-	<div>
-		<nav class="header">
-			<router-link to="/" class="header__link">Поиск по фото</router-link>
-			<router-link to="/comparison-of-two-photos" class="header__link"
-				>Сравнение двух фото</router-link
-			>
-			<router-link to="/data-base" class="header__link">База данных</router-link>
-		</nav>
+	<header class="header">
 		<div
 			v-for="(type, index) in filteredMessageTypes"
 			:key="index"
@@ -15,7 +8,14 @@
 			<div class="health__icon">ⓘ</div>
 			<span>{{ type.message }}</span>
 		</div>
-	</div>
+		<nav class="header__nav">
+			<router-link to="/" class="header__link">Поиск по фото</router-link>
+			<router-link to="/comparison-of-two-photos" class="header__link"
+				>Сравнение двух фото</router-link
+			>
+			<router-link to="/data-base" class="header__link">База данных</router-link>
+		</nav>
+	</header>
 </template>
 
 <script setup lang="ts">
@@ -39,8 +39,18 @@ const filteredMessageTypes = computed(() => {
 @import '../../styles/main.scss';
 
 .header {
+	// display: flex;
+	// gap: 1rem;
+	width: 100%;
 	display: flex;
-	gap: 1rem;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	border-radius: 5px;
+	background: #ffffff;
+	box-shadow:
+		0px 3px 8px -6px rgba(24, 39, 75, 0.05),
+		0px 10px 36px -4px rgba(17, 24, 41, 0.1);
 
 	&__link {
 		color: rgb(0, 0, 0);
@@ -48,10 +58,6 @@ const filteredMessageTypes = computed(() => {
 		padding: 0.5rem 1rem;
 		border-radius: 5px;
 		transition: background 0.3s ease;
-
-		// &:hover {
-		// 	background: rgba(255, 255, 255, 0.2);
-		// }
 
 		&.router-link-active {
 			background: #1f2c5649;
