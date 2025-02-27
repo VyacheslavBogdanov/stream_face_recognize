@@ -38,7 +38,6 @@ interface Face {
 	bbox: number[];
 	dist: number;
 	real: boolean;
-	score: number;
 }
 
 interface ComparisonResponse {
@@ -130,7 +129,6 @@ const processComparisonResult = (result: ComparisonResponse): ComparisonResult =
 
 	if (detected_faces && detected_faces.length > 0) {
 		const dist = detected_faces[0]?.dist || 0;
-		const score = detected_faces[0]?.score || 0;
 
 		if (dist > 0.25) {
 			message = 'Скорее всего, это один и тот же человек';
@@ -141,8 +139,6 @@ const processComparisonResult = (result: ComparisonResponse): ComparisonResult =
 		if (detected_faces.some((face: Face) => face.real === false)) {
 			message = 'Попытка обмана системы';
 		}
-
-		message += ` (Оценка достоверности: ${score.toFixed(2)})`;
 	} else {
 		message = 'На одной из фотографий лиц не обнаружено.';
 	}
