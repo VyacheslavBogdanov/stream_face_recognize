@@ -9,8 +9,6 @@ export function useHealthCheck() {
 		try {
 			const response = await fetch(`${Url}/health`);
 
-			console.log('health', response);
-
 			if (response.ok) {
 				const data = await response.json();
 				// Для тестирования

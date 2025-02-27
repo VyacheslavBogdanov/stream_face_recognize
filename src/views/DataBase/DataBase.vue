@@ -106,6 +106,16 @@ const urlToBase64 = async (imageUrl: string): Promise<string> => {
 
 const fetchFaces = async () => {
 	try {
+		const getAllKeys = await fetch(`${URL}/get_all_keys`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				request_id: uuidv4(),
+			}),
+		});
+		if (!getAllKeys.ok) throw new Error('Ошибка');
+		console.log('getAllKeys', await getAllKeys.json());
+
 		const response = await fetch(SERVER);
 		if (!response.ok) throw new Error('Ошибка загрузки базы');
 		faces.value = await response.json();
