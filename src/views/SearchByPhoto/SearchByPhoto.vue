@@ -56,8 +56,8 @@ interface SearchResult {
 	similarity: number;
 }
 
-const API_URL = import.meta.env.VITE_SERVER_URL;
-const DB_URL = 'http://localhost:3003/people';
+const HOST = import.meta.env.VITE_SERVER_HOST;
+const DB = import.meta.env.VITE_SERVER_DB;
 
 const imageUrl = ref<string>('');
 const selectedFile = ref<File | null>(null);
@@ -102,7 +102,7 @@ const fileToBase64 = (file: File): Promise<string> => {
 };
 
 const fetchFacesFromDB = async (): Promise<SearchResult[]> => {
-	const response = await fetch(DB_URL);
+	const response = await fetch(HOST);
 	if (!response.ok) throw new Error('Ошибка загрузки базы данных');
 	return response.json();
 };

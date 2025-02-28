@@ -72,8 +72,12 @@
 import { ref, onMounted } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
-const URL = import.meta.env.VITE_SERVER_URL;
-const SERVER = 'http://localhost:3003/people';
+const HOST = import.meta.env.VITE_SERVER_HOST;
+const DB = import.meta.env.VITE_SERVER_DB;
+
+// const props = defineProps<{
+
+// }>();
 
 interface Face {
 	id: string;
@@ -106,7 +110,7 @@ const urlToBase64 = async (imageUrl: string): Promise<string> => {
 
 const fetchFaces = async () => {
 	try {
-		const getAllKeys = await fetch(`${URL}/get_all_keys`, {
+		const getAllKeys = await fetch(`${HOST}/get_all_keys`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -116,7 +120,7 @@ const fetchFaces = async () => {
 		if (!getAllKeys.ok) throw new Error('Ошибка');
 		console.log('getAllKeys', await getAllKeys.json());
 
-		const response = await fetch(SERVER);
+		const response = await fetch(DB);
 		if (!response.ok) throw new Error('Ошибка загрузки базы');
 		faces.value = await response.json();
 	} catch (error) {
@@ -140,7 +144,7 @@ const addFace = async () => {
 			image: imageBase64,
 		};
 
-		const response = await fetch(`${URL}/add_new_face`, {
+		const response = await fetch(`${HOST}/add_new_face`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(requestBody),
@@ -148,7 +152,7 @@ const addFace = async () => {
 
 		if (!response.ok) throw new Error('Ошибка');
 
-		const db = await fetch(SERVER, {
+		const db = await fetch(DB, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -168,7 +172,7 @@ const addFace = async () => {
 
 const deleteFace = async (id: string) => {
 	try {
-		const response = await fetch(`${URL}/delete_face`, {
+		const response = await fetch(`${HOST}/delete_face`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ request_id: uuidv4(), items: [id] }),
@@ -176,7 +180,7 @@ const deleteFace = async (id: string) => {
 
 		if (!response.ok) throw new Error('Ошибка удаления с основного сервера');
 
-		const jsonServerResponse = await fetch(`${SERVER}/${id}`, {
+		const jsonServerResponse = await fetch(`${DB}/${id}`, {
 			method: 'DELETE',
 		});
 
@@ -190,7 +194,7 @@ const deleteFace = async (id: string) => {
 
 const clearDatabase = async () => {
 	try {
-		const response = await fetch(`${URL}/clear_db`, {
+		const response = await fetch(`${HOST}/clear_db`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ request_id: uuidv4() }),
@@ -200,7 +204,7 @@ const clearDatabase = async () => {
 
 		await Promise.all(
 			faces.value.map((face) =>
-				fetch(`${SERVER}/${face.id}`, {
+				fetch(`${DB}/${face.id}`, {
 					method: 'DELETE',
 				}),
 			),
