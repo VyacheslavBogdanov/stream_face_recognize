@@ -25,22 +25,24 @@
 				</label>
 			</div>
 
+			<div v-if="previewImage" class="photo-search__preview">
+				<p>Предпросмотр:</p>
+				<img
+					:src="previewImage"
+					alt="Загруженное изображение"
+					class="photo-search__preview-image"
+				/>
+			</div>
+
 			<button type="submit" class="photo-search__button" :disabled="!canSearch">Поиск</button>
 		</form>
 
-		<section v-if="results.length" class="photo-search__results">
+		<section v-if="foundImageUrl" class="photo-search__results">
 			<h2 class="photo-search__subtitle">Результаты поиска:</h2>
-			<ul class="photo-search__list">
-				<li v-for="result in results" :key="result.id" class="photo-search__item">
-					<img :src="result.photoUrl" :alt="result.name" class="photo-search__image" />
-					<div class="photo-search__info">
-						<p class="photo-search__name">{{ result.name }}</p>
-						<p class="photo-search__similarity">
-							Похожесть: {{ result.similarity.toFixed(2) }}%
-						</p>
-					</div>
-				</li>
-			</ul>
+			<div class="photo-search__found">
+				<img :src="foundImageUrl" alt="Найденное изображение" class="photo-search__image" />
+				<p>Найденное изображение</p>
+			</div>
 		</section>
 	</div>
 </template>
@@ -49,27 +51,28 @@
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
-interface SearchResult {
-	id: string;
-	name: string;
-	photoUrl: string;
-	similarity: number;
-}
-
 const HOST = import.meta.env.VITE_SERVER_HOST;
 const DB = import.meta.env.VITE_SERVER_DB;
 
 const imageUrl = ref<string>('');
 const selectedFile = ref<File | null>(null);
-const results = ref<SearchResult[]>([]);
+const previewImage = ref<string | null>(null);
+const foundImageUrl = ref<string | null>(null);
 
 const canSearch = computed(() => !!selectedFile.value || !!imageUrl.value);
 
 const handleFileUpload = (event: Event) => {
 	const target = event.target as HTMLInputElement;
 	if (target.files && target.files[0]) {
-		selectedFile.value = target.files[0];
+		const file = target.files[0];
+		selectedFile.value = file;
 		imageUrl.value = '';
+
+		const reader = new FileReader();
+		reader.onload = () => {
+			previewImage.value = reader.result as string;
+		};
+		reader.readAsDataURL(file);
 	}
 };
 
@@ -101,12 +104,6 @@ const fileToBase64 = (file: File): Promise<string> => {
 	});
 };
 
-const fetchFacesFromDB = async (): Promise<SearchResult[]> => {
-	const response = await fetch(HOST);
-	if (!response.ok) throw new Error('Ошибка загрузки базы данных');
-	return response.json();
-};
-
 const searchFaces = async () => {
 	try {
 		if (!canSearch.value) return;
@@ -126,31 +123,20 @@ const searchFaces = async () => {
 			image: imageBase64,
 		};
 
-		const response = await fetch('http://81.94.156.176:5511/recognize_many', {
+		const response = await fetch(`${HOST}/recognize_many`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(requestBody),
 		});
 
-		console.log('response', response);
+		const data = await response.json();
 
-		// if (!response.ok) throw new Error('Ошибка при поиске лиц');
-		// const { matched_ids }: { matched_ids: { id: string; similarity: number }[] } =
-		// 	await response.json();
-
-		// if (!matched_ids.length) {
-		// 	results.value = [];
-		// 	alert('Совпадения не найдены');
-		// 	return;
-		// }
-
-		// const facesDB = await fetchFacesFromDB();
-		// results.value = matched_ids
-		// 	.map(({ id, similarity }) => {
-		// 		const face = facesDB.find((item) => item.id === id);
-		// 		return face ? { ...face, similarity: similarity * 100 } : null;
-		// 	})
-		// 	.filter(Boolean) as SearchResult[];
+		if (data.detected_faces && data.detected_faces.length > 0) {
+			const foundId = data.detected_faces[0].id;
+			foundImageUrl.value = `${DB}/${foundId}.jpg`;
+		} else {
+			foundImageUrl.value = null;
+		}
 	} catch (error) {
 		console.error('Ошибка при поиске:', error);
 	}
@@ -218,53 +204,42 @@ const searchFaces = async () => {
 		}
 	}
 
+	&__preview {
+		margin-bottom: 15px;
+		text-align: center;
+
+		&-image {
+			max-width: 100%;
+			max-height: 200px;
+			border-radius: 6px;
+			margin-top: 10px;
+		}
+	}
+
 	&__results {
 		width: 100%;
-		max-width: 800px;
+		max-width: 500px;
+		text-align: center;
 	}
 
 	&__subtitle {
 		font-size: 1.5rem;
 		margin-bottom: 15px;
-		text-align: center;
 	}
 
-	&__list {
-		list-style: none;
-		padding: 0;
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-		gap: 20px;
-	}
-
-	&__item {
-		background-color: #f9f9f9;
-		padding: 15px;
-		border-radius: 8px;
-		text-align: center;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	&__found {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 
 	&__image {
 		width: 100%;
+		max-width: 300px;
 		height: auto;
-		max-height: 200px;
 		object-fit: cover;
 		border-radius: 6px;
-		margin-bottom: 10px;
-	}
-
-	&__info {
-		font-size: 1rem;
-	}
-
-	&__name {
-		font-weight: 600;
-		margin-bottom: 5px;
-	}
-
-	&__similarity {
-		color: #555;
+		margin-top: 10px;
 	}
 }
 </style>
