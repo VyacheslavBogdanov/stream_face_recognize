@@ -1,273 +1,245 @@
-<!-- <template>
-	<div class="middle-elements">
-		<FileUpload @fileSelected="updateImage" @fileUrl="updateImageSrc" :status="props.status" />
-		<FireDetectionBtn
-			v-if="imageSrc"
-			@sendRequest="sendRequest"
-			@clearPreview="clearPreview"
-			:status="props.status"
-			:fireRects="fireRects"
-		/>
-	</div>
-	<div v-if="imageSrc" class="preview">
-		<img ref="imageElement" class="preview__img" :src="imageSrc" alt="Изображение" />
-		<div
-			v-for="(rect, index) in fireRects"
-			:key="index"
-			class="preview__rect"
-			:style="{
-				top: rect.top + 'px',
-				left: rect.left + 'px',
-				width: rect.width + 'px',
-				height: rect.height + 'px',
-			}"
-		>
-			<div
-				v-if="rect.confidence !== null"
-				class="preview__confidence"
-				:style="{
-					top: '-3px',
-					left: '0',
-				}"
-			>
-				{{ rect.confidence }}%
+<template>
+	<div class="photo-search">
+		<h1 class="photo-search__title">Поиск по фото</h1>
+
+		<form class="photo-search__form" @submit.prevent="searchFaces">
+			<div class="photo-search__input-group">
+				<label class="photo-search__label">
+					Загрузите файл:
+					<input
+						type="file"
+						@change="handleFileUpload"
+						accept="image/*"
+						class="photo-search__input"
+					/>
+				</label>
+
+				<label class="photo-search__label">
+					Или укажите URL:
+					<input
+						v-model="imageUrl"
+						type="url"
+						placeholder="Введите URL"
+						class="photo-search__input"
+					/>
+				</label>
 			</div>
-		</div>
-	</div>
-	<div v-if="result?.type" :class="['result', resultClass]">
-		<div class="result__icon">ⓘ</div>
-		<span>{{ message }}</span>
+
+			<div v-if="previewImage" class="photo-search__preview">
+				<p>Предпросмотр:</p>
+				<img
+					:src="previewImage"
+					alt="Загруженное изображение"
+					class="photo-search__preview-image"
+				/>
+			</div>
+
+			<button type="submit" class="photo-search__button" :disabled="!canSearch">Поиск</button>
+		</form>
+
+		<section v-if="foundImageUrl" class="photo-search__results">
+			<h2 class="photo-search__subtitle">Результаты поиска:</h2>
+			<div class="photo-search__found">
+				<img :src="foundImageUrl" alt="Найденное изображение" class="photo-search__image" />
+				<p>Найденное изображение</p>
+			</div>
+		</section>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import FileUpload from './FileUpload/FileUpload.vue';
-import FireDetectionBtn from './FireDetectionBtn/FireDetectionBtn.vue';
-import type { MessageType } from '../utils/types';
 
-const props = defineProps<{
-	messageTypes: MessageType[];
-	status: string;
-}>();
+const HOST = import.meta.env.VITE_SERVER_HOST;
+const DB = import.meta.env.VITE_SERVER_DB;
 
-const imageSrc = ref<string | null>(null);
-const result = ref<{ type: string } | null>(null);
-const fireRects = ref<
-	{ top: number; left: number; width: number; height: number; confidence: number | null }[]
->([]);
-const imageBase64 = ref<string | null>(null);
-const imageElement = ref<HTMLImageElement | null>(null);
+const imageUrl = ref<string>('');
+const selectedFile = ref<File | null>(null);
+const previewImage = ref<string | null>(null);
+const foundImageUrl = ref<string | null>(null);
 
-const message = computed(() => {
-	if (result.value?.type === 'fire') {
-		const newArr = props.messageTypes.filter((type) => type.class === 'result--fire');
-		return newArr.length > 0 ? newArr[0].message : 'Статус огня не определен';
-	} else {
-		const newArr = props.messageTypes.filter((type) => type.class === 'result--no-fire');
-		return newArr.length > 0 ? newArr[0].message : 'Статус огня не определен';
+const canSearch = computed(() => !!selectedFile.value || !!imageUrl.value);
+
+const handleFileUpload = (event: Event) => {
+	const target = event.target as HTMLInputElement;
+	if (target.files && target.files[0]) {
+		const file = target.files[0];
+		selectedFile.value = file;
+		imageUrl.value = '';
+
+		const reader = new FileReader();
+		reader.onload = () => {
+			previewImage.value = reader.result as string;
+		};
+		reader.readAsDataURL(file);
 	}
-});
-
-const resultClass = computed(() => {
-	if (result.value?.type === 'fire') {
-		const newArr = props.messageTypes.filter((type) => type.class === 'result--fire');
-		return newArr.length > 0 ? newArr[0].class : 'result--info';
-	} else {
-		const newArr = props.messageTypes.filter((type) => type.class === 'result--no-fire');
-		return newArr.length > 0 ? newArr[0].class : 'result--info';
-	}
-});
-
-const updateImage = (base64: string) => {
-	imageBase64.value = base64;
 };
 
-const updateImageSrc = (url: string) => {
-	imageSrc.value = url;
-};
-
-const clearPreview = () => {
-	fireRects.value = [];
-	result.value = null;
-};
-
-const sendRequest = async () => {
-	if (!imageBase64.value) {
-		console.error('Изображение не выбрано');
-		return;
-	}
-
-	const base64Image = imageBase64.value.replace(/^data:image\/[a-z]+;base64,/, '');
-
-	const requestId = uuidv4();
-	const Url = import.meta.env.VITE_SERVER_URL;
-
+const urlToBase64 = async (imageUrl: string): Promise<string> => {
 	try {
-		const response = await fetch(`${Url}/predict`, {
+		const response = await fetch(imageUrl);
+		if (!response.ok)
+			throw new Error(`Не удалось загрузить изображение: ${response.statusText}`);
+		const blob = await response.blob();
+
+		return await new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onloadend = () => resolve(reader.result as string);
+			reader.onerror = () => reject(new Error('Ошибка чтения файла'));
+			reader.readAsDataURL(blob);
+		});
+	} catch (error) {
+		console.error('Ошибка конвертации URL в base64:', error);
+		throw error;
+	}
+};
+
+const fileToBase64 = (file: File): Promise<string> => {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onloadend = () => resolve(reader.result as string);
+		reader.onerror = () => reject(new Error('Ошибка чтения файла'));
+		reader.readAsDataURL(file);
+	});
+};
+
+const searchFaces = async () => {
+	try {
+		if (!canSearch.value) return;
+
+		let base64Image = '';
+		if (selectedFile.value) {
+			base64Image = await fileToBase64(selectedFile.value);
+		} else if (imageUrl.value) {
+			base64Image = await urlToBase64(imageUrl.value);
+		}
+
+		const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+
+		const requestBody = {
+			request_id: uuidv4(),
+			rec_threshold: 1,
+			image: imageBase64,
+		};
+
+		const response = await fetch(`${HOST}/recognize_many`, {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				thresholds: [
-					{
-						move_confidence: 0.2,
-						move_velocity: 0.3,
-						static_confidence: 0.7,
-						type: 'person',
-					},
-					{
-						move_confidence: 0.2,
-						move_velocity: 0.3,
-						static_confidence: 0.7,
-						type: 'vehicle',
-					},
-				],
-				sabotage_threshold: 22,
-				requestId: requestId,
-				image: base64Image,
-			}),
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestBody),
 		});
 
-		if (!response.ok) {
-			throw new Error(`Ошибка: ${response.status} ${response.statusText}`);
-		}
-
 		const data = await response.json();
-		console.log('Ответ от сервера:', data);
 
-		const fireObjects = data.objects.filter((obj: any) => obj.type === 'fire');
-
-		if (fireObjects.length > 0) {
-			result.value = { type: 'fire' };
-			const img = imageElement.value;
-
-			if (img) {
-				const scaleX = img.clientWidth / img.naturalWidth;
-				const scaleY = img.clientHeight / img.naturalHeight;
-
-				fireRects.value = fireObjects.map((fireObject: any) => {
-					const [x, y, w, h] = fireObject.rect;
-					return {
-						left: x * scaleX,
-						top: y * scaleY,
-						width: w * scaleX,
-						height: h * scaleY,
-						confidence: Math.round(fireObject.confidence * 100),
-					};
-				});
-			}
+		if (data.detected_faces && data.detected_faces.length > 0) {
+			const foundId = data.detected_faces[0].id;
+			foundImageUrl.value = `${DB}/${foundId}.jpg`;
 		} else {
-			result.value = { type: 'no_fire' };
-			fireRects.value = [];
+			foundImageUrl.value = null;
 		}
 	} catch (error) {
-		console.error('Ошибка при запросе:', error);
-		result.value = { type: 'no_fire' };
-		fireRects.value = [];
+		console.error('Ошибка при поиске:', error);
 	}
 };
-
-watch(imageSrc, () => {
-	clearPreview();
-});
 </script>
 
 <style lang="scss" scoped>
-@import '../../styles/main.scss';
-
-.middle-elements {
-	height: 50px;
+.photo-search {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	align-items: center;
-	margin: 40px 0 40px 0;
+	padding: 20px;
 
-	@media (max-width: 1250px) {
-		flex-direction: column;
-		height: 110px;
-	}
-}
-
-.preview {
-	max-width: 740px;
-	height: 400px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	position: relative;
-	overflow: hidden;
-	border: 1px solid #ddd;
-	border-radius: $border-radius;
-
-	&__img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
+	&__title {
+		font-size: 2rem;
+		margin-bottom: 20px;
 	}
 
-	&__rect {
-		position: absolute;
-		border: 2px solid red;
-		box-sizing: border-box;
-	}
-
-	&__confidence {
-		position: absolute;
-		text-align: center;
-		font-size: 12px;
-		background: rgba(255, 255, 255, 0.8);
-		color: red;
-		padding: 2px 4px;
-		border-radius: 4px;
-		transform: translateY(-100%);
-	}
-}
-
-.result {
-	position: relative;
-	display: flex;
-	align-items: center;
-	padding: 10px 30px 10px 40px;
-	border-radius: $border-radius;
-	max-width: fit-content;
-	word-wrap: break-word;
-	font-size: 23px;
-	height: 40px;
-	opacity: 0.85;
-	margin: 20px 0;
-
-	@media (max-width: 835px) {
-		font-size: 17px;
-	}
-
-	&__icon {
+	&__form {
 		display: flex;
-		position: absolute;
-		transform: rotate(180deg);
-		left: 10px;
-		height: 30px;
+		flex-direction: column;
+		align-items: flex-start;
+		width: 100%;
+		max-width: 500px;
+		margin-bottom: 30px;
 	}
 
-	&--fire {
-		background-color: #e0fde7;
-		color: $color-success;
+	&__input-group {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		margin-bottom: 15px;
 	}
 
-	&--no-fire {
-		background-color: #f2dee0;
-		color: $color-error;
+	&__label {
+		font-weight: 600;
+		margin-bottom: 10px;
 	}
 
-	&--info {
-		background-color: #e3e3ff;
-		color: $color-primary;
+	&__input {
+		width: 100%;
+		padding: 10px;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		font-size: 1rem;
+	}
+
+	&__button {
+		padding: 10px 20px;
+		background-color: #007bff;
+		color: #fff;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 1rem;
+		transition: background-color 0.3s;
+
+		&:hover:not(:disabled) {
+			background-color: #0056b3;
+		}
+
+		&:disabled {
+			background-color: #a0a0a0;
+			cursor: not-allowed;
+		}
+	}
+
+	&__preview {
+		margin-bottom: 15px;
+		text-align: center;
+
+		&-image {
+			max-width: 100%;
+			max-height: 200px;
+			border-radius: 6px;
+			margin-top: 10px;
+		}
+	}
+
+	&__results {
+		width: 100%;
+		max-width: 500px;
+		text-align: center;
+	}
+
+	&__subtitle {
+		font-size: 1.5rem;
+		margin-bottom: 15px;
+	}
+
+	&__found {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	&__image {
+		width: 100%;
+		max-width: 300px;
+		height: auto;
+		object-fit: cover;
+		border-radius: 6px;
+		margin-top: 10px;
 	}
 }
-</style> -->
-
-<template></template>
-
-<script setup lang="ts"></script>
+</style>

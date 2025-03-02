@@ -2,7 +2,7 @@
 	<div id="app">
 		<div class="app">
 			<CheckHealth :messageTypes="messageTypes" :status="status" />
-			<router-view :messageTypes="messageTypes" :status="status" />
+			<router-view :messageTypes="messageTypes" :status="status" :HOST="HOST" :DB="DB" />
 		</div>
 	</div>
 </template>
@@ -13,6 +13,9 @@ import { ref, onMounted } from 'vue';
 import { fetchData } from './components/mocks/db';
 import { useHealthCheck } from './components/utils/useHealthCheck';
 import type { MessageType } from './components/utils/types.ts';
+
+const HOST = import.meta.env.HOST;
+const DB = import.meta.env.DB;
 
 const { status } = useHealthCheck();
 const messageTypes = ref<MessageType[]>([]);
