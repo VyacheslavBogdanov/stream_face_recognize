@@ -1,60 +1,3 @@
-<template>
-	<div class="database">
-		<form class="database__form" @submit.prevent="addFace">
-			<input
-				v-model="newFace.name"
-				type="text"
-				placeholder="Имя субъекта"
-				class="database__input"
-				required
-			/>
-			<input
-				v-model="newFace.photoUrl"
-				type="url"
-				placeholder="Ссылка на фото"
-				class="database__input"
-				required
-			/>
-			<button type="submit" class="database__button">Добавить в БД</button>
-		</form>
-		<table class="database__table" v-if="faces.length">
-			<thead class="database__thead">
-				<tr>
-					<th>ID</th>
-					<th>Имя</th>
-					<th>Фото</th>
-					<th>Действия</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="face in faces" :key="face.id">
-					<td>{{ face.id }}</td>
-					<td>{{ face.name }}</td>
-					<td>
-						<img :src="face.photoUrl" :alt="face.name" class="database__photo" />
-					</td>
-					<td>
-						<button
-							@click="deleteFace(face.id)"
-							class="database__button database__button--delete"
-						>
-							Удалить
-						</button>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<div v-else>В базе данных нет объектов</div>
-		<button
-			v-if="faces.length"
-			@click="clearDatabase"
-			class="database__button database__button--danger"
-		>
-			Удалить все из БД
-		</button>
-	</div>
-</template>
-
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
@@ -86,16 +29,6 @@ const urlToBase64 = async (imageUrl: string): Promise<string> => {
 
 const fetchFaces = async () => {
 	try {
-		// const getAllKeys = await fetch(`${HOST}/get_all_keys`, {
-		// 	method: 'POST',
-		// 	headers: { 'Content-Type': 'application/json' },
-		// 	body: JSON.stringify({
-		// 		request_id: uuidv4(),
-		// 	}),
-		// });
-		// if (!getAllKeys.ok) throw new Error('Ошибка');
-		// console.log('getAllKeys', await getAllKeys.json());
-
 		const db = await fetch(DB);
 		if (!db.ok) throw new Error('Ошибка загрузки базы данных');
 		faces.value = await db.json();
@@ -147,18 +80,15 @@ const deleteFace = async (id: string) => {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ request_id: uuidv4(), items: [id] }),
 		});
+		if (!response.ok) throw new Error('Ошибка удаления вектора');
 
-		if (!response.ok) throw new Error('Ошибка удаления с основного сервера');
-
-		const jsonServerResponse = await fetch(`${DB}/${id}`, {
+		const db = await fetch(`${DB}/${id}`, {
 			method: 'DELETE',
 		});
-
-		if (!jsonServerResponse.ok) throw new Error('Ошибка удаления из JSON Server');
-
+		if (!db.ok) throw new Error('Ошибка удаления объекта из базы данных');
 		faces.value = faces.value.filter((face) => face.id !== id);
 	} catch (error) {
-		console.error('Ошибка удаления:', error);
+		console.error(error);
 	}
 };
 
@@ -169,8 +99,7 @@ const clearDatabase = async () => {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ request_id: uuidv4() }),
 		});
-
-		if (!response.ok) throw new Error('Ошибка очистки на основном сервере');
+		if (!response.ok) throw new Error('Ошибка очистки базы векторов');
 
 		await Promise.all(
 			faces.value.map((face) =>
@@ -179,17 +108,98 @@ const clearDatabase = async () => {
 				}),
 			),
 		);
-
 		faces.value = [];
 	} catch (error) {
-		console.error('Ошибка очистки базы:', error);
+		console.error(error);
 	}
 };
 
 onMounted(fetchFaces);
 </script>
 
+<template>
+	<div class="database">
+		<div class="menu">
+			<div class="menu__item">Векторов в БД: {{ faces.length }}</div>
+			<div class="menu__item">Объектов в локальной БД: {{ faces.length }}</div>
+			<div class="menu__sync">Синхронизация локальной БД и БД</div>
+		</div>
+		<form class="database__form" @submit.prevent="addFace">
+			<input
+				v-model="newFace.name"
+				type="text"
+				placeholder="Введите имя"
+				class="database__input"
+				required
+			/>
+			<input
+				v-model="newFace.photoUrl"
+				type="url"
+				placeholder="Введите URL изображения"
+				class="database__input"
+				required
+			/>
+			<button type="submit" class="database__button">Добавить в БД</button>
+		</form>
+		<table class="database__table" v-if="faces.length">
+			<thead class="database__thead">
+				<tr>
+					<th class="dtabase__th">ID</th>
+					<th class="dtabase__th">Имя</th>
+					<th class="dtabase__th">Фото</th>
+					<th class="dtabase__th">Действия</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="face in faces" :key="face.id">
+					<td class="dtabase__td">{{ face.id }}</td>
+					<td class="dtabase__td">{{ face.name }}</td>
+					<td class="dtabase__td">
+						<img :src="face.photoUrl" :alt="face.name" class="database__photo" />
+					</td>
+					<td class="dtabase__td">
+						<button
+							@click="deleteFace(face.id)"
+							class="database__button database__button--delete"
+						>
+							Удалить
+						</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div v-else>В базе данных нет объектов</div>
+		<button
+			v-if="faces.length"
+			@click="clearDatabase"
+			class="database__button database__button--danger"
+		>
+			Удалить все из БД
+		</button>
+	</div>
+</template>
+
 <style lang="scss" scoped>
+.menu {
+	display: flex;
+	margin: 10px;
+	padding: 10px;
+	border: 1px solid #030000;
+	justify-content: space-between;
+	flex-direction: row;
+	align-items: center;
+
+	&__item {
+		border: 1px solid #060887;
+		padding: 10px;
+	}
+
+	&__sync {
+		border: 1px solid #060887;
+		padding: 10px;
+		cursor: pointer;
+	}
+}
 .database {
 	width: 70%;
 	margin: 55px;
@@ -224,10 +234,6 @@ onMounted(fetchFaces);
 			background-color: #ff0000;
 			margin-top: 10px;
 		}
-
-		&--cancel {
-			background-color: #6c757d;
-		}
 	}
 
 	&__table {
@@ -259,25 +265,6 @@ onMounted(fetchFaces);
 		height: 50px;
 		object-fit: cover;
 		border-radius: 5px;
-	}
-
-	&__modal {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: rgba(0, 0, 0, 0.5);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-
-		&-content {
-			background: white;
-			padding: 20px;
-			border-radius: 5px;
-			text-align: center;
-		}
 	}
 }
 </style>
