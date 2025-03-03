@@ -34,7 +34,6 @@
 						<img :src="face.photoUrl" :alt="face.name" class="database__photo" />
 					</td>
 					<td>
-						<!-- <button @click="editFace(face)" class="database__button">✏️</button> -->
 						<button
 							@click="deleteFace(face.id)"
 							class="database__button database__button--delete"
@@ -53,18 +52,6 @@
 		>
 			Удалить все из БД
 		</button>
-
-		<!-- <div v-if="editingFace" class="database__modal">
-			<div class="database__modal-content">
-				<h2>Редактирование</h2>
-				<input v-model="editingFace.name" type="text" class="database__input" />
-				<input v-model="editingFace.photoUrl" type="url" class="database__input" />
-				<button @click="updateFace" class="database__button">Сохранить</button>
-				<button @click="cancelEdit" class="database__button database__button--cancel">
-					Отмена
-				</button>
-			</div>
-		</div> -->
 	</div>
 </template>
 
@@ -75,10 +62,6 @@ import { v4 as uuidv4 } from 'uuid';
 const HOST = import.meta.env.VITE_SERVER_HOST;
 const DB = import.meta.env.VITE_SERVER_DB;
 
-// const props = defineProps<{
-
-// }>();
-
 interface Face {
 	id: string;
 	name: string;
@@ -87,7 +70,6 @@ interface Face {
 
 const faces = ref<Face[]>([]);
 const newFace = ref<Face>({ id: '', name: '', photoUrl: '' });
-// const editingFace = ref<Face | null>(null);
 
 const urlToBase64 = async (imageUrl: string): Promise<string> => {
 	try {
@@ -110,15 +92,15 @@ const urlToBase64 = async (imageUrl: string): Promise<string> => {
 
 const fetchFaces = async () => {
 	try {
-		const getAllKeys = await fetch(`${HOST}/get_all_keys`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				request_id: uuidv4(),
-			}),
-		});
-		if (!getAllKeys.ok) throw new Error('Ошибка');
-		console.log('getAllKeys', await getAllKeys.json());
+		// const getAllKeys = await fetch(`${HOST}/get_all_keys`, {
+		// 	method: 'POST',
+		// 	headers: { 'Content-Type': 'application/json' },
+		// 	body: JSON.stringify({
+		// 		request_id: uuidv4(),
+		// 	}),
+		// });
+		// if (!getAllKeys.ok) throw new Error('Ошибка');
+		// console.log('getAllKeys', await getAllKeys.json());
 
 		const response = await fetch(DB);
 		if (!response.ok) throw new Error('Ошибка загрузки базы');
@@ -216,45 +198,6 @@ const clearDatabase = async () => {
 	}
 };
 
-// const editFace = (face: Face) => {
-// 	editingFace.value = { ...face };
-// };
-
-// const updateFace = async () => {
-// 	if (!editingFace.value) return;
-
-// 	try {
-// 		const requestBody = {
-// 			request_id: uuidv4(),
-// 			id: editingFace.value.id,
-// 			name: editingFace.value.name,
-// 			photoUrl: editingFace.value.photoUrl,
-// 		};
-
-// 		const response = await fetch(`${URL}/add_new_face`, {
-// 			method: 'POST',
-// 			headers: { 'Content-Type': 'application/json' },
-// 			body: JSON.stringify(requestBody),
-// 		});
-
-// 		if (response.ok) {
-// 			console.log('update FACE', await response.json());
-
-// 			const index = faces.value.findIndex((face) => face.id === editingFace.value!.id);
-// 			if (index !== -1) faces.value[index] = { ...editingFace.value };
-// 			editingFace.value = null;
-// 		} else {
-// 			console.error('Ошибка обновления:', await response.json());
-// 		}
-// 	} catch (error) {
-// 		console.error('Ошибка обновления:', error);
-// 	}
-// };
-
-// const cancelEdit = () => {
-// 	editingFace.value = null;
-// };
-
 onMounted(fetchFaces);
 </script>
 
@@ -322,10 +265,6 @@ onMounted(fetchFaces);
 			padding: 25px;
 		}
 	}
-
-	// &__thead {
-
-	// }
 
 	&__photo {
 		width: 50px;
