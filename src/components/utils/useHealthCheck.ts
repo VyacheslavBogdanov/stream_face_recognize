@@ -11,6 +11,7 @@ export function useHealthCheck() {
 
 			if (response.ok) {
 				const data = await response.json();
+
 				// Для тестирования
 				// const data = { result: 0 };
 

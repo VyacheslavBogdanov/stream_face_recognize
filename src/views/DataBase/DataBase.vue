@@ -58,15 +58,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
+import type { Face } from '../../components/utils/types.ts';
 
 const HOST = import.meta.env.VITE_SERVER_HOST;
 const DB = import.meta.env.VITE_SERVER_DB;
-
-interface Face {
-	id: string;
-	name: string;
-	photoUrl: string;
-}
 
 const faces = ref<Face[]>([]);
 const newFace = ref<Face>({ id: '', name: '', photoUrl: '' });
@@ -77,7 +72,6 @@ const urlToBase64 = async (imageUrl: string): Promise<string> => {
 		if (!response.ok)
 			throw new Error(`Не удалось загрузить изображение: ${response.statusText}`);
 		const blob = await response.blob();
-
 		return await new Promise((resolve, reject) => {
 			const reader = new FileReader();
 			reader.onloadend = () => resolve(reader.result as string);
@@ -102,9 +96,9 @@ const fetchFaces = async () => {
 		// if (!getAllKeys.ok) throw new Error('Ошибка');
 		// console.log('getAllKeys', await getAllKeys.json());
 
-		const response = await fetch(DB);
-		if (!response.ok) throw new Error('Ошибка загрузки базы');
-		faces.value = await response.json();
+		const db = await fetch(DB);
+		if (!db.ok) throw new Error('Ошибка загрузки базы данных');
+		faces.value = await db.json();
 	} catch (error) {
 		console.error(error);
 	}
@@ -113,42 +107,36 @@ const fetchFaces = async () => {
 const addFace = async () => {
 	if (!newFace.value.name || !newFace.value.photoUrl) return;
 
-	const requestId = uuidv4();
-	const faceId = uuidv4();
-
 	try {
 		const base64Image = await urlToBase64(newFace.value.photoUrl);
 		const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
 
-		const requestBody = {
-			request_id: requestId,
-			id: faceId,
-			image: imageBase64,
-		};
-
 		const response = await fetch(`${HOST}/add_new_face`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestBody),
+			body: JSON.stringify({
+				request_id: uuidv4(),
+				id: uuidv4(),
+				image: imageBase64,
+			}),
 		});
-
-		if (!response.ok) throw new Error('Ошибка');
+		if (!response.ok) throw new Error('Ошибка добавления вектора');
 
 		const db = await fetch(DB, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				id: faceId,
+				id: uuidv4(),
 				name: newFace.value.name,
 				photoUrl: newFace.value.photoUrl,
 			}),
 		});
-		if (!db.ok) throw new Error('Ошибка');
+		if (!db.ok) throw new Error('Ошибка добавления объекта в базу данных');
 		faces.value = await db.json();
 		newFace.value = { id: '', name: '', photoUrl: '' };
 		fetchFaces();
 	} catch (error) {
-		console.error('Ошибка при добавлении:', error);
+		console.error(error);
 	}
 };
 

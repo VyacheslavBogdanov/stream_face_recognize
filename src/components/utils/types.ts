@@ -7,3 +7,9 @@ export interface MockAPIResponse {
 	status?: number;
 	data?: MessageType[];
 }
+
+export interface Face {
+	id: string;
+	name: string;
+	photoUrl: string;
+}
