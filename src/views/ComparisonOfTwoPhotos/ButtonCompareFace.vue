@@ -1,9 +1,14 @@
 <template>
-	<button class="compare-button" @click="emit('compare')" :disabled="isDisabled">Сравнить</button>
+	<button class="compare-button" @click="emit('compare')" :disabled="isDisabled">
+		<span class="compare-button__name">Сравнить</span>
+	</button>
 </template>
 
 <script setup lang="ts">
+import { defineProps } from 'vue';
+
 defineProps<{ isDisabled: boolean }>();
+
 const emit = defineEmits<{
 	(event: 'compare'): void;
 }>();
@@ -11,46 +16,27 @@ const emit = defineEmits<{
 
 <style scoped lang="scss">
 @import '../../styles/main.scss';
+
 .compare-button {
+	width: 250px;
 	position: relative;
 	height: 50px;
 	padding: 0 30px;
 	color: #513d3d;
-	border: $border-width solid #513d3d;
+	border: 1px solid #513d3d;
 	background-color: $color-bg;
 	border-radius: $border-radius;
 	user-select: none;
 	white-space: nowrap;
 	transition: all 0.05s linear;
 	font-family: inherit;
-	margin: 20px 0 20px 10px;
-
-	&:before,
-	&:after {
-		content: '';
-		position: absolute;
-
-		transition: all 0.2s linear;
-	}
-
-	&:before {
-		width: calc(100% + 6px);
-		height: calc(100% - 16px);
-		top: 8px;
-		left: -3px;
-	}
-
-	&:after {
-		width: calc(100% - 16px);
-		height: calc(100% + 6px);
-		top: -3px;
-		left: 8px;
-	}
+	margin: auto;
+	display: block;
 
 	&:hover {
 		cursor: pointer;
-		border-color: rgb(3, 2, 2);
-		color: rgb(11, 11, 11);
+		border-color: $border-color;
+		color: $border-color;
 
 		&:before {
 			height: calc(100% - 32px);
@@ -66,9 +52,18 @@ const emit = defineEmits<{
 	&:active {
 		transform: scale(0.97);
 	}
+
+	&:disabled {
+		cursor: not-allowed;
+		background-color: $color-bg;
+		border-color: #bfbfbf;
+		color: #a0a0a0;
+		opacity: 0.7;
+	}
+
 	&__name {
-		font-size: 25px;
-		z-index: 0;
+		font-size: 18px;
+		z-index: 3;
 		position: relative;
 		font-weight: 500;
 	}

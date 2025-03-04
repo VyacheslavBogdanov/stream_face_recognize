@@ -1,21 +1,25 @@
 <template>
 	<div class="comparison-of-photos">
 		<div class="upload-container">
-			<UploadSource @update:imageData="updateTargetImage" :status="status" />
-
+			<UploadSource @update:imageData="updateSourceImage" :isDisabled="isDisabled" />
 			<UploadTarget
-				@update:imageData="updateSourceImage"
-				:status="status"
+				@update:imageData="updateTargetImage"
 				:bboxes="targetBboxes"
+				:isDisabled="isDisabled"
 			/>
 		</div>
 
 		<ButtonCompareFace :isDisabled="isDisabled" @compare="comparePhotos" />
 
-		<div v-if="comparisonResult" class="comparison-result">
-			<div v-if="comparisonResult.message" class="comparison-message">
-				<p>{{ comparisonResult.message }}</p>
+		<div v-if="comparisonResult?.type" :class="['result', comparisonResult]">
+			<div
+				v-if="comparisonResult?.message"
+				:class="['comparison-result', comparisonResult?.type]"
+			>
+				<div class="icon">ⓘ</div>
+				<span>{{ comparisonResult.message }}</span>
 			</div>
+
 			<div v-if="comparisonResult.detected_faces">
 				<div
 					v-for="(face, index) in comparisonResult.detected_faces"
@@ -33,6 +37,12 @@ import { v4 as uuidv4 } from 'uuid';
 import UploadTarget from './UploadTarget.vue';
 import UploadSource from './UploadSource.vue';
 import ButtonCompareFace from './ButtonCompareFace.vue';
+import type { MessageType } from '../../components/mocks/db';
+
+const props = defineProps<{
+	messageTypes: MessageType[];
+	status: string;
+}>();
 
 interface Face {
 	bbox: number[];
@@ -49,17 +59,15 @@ interface ComparisonResponse {
 interface ComparisonResult {
 	message: string;
 	detected_faces?: Face[];
+	type: string;
 }
 
-const status = ref('active');
-const isDisabled = computed(() => status.value === 'inactive');
+const isDisabled = computed(() => props.status === 'inactive');
 
 const targetImageBase64 = ref<string | null>(null);
 const sourceImageBase64 = ref<string | null>(null);
-
 const comparisonResult = ref<ComparisonResult | null>(null);
 const targetBboxes = ref<number[]>([]);
-
 const updateTargetImage = (imageData: string) => {
 	targetImageBase64.value = imageData;
 };
@@ -68,29 +76,33 @@ const updateSourceImage = (imageData: string) => {
 	sourceImageBase64.value = imageData;
 };
 
-const removeBase64Prefix = (base64String: string): string => {
+const Base64Image = (base64String: string): string => {
 	const regex = /^data:image\/[a-zA-Z]+;base64,/;
 	return base64String.replace(regex, '');
 };
 
 const comparePhotos = async () => {
 	if (!targetImageBase64.value || !sourceImageBase64.value) {
-		comparisonResult.value = { message: 'Пожалуйста, загрузите оба изображения.' };
+		comparisonResult.value = {
+			type: 'compare--info',
+			message: props.messageTypes.find((type) => type.class === 'compare--info')?.message,
+		};
 		return;
 	}
 
-	const cleanSourceImage = removeBase64Prefix(sourceImageBase64.value);
-	const cleanTargetImage = removeBase64Prefix(targetImageBase64.value);
+	const Base64ImageSource = Base64Image(sourceImageBase64.value);
+	const Base64ImageTarget = Base64Image(targetImageBase64.value);
 
 	try {
+		const Url = import.meta.env.VITE_SERVER_HOST;
 		const requestData = {
 			request_id: uuidv4(),
 			rec_threshold: 1,
-			source_image: cleanSourceImage,
-			target_image: cleanTargetImage,
+			source_image: Base64ImageSource,
+			target_image: Base64ImageTarget,
 		};
 
-		const response = await fetch('http://81.94.156.176:5511/recognize_one_by_image', {
+		const response = await fetch(`${Url}/recognize_one_by_image`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -151,6 +163,34 @@ const processComparisonResult = (result: ComparisonResponse): ComparisonResult =
 </script>
 
 <style scoped lang="scss">
+@import '../../styles/main.scss';
+.comparison-result {
+	position: relative;
+	display: flex;
+	align-items: center;
+	padding: 10px 30px 10px 40px;
+	border-radius: 8px;
+	font-family: Arial, sans-serif;
+	max-width: fit-content;
+	word-wrap: break-word;
+	font-size: 23px;
+	font-family: sans-serif;
+	height: 40px;
+	margin: auto;
+}
+
+.icon {
+	display: flex;
+	position: absolute;
+	transform: rotate(180deg);
+	left: 10px;
+	height: 30px;
+}
+
+.compare--info {
+	background-color: #e3e3ff;
+	color: $color-primary;
+}
 .comparison-of-photos {
 	display: flex;
 	flex-direction: column;

@@ -10,10 +10,10 @@
 				v-model="imageUrl"
 				placeholder="Введите URL изображения..."
 				@input="onUrlChange"
-				:disabled="isDisabled"
 				:class="{ 'upload__url--active': imageUrl && !isInvalidUrl }"
+				:disabled="isDisabled"
 			/>
-			<button class="upload__clear" @click="clearUpload">🗑</button>
+			<button class="upload__clear" @click="clearUpload" :disabled="isDisabled">🗑</button>
 		</div>
 		<div
 			class="upload"
@@ -59,12 +59,11 @@ import { ref, computed, watch, defineEmits, defineProps } from 'vue';
 
 const emit = defineEmits(['update:imageData']);
 const props = defineProps<{
-	status: string;
+	isDisabled: boolean;
 	bboxes: number[];
 }>();
 
 const localBboxes = ref<number[]>(props.bboxes);
-const isDisabled = computed(() => props.status === 'inactive');
 
 const fileName = ref<string | null>(null);
 const previewSrc = ref<string | null>(null);
