@@ -1,56 +1,44 @@
 <template>
-	<div class="photo-search">
-		<h1 class="photo-search__title">Поиск по фото</h1>
-
-		<form class="photo-search__form" @submit.prevent="searchFaces">
-			<div class="photo-search__input-group">
-				<label class="photo-search__label">
-					Загрузите файл:
-					<input
-						type="file"
-						@change="handleFileUpload"
-						accept="image/*"
-						class="photo-search__input"
-					/>
-				</label>
-
-				<label class="photo-search__label">
-					Или укажите URL:
-					<input
-						v-model="imageUrl"
-						type="url"
-						placeholder="Введите URL"
-						class="photo-search__input"
-					/>
-				</label>
-			</div>
-
-			<div v-if="previewImage" class="photo-search__preview">
-				<p>Предпросмотр:</p>
-				<img
-					:src="previewImage"
-					alt="Загруженное изображение"
-					class="photo-search__preview-image"
+	<div class="upload">
+		<div class="upload__inputs">
+			<div class="upload__input-wrapper">
+				<span class="upload__placeholder">Загрузить изображение</span>
+				<input
+					type="file"
+					@change="handleFileUpload"
+					accept="image/*"
+					class="upload__input"
+					:disabled="isDisabled"
 				/>
 			</div>
 
-			<button type="submit" class="photo-search__button" :disabled="!canSearch">Поиск</button>
-		</form>
-
-		<section v-if="foundImageUrl" class="photo-search__results">
-			<h2 class="photo-search__subtitle">Результаты поиска:</h2>
-			<div class="photo-search__found">
-				<img :src="foundImageUrl" alt="Найденное изображение" class="photo-search__image" />
-				<p>Найденное изображение</p>
+			<div class="upload__url">
+				<input
+					v-model="imageUrl"
+					type="url"
+					placeholder="Введите URL"
+					class="upload__url-input"
+					:disabled="isDisabled"
+				/>
 			</div>
-		</section>
+		</div>
+
+		<div v-if="previewImage" class="upload__preview">
+			<img :src="previewImage" alt="Загруженное изображение" class="upload__preview-image" />
+		</div>
+
+		<button type="submit" class="upload__button" :disabled="!canSearch" @click="searchFaces">
+			<span class="upload__button-name">Поиск</span>
+		</button>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-
+const props = defineProps<{
+	status: string;
+}>();
 const HOST = import.meta.env.VITE_SERVER_HOST;
 const DB = import.meta.env.VITE_SERVER_DB;
 
@@ -59,6 +47,7 @@ const selectedFile = ref<File | null>(null);
 const previewImage = ref<string | null>(null);
 const foundImageUrl = ref<string | null>(null);
 
+const isDisabled = computed(() => props.status === 'inactive');
 const canSearch = computed(() => !!selectedFile.value || !!imageUrl.value);
 
 const handleFileUpload = (event: Event) => {
@@ -117,16 +106,14 @@ const searchFaces = async () => {
 
 		const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
 
-		const requestBody = {
-			request_id: uuidv4(),
-			rec_threshold: 1,
-			image: imageBase64,
-		};
-
 		const response = await fetch(`${HOST}/recognize_many`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestBody),
+			body: JSON.stringify({
+				request_id: uuidv4(),
+				rec_threshold: 1,
+				image: imageBase64,
+			}),
 		});
 
 		const data = await response.json();
@@ -144,102 +131,137 @@ const searchFaces = async () => {
 </script>
 
 <style lang="scss" scoped>
-.photo-search {
+@import '../../styles/main.scss';
+
+.upload {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 20px;
+	gap: 20px;
+	width: 100%;
+	max-width: 1000px;
+	margin: 0 auto;
+	padding-top: 30px;
+}
 
-	&__title {
-		font-size: 2rem;
-		margin-bottom: 20px;
-	}
+.upload__inputs {
+	display: flex;
+	gap: 15px;
+	justify-content: center;
+	width: 100%;
+	max-width: 600px;
+}
 
-	&__form {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		width: 100%;
-		max-width: 500px;
-		margin-bottom: 30px;
-	}
+.upload__input-wrapper {
+	width: 100%;
+	max-width: 350px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px dashed #513d3d;
+	border-radius: 8px;
+	background-color: #f9f9f9;
+	cursor: pointer;
+	position: relative;
+	transition: border 0.1s ease;
+}
 
-	&__input-group {
-		display: flex;
-		flex-direction: column;
-		width: 100%;
-		margin-bottom: 15px;
-	}
+.upload__input {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	opacity: 0;
+	cursor: pointer;
+}
 
-	&__label {
-		font-weight: 600;
-		margin-bottom: 10px;
-	}
+.upload__placeholder {
+	color: #513d3d;
+	font-size: 14px;
+	text-align: center;
+}
 
-	&__input {
-		width: 100%;
-		padding: 10px;
-		border: 1px solid #ccc;
-		border-radius: 4px;
-		font-size: 1rem;
-	}
+.upload__url {
+	width: 100%;
+	max-width: 350px;
+	height: 40px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border: 1px dashed #513d3d;
+	border-radius: 8px;
+	background-color: #f9f9f9;
+}
 
-	&__button {
-		padding: 10px 20px;
-		background-color: #007bff;
-		color: #fff;
-		border: none;
-		border-radius: 4px;
+.upload__url-input {
+	width: 100%;
+	padding: 8px;
+	border: none;
+	background-color: transparent;
+	text-align: center;
+	outline: none;
+}
+
+.upload__url-input:disabled {
+	background-color: $color-bg;
+}
+
+.upload__preview {
+	width: 100%;
+	max-width: 450px;
+	height: 450px;
+	margin-top: 20px;
+	border-radius: 8px;
+	overflow: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: #f0f0f0;
+}
+
+.upload__preview-image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+.upload__button {
+	width: 250px;
+	height: 50px;
+	padding: 0 30px;
+	color: #513d3d;
+	border: 1px solid #513d3d;
+	background-color: $color-bg;
+	border-radius: $border-radius;
+	user-select: none;
+	white-space: nowrap;
+	transition: all 0.05s linear;
+	font-family: inherit;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	&:hover {
 		cursor: pointer;
-		font-size: 1rem;
-		transition: background-color 0.3s;
-
-		&:hover:not(:disabled) {
-			background-color: #0056b3;
-		}
-
-		&:disabled {
-			background-color: #a0a0a0;
-			cursor: not-allowed;
-		}
+		border-color: $border-color;
+		color: $border-color;
 	}
 
-	&__preview {
-		margin-bottom: 15px;
-		text-align: center;
-
-		&-image {
-			max-width: 100%;
-			max-height: 200px;
-			border-radius: 6px;
-			margin-top: 10px;
-		}
+	&:active {
+		transform: scale(0.97);
 	}
 
-	&__results {
-		width: 100%;
-		max-width: 500px;
-		text-align: center;
+	&:disabled {
+		cursor: not-allowed;
+		background-color: $color-bg;
+		border-color: #bfbfbf;
+		color: #a0a0a0;
+		opacity: 0.7;
+		transition: none;
 	}
+}
 
-	&__subtitle {
-		font-size: 1.5rem;
-		margin-bottom: 15px;
-	}
-
-	&__found {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	&__image {
-		width: 100%;
-		max-width: 300px;
-		height: auto;
-		object-fit: cover;
-		border-radius: 6px;
-		margin-top: 10px;
-	}
+.upload__button-name {
+	font-size: 16px;
+	font-weight: 500;
 }
 </style>

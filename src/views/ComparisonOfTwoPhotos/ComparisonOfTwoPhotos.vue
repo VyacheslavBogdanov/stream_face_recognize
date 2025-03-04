@@ -76,16 +76,14 @@ const updateSourceImage = (imageData: string) => {
 	sourceImageBase64.value = imageData;
 };
 
-const Base64Image = (base64String: string): string => {
-	const regex = /^data:image\/[a-zA-Z]+;base64,/;
-	return base64String.replace(regex, '');
-};
+const Base64Image = (base64String: string) =>
+	base64String.replace(/^data:image\/[a-zA-Z]+;base64,/, '');
 
 const comparePhotos = async () => {
 	if (!targetImageBase64.value || !sourceImageBase64.value) {
 		comparisonResult.value = {
 			type: 'compare--info',
-			message: props.messageTypes.find((type) => type.class === 'compare--info')?.message,
+			message: props.messageTypes.find((type) => type.class === 'compare--info')?.message, //загрузите оба изображения
 		};
 		return;
 	}
@@ -94,20 +92,17 @@ const comparePhotos = async () => {
 	const Base64ImageTarget = Base64Image(targetImageBase64.value);
 
 	try {
-		const Url = import.meta.env.VITE_SERVER_HOST;
-		const requestData = {
-			request_id: uuidv4(),
-			rec_threshold: 1,
-			source_image: Base64ImageSource,
-			target_image: Base64ImageTarget,
-		};
-
-		const response = await fetch(`${Url}/recognize_one_by_image`, {
+		const response = await fetch(`${import.meta.env.VITE_SERVER_HOST}/recognize_one_by_image`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(requestData),
+			body: JSON.stringify({
+				request_id: uuidv4(),
+				rec_threshold: 1,
+				source_image: Base64ImageSource,
+				target_image: Base64ImageTarget,
+			}),
 		});
 
 		if (!response.ok) {
@@ -162,9 +157,9 @@ const processComparisonResult = (result: ComparisonResponse): ComparisonResult =
 			const dist = detected_faces[0].dist;
 
 			if (dist > 0.25) {
-				messageType = 'compare--warning';
+				messageType = 'compare--warning'; // скорее всего это один и тот же человек
 			} else {
-				messageType = 'compare--success';
+				messageType = 'compare--success'; //это разные люди
 			}
 			message =
 				props.messageTypes.find((type) => type.class === messageType)?.message ||

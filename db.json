@@ -1,5 +1,4 @@
 {
-
   "people": [
     {
       "id": "143d10c9-9b89-4abd-9779-db3d81b58a96",
@@ -15,7 +14,11 @@
       "id": "724d49d0-6106-40c9-9d53-868fd26f5c7b",
       "name": "Егорка",
       "photoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjtDjS5JR_T50vKqV6pcq7DVtlh3V2IMyM8w&s"
+    },
+    {
+      "id": "31e4cb22-34e6-40ed-99e7-a2e357fc1236",
+      "name": "Михаил",
+      "photoUrl": "https://img.freepik.com/premium-photo/handsome-young-man_33839-1226.jpg?semt=ais_hybrid"
     }
   ]
-
 }
