@@ -9,10 +9,12 @@ export interface MockAPIResponse {
 }
 
 export interface Face {
-	bbox: number[];
-	dist: number;
-	real: boolean;
-  }
+
+	id: string;
+	name: string;
+	photoUrl: string;
+}
+
 
   export interface ComparisonResponse {
 	request_id: string;
@@ -24,3 +26,4 @@ export interface Face {
 	message: string;
 	detected_faces?: Face[];
   }
+

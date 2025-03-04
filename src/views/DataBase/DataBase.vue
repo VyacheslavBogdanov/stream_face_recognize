@@ -1,17 +1,184 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { v4 as uuidv4 } from 'uuid';
+import type { Face } from '../../components/utils/types.ts';
+
+const HOST = import.meta.env.VITE_SERVER_HOST;
+const DB = import.meta.env.VITE_SERVER_DB;
+
+const faces = ref<Face[]>([]);
+const newFace = ref<Face>({ id: '', name: '', photoUrl: '' });
+const vectors = ref<string[]>([]);
+
+const urlToBase64 = async (imageUrl: string): Promise<string> => {
+	try {
+		const response = await fetch(imageUrl);
+		if (!response.ok)
+			throw new Error(`Не удалось загрузить изображение: ${response.statusText}`);
+		const blob = await response.blob();
+		return await new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onloadend = () => resolve(reader.result as string);
+			reader.onerror = () => reject(new Error('Ошибка чтения файла'));
+			reader.readAsDataURL(blob);
+		});
+	} catch (error) {
+		console.error('Ошибка конвертации URL в base64:', error);
+		throw error;
+	}
+};
+
+const fetchFaces = async () => {
+	try {
+		const response = await fetch(`${HOST}/get_all_keys`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				request_id: uuidv4(),
+			}),
+		});
+		if (!response.ok) throw new Error('Ошибка получения ключей');
+		const allKeys = await response.json();
+		console.log('allKeys', allKeys);
+
+		vectors.value = allKeys.result;
+		console.log('vectors.value', vectors.value);
+
+		const db = await fetch(DB);
+		if (!db.ok) throw new Error('Ошибка загрузки базы данных');
+		faces.value = await db.json();
+		console.log('faces.value', faces.value);
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+const addFace = async () => {
+	if (!newFace.value.name || !newFace.value.photoUrl) return;
+	const id = uuidv4();
+	try {
+		// const base64Image = await urlToBase64(newFace.value.photoUrl);
+		// const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+
+		// const response = await fetch(`${HOST}/add_new_face`, {
+		// 	method: 'POST',
+		// 	headers: { 'Content-Type': 'application/json' },
+		// 	body: JSON.stringify({
+		// 		request_id: uuidv4(),
+		// 		id: id,
+		// 		image: imageBase64,
+		// 	}),
+		// });
+		// if (!response.ok) throw new Error('Ошибка добавления вектора');
+
+		const db = await fetch(DB, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				id: id,
+				name: newFace.value.name,
+				photoUrl: newFace.value.photoUrl,
+			}),
+		});
+		if (!db.ok) throw new Error('Ошибка добавления объекта в базу данных');
+		faces.value = await db.json();
+		newFace.value = { id: '', name: '', photoUrl: '' };
+		fetchFaces();
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+const deleteFace = async (id: string) => {
+	try {
+		const response = await fetch(`${HOST}/delete_face`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ request_id: uuidv4(), items: [id] }),
+		});
+		if (!response.ok) throw new Error('Ошибка удаления вектора');
+
+		const db = await fetch(`${DB}/${id}`, {
+			method: 'DELETE',
+		});
+		if (!db.ok) throw new Error('Ошибка удаления объекта из базы данных');
+		faces.value = faces.value.filter((face) => face.id !== id);
+		fetchFaces();
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+const clearDatabase = async () => {
+	try {
+		const response = await fetch(`${HOST}/clear_db`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ request_id: uuidv4() }),
+		});
+		if (!response.ok) throw new Error('Ошибка очистки базы векторов');
+
+		await Promise.all(
+			faces.value.map((face) =>
+				fetch(`${DB}/${face.id}`, {
+					method: 'DELETE',
+				}),
+			),
+		);
+		faces.value = [];
+		fetchFaces();
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+const syncDB = async () => {
+	if (vectors.value.length === faces.value.length) return;
+	try {
+		await Promise.all(
+			faces.value.map(async (face) => {
+				const base64Image = await urlToBase64(face.photoUrl);
+				const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+
+				return fetch(`${HOST}/add_new_face`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						request_id: uuidv4(),
+						id: face.id,
+						image: imageBase64,
+					}),
+				});
+			}),
+		);
+		fetchFaces();
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+onMounted(fetchFaces);
+</script>
+
 <template>
 	<div class="database">
+		<div class="menu">
+			<div class="menu__item">Векторов в БД: {{ vectors.length }}</div>
+			<div class="menu__item">Объектов в локальной БД: {{ faces.length }}</div>
+			<div class="menu__sync" @click="syncDB">Синхронизация локальной БД и БД</div>
+		</div>
 		<form class="database__form" @submit.prevent="addFace">
 			<input
 				v-model="newFace.name"
 				type="text"
-				placeholder="Имя субъекта"
+				placeholder="Введите имя"
 				class="database__input"
 				required
 			/>
 			<input
 				v-model="newFace.photoUrl"
 				type="url"
-				placeholder="Ссылка на фото"
+				placeholder="Введите URL изображения"
 				class="database__input"
 				required
 			/>
@@ -20,21 +187,20 @@
 		<table class="database__table" v-if="faces.length">
 			<thead class="database__thead">
 				<tr>
-					<th>ID</th>
-					<th>Имя</th>
-					<th>Фото</th>
-					<th>Действия</th>
+					<th class="dtabase__th">ID</th>
+					<th class="dtabase__th">Имя</th>
+					<th class="dtabase__th">Фото</th>
+					<th class="dtabase__th">Действия</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="face in faces" :key="face.id">
-					<td>{{ face.id }}</td>
-					<td>{{ face.name }}</td>
-					<td>
+					<td class="dtabase__td">{{ face.id }}</td>
+					<td class="dtabase__td">{{ face.name }}</td>
+					<td class="dtabase__td">
 						<img :src="face.photoUrl" :alt="face.name" class="database__photo" />
 					</td>
-					<td>
-						<!-- <button @click="editFace(face)" class="database__button">✏️</button> -->
+					<td class="dtabase__td">
 						<button
 							@click="deleteFace(face.id)"
 							class="database__button database__button--delete"
@@ -53,212 +219,30 @@
 		>
 			Удалить все из БД
 		</button>
-
-		<!-- <div v-if="editingFace" class="database__modal">
-			<div class="database__modal-content">
-				<h2>Редактирование</h2>
-				<input v-model="editingFace.name" type="text" class="database__input" />
-				<input v-model="editingFace.photoUrl" type="url" class="database__input" />
-				<button @click="updateFace" class="database__button">Сохранить</button>
-				<button @click="cancelEdit" class="database__button database__button--cancel">
-					Отмена
-				</button>
-			</div>
-		</div> -->
 	</div>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { v4 as uuidv4 } from 'uuid';
-
-const HOST = import.meta.env.VITE_SERVER_HOST;
-const DB = import.meta.env.VITE_SERVER_DB;
-
-// const props = defineProps<{
-
-// }>();
-
-interface Face {
-	id: string;
-	name: string;
-	photoUrl: string;
-}
-
-const faces = ref<Face[]>([]);
-const newFace = ref<Face>({ id: '', name: '', photoUrl: '' });
-// const editingFace = ref<Face | null>(null);
-
-const urlToBase64 = async (imageUrl: string): Promise<string> => {
-	try {
-		const response = await fetch(imageUrl);
-		if (!response.ok)
-			throw new Error(`Не удалось загрузить изображение: ${response.statusText}`);
-		const blob = await response.blob();
-
-		return await new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onloadend = () => resolve(reader.result as string);
-			reader.onerror = () => reject(new Error('Ошибка чтения файла'));
-			reader.readAsDataURL(blob);
-		});
-	} catch (error) {
-		console.error('Ошибка конвертации URL в base64:', error);
-		throw error;
-	}
-};
-
-const fetchFaces = async () => {
-	try {
-		const getAllKeys = await fetch(`${HOST}/get_all_keys`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				request_id: uuidv4(),
-			}),
-		});
-		if (!getAllKeys.ok) throw new Error('Ошибка');
-		console.log('getAllKeys', await getAllKeys.json());
-
-		const response = await fetch(DB);
-		if (!response.ok) throw new Error('Ошибка загрузки базы');
-		faces.value = await response.json();
-	} catch (error) {
-		console.error(error);
-	}
-};
-
-const addFace = async () => {
-	if (!newFace.value.name || !newFace.value.photoUrl) return;
-
-	const requestId = uuidv4();
-	const faceId = uuidv4();
-
-	try {
-		const base64Image = await urlToBase64(newFace.value.photoUrl);
-		const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
-
-		const requestBody = {
-			request_id: requestId,
-			id: faceId,
-			image: imageBase64,
-		};
-
-		const response = await fetch(`${HOST}/add_new_face`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestBody),
-		});
-
-		if (!response.ok) throw new Error('Ошибка');
-
-		const db = await fetch(DB, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				id: faceId,
-				name: newFace.value.name,
-				photoUrl: newFace.value.photoUrl,
-			}),
-		});
-		if (!db.ok) throw new Error('Ошибка');
-		faces.value = await db.json();
-		newFace.value = { id: '', name: '', photoUrl: '' };
-		fetchFaces();
-	} catch (error) {
-		console.error('Ошибка при добавлении:', error);
-	}
-};
-
-const deleteFace = async (id: string) => {
-	try {
-		const response = await fetch(`${HOST}/delete_face`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ request_id: uuidv4(), items: [id] }),
-		});
-
-		if (!response.ok) throw new Error('Ошибка удаления с основного сервера');
-
-		const jsonServerResponse = await fetch(`${DB}/${id}`, {
-			method: 'DELETE',
-		});
-
-		if (!jsonServerResponse.ok) throw new Error('Ошибка удаления из JSON Server');
-
-		faces.value = faces.value.filter((face) => face.id !== id);
-	} catch (error) {
-		console.error('Ошибка удаления:', error);
-	}
-};
-
-const clearDatabase = async () => {
-	try {
-		const response = await fetch(`${HOST}/clear_db`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ request_id: uuidv4() }),
-		});
-
-		if (!response.ok) throw new Error('Ошибка очистки на основном сервере');
-
-		await Promise.all(
-			faces.value.map((face) =>
-				fetch(`${DB}/${face.id}`, {
-					method: 'DELETE',
-				}),
-			),
-		);
-
-		faces.value = [];
-	} catch (error) {
-		console.error('Ошибка очистки базы:', error);
-	}
-};
-
-// const editFace = (face: Face) => {
-// 	editingFace.value = { ...face };
-// };
-
-// const updateFace = async () => {
-// 	if (!editingFace.value) return;
-
-// 	try {
-// 		const requestBody = {
-// 			request_id: uuidv4(),
-// 			id: editingFace.value.id,
-// 			name: editingFace.value.name,
-// 			photoUrl: editingFace.value.photoUrl,
-// 		};
-
-// 		const response = await fetch(`${URL}/add_new_face`, {
-// 			method: 'POST',
-// 			headers: { 'Content-Type': 'application/json' },
-// 			body: JSON.stringify(requestBody),
-// 		});
-
-// 		if (response.ok) {
-// 			console.log('update FACE', await response.json());
-
-// 			const index = faces.value.findIndex((face) => face.id === editingFace.value!.id);
-// 			if (index !== -1) faces.value[index] = { ...editingFace.value };
-// 			editingFace.value = null;
-// 		} else {
-// 			console.error('Ошибка обновления:', await response.json());
-// 		}
-// 	} catch (error) {
-// 		console.error('Ошибка обновления:', error);
-// 	}
-// };
-
-// const cancelEdit = () => {
-// 	editingFace.value = null;
-// };
-
-onMounted(fetchFaces);
-</script>
-
 <style lang="scss" scoped>
+.menu {
+	display: flex;
+	margin: 10px;
+	padding: 10px;
+	border: 1px solid #030000;
+	justify-content: space-between;
+	flex-direction: row;
+	align-items: center;
+
+	&__item {
+		border: 1px solid #060887;
+		padding: 10px;
+	}
+
+	&__sync {
+		border: 1px solid #060887;
+		padding: 10px;
+		cursor: pointer;
+	}
+}
 .database {
 	width: 70%;
 	margin: 55px;
@@ -293,10 +277,6 @@ onMounted(fetchFaces);
 			background-color: #ff0000;
 			margin-top: 10px;
 		}
-
-		&--cancel {
-			background-color: #6c757d;
-		}
 	}
 
 	&__table {
@@ -323,34 +303,11 @@ onMounted(fetchFaces);
 		}
 	}
 
-	// &__thead {
-
-	// }
-
 	&__photo {
 		width: 50px;
 		height: 50px;
 		object-fit: cover;
 		border-radius: 5px;
-	}
-
-	&__modal {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: rgba(0, 0, 0, 0.5);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-
-		&-content {
-			background: white;
-			padding: 20px;
-			border-radius: 5px;
-			text-align: center;
-		}
 	}
 }
 </style>
