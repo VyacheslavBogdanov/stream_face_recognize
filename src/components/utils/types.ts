@@ -7,3 +7,20 @@ export interface MockAPIResponse {
 	status?: number;
 	data?: MessageType[];
 }
+
+export interface Face {
+	bbox: number[];
+	dist: number;
+	real: boolean;
+  }
+
+  export interface ComparisonResponse {
+	request_id: string;
+	detected_faces?: Face[];
+	message?: string;
+  }
+
+  export interface ComparisonResult {
+	message: string;
+	detected_faces?: Face[];
+  }
