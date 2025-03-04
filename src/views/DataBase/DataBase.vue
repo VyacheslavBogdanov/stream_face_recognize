@@ -47,6 +47,7 @@ const fetchFaces = async () => {
 		const db = await fetch(DB);
 		if (!db.ok) throw new Error('Ошибка загрузки базы данных');
 		faces.value = await db.json();
+		console.log('faces.value', faces.value);
 	} catch (error) {
 		console.error(error);
 	}
@@ -54,7 +55,7 @@ const fetchFaces = async () => {
 
 const addFace = async () => {
 	if (!newFace.value.name || !newFace.value.photoUrl) return;
-
+	const id = uuidv4();
 	try {
 		const base64Image = await urlToBase64(newFace.value.photoUrl);
 		const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
@@ -64,7 +65,7 @@ const addFace = async () => {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				request_id: uuidv4(),
-				id: uuidv4(),
+				id: id,
 				image: imageBase64,
 			}),
 		});
@@ -74,7 +75,7 @@ const addFace = async () => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				id: uuidv4(),
+				id: id,
 				name: newFace.value.name,
 				photoUrl: newFace.value.photoUrl,
 			}),
@@ -102,6 +103,7 @@ const deleteFace = async (id: string) => {
 		});
 		if (!db.ok) throw new Error('Ошибка удаления объекта из базы данных');
 		faces.value = faces.value.filter((face) => face.id !== id);
+		fetchFaces();
 	} catch (error) {
 		console.error(error);
 	}
@@ -124,6 +126,31 @@ const clearDatabase = async () => {
 			),
 		);
 		faces.value = [];
+		fetchFaces();
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+const syncDB = async () => {
+	if (vectors.value.length === faces.value.length) return;
+	try {
+		const responses = await Promise.all(
+			faces.value.map(async (face) => {
+				const base64Image = await urlToBase64(face.photoUrl);
+				const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+
+				return fetch(`${HOST}/add_new_face`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						request_id: uuidv4(),
+						id: face.id,
+						image: imageBase64,
+					}),
+				});
+			}),
+		);
 	} catch (error) {
 		console.error(error);
 	}
@@ -137,7 +164,7 @@ onMounted(fetchFaces);
 		<div class="menu">
 			<div class="menu__item">Векторов в БД: {{ vectors.length }}</div>
 			<div class="menu__item">Объектов в локальной БД: {{ faces.length }}</div>
-			<div class="menu__sync">Синхронизация локальной БД и БД</div>
+			<div class="menu__sync" @click="syncDB">Синхронизация локальной БД и БД</div>
 		</div>
 		<form class="database__form" @submit.prevent="addFace">
 			<input

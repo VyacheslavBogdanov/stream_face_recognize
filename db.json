@@ -1,18 +1,33 @@
 {
   "people": [
     {
-      "id": "4db3c0f2-26a1-45f7-8236-8d81d9ce23aa",
-      "name": "No name",
+      "id": "9ee23877-1d1c-4759-81a6-ec79788b8fab",
+      "name": "ad",
+      "photoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTqq87z7OSPXOnesnGH90XuxyiQniOa4W-eA&s"
+    },
+    {
+      "id": "a86c2400-2e84-4443-bf0d-91a71101ed3d",
+      "name": "dafdsa",
       "photoUrl": "https://img.freepik.com/free-photo/portrait-handsome-brunet-unshaven-adult-man-looks-with-calm-confident-expression-has-serious-look-wears-casual-jumper-poses-making-photo-against-white-background-being-hard-impress_273609-57668.jpg?semt=ais_hybrid"
     },
     {
-      "id": "4f9d1f91-9b4e-4564-a1cc-9161c5c76957",
-      "name": "Misha",
-      "photoUrl": "https://s0.rbk.ru/v6_top_pics/media/img/8/23/756747291154238.webp"
+      "id": "9ee23877-1d1c-4759-81a6-ec79788b8fab",
+      "name": "ad",
+      "photoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTqq87z7OSPXOnesnGH90XuxyiQniOa4W-eA&s"
     },
     {
-      "id": "d8cb3bd3-6539-40c6-a0df-e2c9959defd9",
-      "name": "Zhenya",
+      "id": "a86c2400-2e84-4443-bf0d-91a71101ed3d",
+      "name": "dafdsa",
+      "photoUrl": "https://img.freepik.com/free-photo/portrait-handsome-brunet-unshaven-adult-man-looks-with-calm-confident-expression-has-serious-look-wears-casual-jumper-poses-making-photo-against-white-background-being-hard-impress_273609-57668.jpg?semt=ais_hybrid"
+    },
+    {
+      "id": "9ee23877-1d1c-4759-81a6-ec79788b8fab",
+      "name": "ad",
+      "photoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTqq87z7OSPXOnesnGH90XuxyiQniOa4W-eA&s"
+    },
+    {
+      "id": "a86c2400-2e84-4443-bf0d-91a71101ed3d",
+      "name": "dafdsa",
       "photoUrl": "https://img.freepik.com/free-photo/portrait-handsome-brunet-unshaven-adult-man-looks-with-calm-confident-expression-has-serious-look-wears-casual-jumper-poses-making-photo-against-white-background-being-hard-impress_273609-57668.jpg?semt=ais_hybrid"
     }
   ]
