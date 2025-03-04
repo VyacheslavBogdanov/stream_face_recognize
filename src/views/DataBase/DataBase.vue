@@ -8,7 +8,7 @@ const DB = import.meta.env.VITE_SERVER_DB;
 
 const faces = ref<Face[]>([]);
 const newFace = ref<Face>({ id: '', name: '', photoUrl: '' });
-const vectors = ref<Number>(0);
+const vectors = ref<string[]>([]);
 
 const urlToBase64 = async (imageUrl: string): Promise<string> => {
 	try {
@@ -30,14 +30,19 @@ const urlToBase64 = async (imageUrl: string): Promise<string> => {
 
 const fetchFaces = async () => {
 	try {
-		// const response = await fetch(`${HOST}/get_all_keys`, {
-		// 	method: 'POST',
-		// 	headers: { 'Content-Type': 'application/json' },
-		// 	body: JSON.stringify({
-		// 		request_id: uuidv4(),
-		// 	}),
-		// });
-		// if (!response.ok) throw new Error('Ошибка получения ключей');
+		const response = await fetch(`${HOST}/get_all_keys`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				request_id: uuidv4(),
+			}),
+		});
+		if (!response.ok) throw new Error('Ошибка получения ключей');
+		const allKeys = await response.json();
+		console.log('allKeys', allKeys);
+
+		vectors.value = allKeys.result;
+		console.log('vectors.value', vectors.value);
 
 		const db = await fetch(DB);
 		if (!db.ok) throw new Error('Ошибка загрузки базы данных');
@@ -130,7 +135,7 @@ onMounted(fetchFaces);
 <template>
 	<div class="database">
 		<div class="menu">
-			<div class="menu__item">Векторов в БД: {{ vectors }}</div>
+			<div class="menu__item">Векторов в БД: {{ vectors.length }}</div>
 			<div class="menu__item">Объектов в локальной БД: {{ faces.length }}</div>
 			<div class="menu__sync">Синхронизация локальной БД и БД</div>
 		</div>
