@@ -57,19 +57,19 @@ const addFace = async () => {
 	if (!newFace.value.name || !newFace.value.photoUrl) return;
 	const id = uuidv4();
 	try {
-		const base64Image = await urlToBase64(newFace.value.photoUrl);
-		const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+		// const base64Image = await urlToBase64(newFace.value.photoUrl);
+		// const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
 
-		const response = await fetch(`${HOST}/add_new_face`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				request_id: uuidv4(),
-				id: id,
-				image: imageBase64,
-			}),
-		});
-		if (!response.ok) throw new Error('Ошибка добавления вектора');
+		// const response = await fetch(`${HOST}/add_new_face`, {
+		// 	method: 'POST',
+		// 	headers: { 'Content-Type': 'application/json' },
+		// 	body: JSON.stringify({
+		// 		request_id: uuidv4(),
+		// 		id: id,
+		// 		image: imageBase64,
+		// 	}),
+		// });
+		// if (!response.ok) throw new Error('Ошибка добавления вектора');
 
 		const db = await fetch(DB, {
 			method: 'POST',
@@ -135,7 +135,7 @@ const clearDatabase = async () => {
 const syncDB = async () => {
 	if (vectors.value.length === faces.value.length) return;
 	try {
-		const responses = await Promise.all(
+		await Promise.all(
 			faces.value.map(async (face) => {
 				const base64Image = await urlToBase64(face.photoUrl);
 				const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
@@ -151,6 +151,7 @@ const syncDB = async () => {
 				});
 			}),
 		);
+		fetchFaces();
 	} catch (error) {
 		console.error(error);
 	}

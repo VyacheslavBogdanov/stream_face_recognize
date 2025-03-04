@@ -1,34 +1,29 @@
 {
   "people": [
     {
-      "id": "9ee23877-1d1c-4759-81a6-ec79788b8fab",
-      "name": "ad",
-      "photoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTqq87z7OSPXOnesnGH90XuxyiQniOa4W-eA&s"
-    },
-    {
-      "id": "a86c2400-2e84-4443-bf0d-91a71101ed3d",
-      "name": "dafdsa",
+      "id": "2b1f85bc-219d-41ed-b4d1-2cf1b6d9965a",
+      "name": "dsadsadsa",
       "photoUrl": "https://img.freepik.com/free-photo/portrait-handsome-brunet-unshaven-adult-man-looks-with-calm-confident-expression-has-serious-look-wears-casual-jumper-poses-making-photo-against-white-background-being-hard-impress_273609-57668.jpg?semt=ais_hybrid"
     },
     {
-      "id": "9ee23877-1d1c-4759-81a6-ec79788b8fab",
-      "name": "ad",
-      "photoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTqq87z7OSPXOnesnGH90XuxyiQniOa4W-eA&s"
-    },
-    {
-      "id": "a86c2400-2e84-4443-bf0d-91a71101ed3d",
-      "name": "dafdsa",
+      "id": "981ede80-0e23-4122-9892-a5259c1671a8",
+      "name": "adsad",
       "photoUrl": "https://img.freepik.com/free-photo/portrait-handsome-brunet-unshaven-adult-man-looks-with-calm-confident-expression-has-serious-look-wears-casual-jumper-poses-making-photo-against-white-background-being-hard-impress_273609-57668.jpg?semt=ais_hybrid"
     },
     {
-      "id": "9ee23877-1d1c-4759-81a6-ec79788b8fab",
-      "name": "ad",
-      "photoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTqq87z7OSPXOnesnGH90XuxyiQniOa4W-eA&s"
+      "id": "3f7257e5-9c97-47ba-abb4-ff01aea404a8",
+      "name": "dasdas",
+      "photoUrl": "https://img.freepik.com/free-photo/portrait-handsome-brunet-unshaven-adult-man-looks-with-calm-confident-expression-has-serious-look-wears-casual-jumper-poses-making-photo-against-white-background-being-hard-impress_273609-57668.jpg?semt=ais_hybrid"
     },
     {
-      "id": "a86c2400-2e84-4443-bf0d-91a71101ed3d",
-      "name": "dafdsa",
-      "photoUrl": "https://img.freepik.com/free-photo/portrait-handsome-brunet-unshaven-adult-man-looks-with-calm-confident-expression-has-serious-look-wears-casual-jumper-poses-making-photo-against-white-background-being-hard-impress_273609-57668.jpg?semt=ais_hybrid"
+      "id": "87cbddcd-f93a-40c7-a8a5-1b78223b6a20",
+      "name": "Вася",
+      "photoUrl": "https://img.freepik.com/free-photo/emotions-people-concept-headshot-serious-looking-handsome-man-with-beard-looking-confident-determined_1258-26730.jpg"
+    },
+    {
+      "id": "a049809a-884d-44aa-b050-a1529b752edd",
+      "name": "Стэтхем",
+      "photoUrl": "https://maxmoore.ru/img/2638/8258/skin-care-for-men-over-30-main-xl.jpg"
     }
   ]
 }
