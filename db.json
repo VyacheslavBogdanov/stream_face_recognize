@@ -1,24 +1,19 @@
 {
   "people": [
     {
-      "id": "143d10c9-9b89-4abd-9779-db3d81b58a96",
-      "name": "Вася",
-      "photoUrl": "https://img.freepik.com/free-photo/emotions-people-concept-headshot-serious-looking-handsome-man-with-beard-looking-confident-determined_1258-26730.jpg"
+      "id": "4db3c0f2-26a1-45f7-8236-8d81d9ce23aa",
+      "name": "No name",
+      "photoUrl": "https://img.freepik.com/free-photo/portrait-handsome-brunet-unshaven-adult-man-looks-with-calm-confident-expression-has-serious-look-wears-casual-jumper-poses-making-photo-against-white-background-being-hard-impress_273609-57668.jpg?semt=ais_hybrid"
     },
     {
-      "id": "b26fe5d9-50a7-4075-a9f0-e59685858c36",
-      "name": "Юра",
-      "photoUrl": "https://img.freepik.com/free-photo/smiley-handsome-man-posing-shirtless_23-2148696641.jpg?semt=ais_hybrid"
+      "id": "4f9d1f91-9b4e-4564-a1cc-9161c5c76957",
+      "name": "Misha",
+      "photoUrl": "https://s0.rbk.ru/v6_top_pics/media/img/8/23/756747291154238.webp"
     },
     {
-      "id": "724d49d0-6106-40c9-9d53-868fd26f5c7b",
-      "name": "Егорка",
-      "photoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjtDjS5JR_T50vKqV6pcq7DVtlh3V2IMyM8w&s"
-    },
-    {
-      "id": "c88e3b71-fbe2-4c12-8716-f626f45c05de",
-      "name": "adasd",
-      "photoUrl": "https://img.freepik.com/free-photo/emotions-people-concept-headshot-serious-looking-handsome-man-with-beard-looking-confident-determined_1258-26730.jpg"
+      "id": "d8cb3bd3-6539-40c6-a0df-e2c9959defd9",
+      "name": "Zhenya",
+      "photoUrl": "https://img.freepik.com/free-photo/portrait-handsome-brunet-unshaven-adult-man-looks-with-calm-confident-expression-has-serious-look-wears-casual-jumper-poses-making-photo-against-white-background-being-hard-impress_273609-57668.jpg?semt=ais_hybrid"
     }
   ]
 }

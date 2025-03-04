@@ -11,6 +11,7 @@ const Url = import.meta.env.VITE_SERVER_HOST;
 
 			if (response.ok) {
 				const data = await response.json();
+
 				// Для тестирования
 				// const data = { result: 0 };
 
