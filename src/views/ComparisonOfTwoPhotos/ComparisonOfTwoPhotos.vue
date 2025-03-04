@@ -120,16 +120,24 @@ const comparePhotos = async () => {
 
 			targetBboxes.value = result.detected_faces[0]?.bbox || [];
 		} else {
-			comparisonResult.value = { message: 'На одной из фотографий лиц не обнаружено.' };
+			comparisonResult.value = {
+				message: 'На одной из фотографий лиц не обнаружено.',
+				type: 'compare--error',
+				detected_faces: [],
+			};
 		}
 	} catch (error: unknown) {
 		if (error instanceof Error) {
 			comparisonResult.value = {
-				message: 'Произошла ошибка при отправке запроса: ' + error.message,
+				message: 'На одной из фотографий лиц не обнаружено.',
+				type: 'compare--error',
+				detected_faces: [],
 			};
 		} else {
 			comparisonResult.value = {
-				message: 'Произошла неизвестная ошибка',
+				message: 'На одной из фотографий лиц не обнаружено.',
+				type: 'compare--error',
+				detected_faces: [],
 			};
 		}
 	}
@@ -137,27 +145,37 @@ const comparePhotos = async () => {
 
 const processComparisonResult = (result: ComparisonResponse): ComparisonResult => {
 	const { detected_faces } = result;
-	let message = '';
+	let messageType = 'compare--info';
+	let message = props.messageTypes.find((type) => type.class === messageType)?.message || '';
 
-	if (detected_faces && detected_faces.length > 0) {
-		const dist = detected_faces[0]?.dist || 0;
-
-		if (dist > 0.25) {
-			message = 'Скорее всего, это один и тот же человек';
-		} else {
-			message = 'Это разные люди';
-		}
-
-		if (detected_faces.some((face: Face) => face.real === false)) {
-			message = 'Попытка обмана системы';
-		}
+	if (!detected_faces || detected_faces.length === 0) {
+		messageType = 'compare--error';
+		message =
+			props.messageTypes.find((type) => type.class === messageType)?.message || 'Ошибка!';
 	} else {
-		message = 'На одной из фотографий лиц не обнаружено.';
+		if (detected_faces.some((face: Face) => !face.real)) {
+			messageType = 'compare--error';
+			message =
+				props.messageTypes.find((type) => type.class === messageType)?.message ||
+				'Попытка обмана!';
+		} else {
+			const dist = detected_faces[0].dist;
+
+			if (dist > 0.25) {
+				messageType = 'compare--warning';
+			} else {
+				messageType = 'compare--success';
+			}
+			message =
+				props.messageTypes.find((type) => type.class === messageType)?.message ||
+				'Результат неизвестен';
+		}
 	}
 
 	return {
 		detected_faces: detected_faces || [],
 		message,
+		type: messageType,
 	};
 };
 </script>
@@ -191,6 +209,33 @@ const processComparisonResult = (result: ComparisonResponse): ComparisonResult =
 	background-color: #e3e3ff;
 	color: $color-primary;
 }
+.compare--success {
+	background-color: #e0fde7;
+	color: #2a9b44;
+}
+.compare--warning {
+	background-color: #f9ebd8;
+	color: #d77417;
+}
+.compare--error {
+	background-color: #f2dee0;
+	color: #db1428;
+}
+.face-info {
+	background: #f4f4f4;
+	padding: 8px;
+	margin-top: 5px;
+	border-radius: 5px;
+}
+.real {
+	color: green;
+	font-weight: bold;
+}
+.fake {
+	color: red;
+	font-weight: bold;
+}
+
 .comparison-of-photos {
 	display: flex;
 	flex-direction: column;
