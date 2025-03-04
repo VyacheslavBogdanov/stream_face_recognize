@@ -59,6 +59,7 @@ const emit = defineEmits<{
 		border-color: #bfbfbf;
 		color: #a0a0a0;
 		opacity: 0.7;
+		transition: none;
 	}
 
 	&__name {
