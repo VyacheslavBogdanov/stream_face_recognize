@@ -5,7 +5,7 @@ export function useHealthCheck() {
 	let intervalId: number | undefined;
 
 	const checkHealth = async () => {
-		const Url = import.meta.env.VITE_SERVER_HOST;
+const Url = import.meta.env.VITE_SERVER_HOST;
 		try {
 			const response = await fetch(`${Url}/health`);
 

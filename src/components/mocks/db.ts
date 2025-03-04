@@ -3,8 +3,8 @@ import type { MessageType, MockAPIResponse } from '../utils/types';
 const messageTypes: MessageType[] = [
 	{ class: 'health--success', message: 'Детектор работает корректно' },
 	{ class: 'health--warning', message: 'Обнаружен сбой детектора' },
-	{ class: 'result--fire', message: 'Огонь обнаружен' },
-	{ class: 'result--no-fire', message: 'Огонь не обнаружен' },
+    {class: 'compare--info', message: 'Загрузите оба изображения!'},
+
 ];
 
 const mockAPI = (endpoint: string): Promise<MockAPIResponse> => {
