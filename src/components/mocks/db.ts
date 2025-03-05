@@ -1,10 +1,11 @@
 import type { MessageType, MockAPIResponse } from '../utils/types';
 
-const messageTypes: MessageType[] = [
+export const messageTypes: MessageType[] = [
 	{ class: 'health--success', message: 'Детектор работает корректно' },
 	{ class: 'health--warning', message: 'Обнаружен сбой детектора' },
 
-    { class: 'compare--info', message: 'Загрузите оба изображения!'},
+	{ class: 'error-server', message: 'Ошибка при запросе'},
+    { class: 'compare--info', message: 'Загрузите оба изображения'},
 	{ class: 'compare--error', message: 'На одной из фотографий лиц не обнаружено' },
 	{ class: 'compare--error', message: 'Попытка обмана системы' },
 	{ class: 'compare--warning', message: 'Скорее всего, это один и тот же человек' },
