@@ -57,19 +57,19 @@ const addFace = async () => {
 	if (!newFace.value.name || !newFace.value.photoUrl) return;
 	const id = uuidv4();
 	try {
-		const base64Image = await urlToBase64(newFace.value.photoUrl);
-		const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+		// const base64Image = await urlToBase64(newFace.value.photoUrl);
+		// const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
 
-		const response = await fetch(`${HOST}/add_new_face`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				request_id: uuidv4(),
-				id: id,
-				image: imageBase64,
-			}),
-		});
-		if (!response.ok) throw new Error('Ошибка добавления вектора');
+		// const response = await fetch(`${HOST}/add_new_face`, {
+		// 	method: 'POST',
+		// 	headers: { 'Content-Type': 'application/json' },
+		// 	body: JSON.stringify({
+		// 		request_id: uuidv4(),
+		// 		id: id,
+		// 		image: imageBase64,
+		// 	}),
+		// });
+		// if (!response.ok) throw new Error('Ошибка добавления вектора');
 
 		const db = await fetch(DB, {
 			method: 'POST',
@@ -190,7 +190,9 @@ onMounted(fetchFaces);
 		<div class="menu">
 			<div class="menu__item">Векторов в БД: {{ vectors.length }}</div>
 			<div class="menu__item">Объектов в локальной БД: {{ faces.length }}</div>
-			<div class="menu__sync" @click="syncDB">Синхронизация локальной БД и БД</div>
+			<div class="menu__sync">
+				<button class="menu__syncBtn" @click="syncDB">Синхронизация</button>
+			</div>
 		</div>
 		<form class="database__form" @submit.prevent="addFace">
 			<input
@@ -220,12 +222,21 @@ onMounted(fetchFaces);
 			</thead>
 			<tbody>
 				<tr v-for="face in faces" :key="face.id">
-					<td class="dtabase__td">{{ face.id }}</td>
-					<td class="dtabase__td">{{ face.name }}</td>
-					<td class="dtabase__td">
+					<td class="database__td">
+						<div class="database__id">
+							<span
+								class="database__warning"
+								title="Отсутствует вектор в базе данных. Сделайте синхронизацию!"
+								>ⓘ</span
+							>
+							<span>{{ face.id }}</span>
+						</div>
+					</td>
+					<td class="database__td">{{ face.name }}</td>
+					<td class="database__td">
 						<img :src="face.photoUrl" :alt="face.name" class="database__photo" />
 					</td>
-					<td class="dtabase__td">
+					<td class="database__td">
 						<button
 							@click="deleteFace(face.id)"
 							class="database__button database__button--delete"
@@ -248,6 +259,7 @@ onMounted(fetchFaces);
 </template>
 
 <style lang="scss" scoped>
+@import '../../styles/main.scss';
 .menu {
 	display: flex;
 	margin: 10px;
@@ -256,18 +268,54 @@ onMounted(fetchFaces);
 	justify-content: space-between;
 	flex-direction: row;
 	align-items: center;
+}
 
-	&__item {
-		border: 1px solid #060887;
-		padding: 10px;
+.menu__item {
+	border: 1px solid #060887;
+	padding: 10px;
+}
+
+.menu__sync {
+	border: 1px solid #060887;
+	padding: 10px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.menu__syncBtn {
+	background: none;
+	border: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	// width: 40px;
+	// height: 40px;
+}
+
+.menu__syncBtn::before {
+	content: '\21BB';
+	font-size: 24px;
+	display: inline-block;
+	transform-origin: center;
+}
+
+.menu__syncBtn:hover::before {
+	animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+	0% {
+		transform: rotate(0deg);
 	}
-
-	&__sync {
-		border: 1px solid #060887;
-		padding: 10px;
-		cursor: pointer;
+	100% {
+		transform: rotate(360deg);
 	}
 }
+
 .database {
 	width: 70%;
 	margin: 55px;
@@ -326,6 +374,31 @@ onMounted(fetchFaces);
 				0px 10px 70px -4px rgba(17, 24, 41, 0.1);
 			padding: 25px;
 		}
+	}
+
+	&__id {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	&__warning {
+		padding: 10px;
+		border-radius: $border-radius;
+		max-width: fit-content;
+		word-wrap: break-word;
+		font-size: 23px;
+		height: 40px;
+		opacity: 0.85;
+		margin: 20px 0;
+		// background-color: #f9ebd8;
+		color: $color-warning;
+		// transform: rotate(180deg);
+	}
+
+	&__warning:hover {
+		cursor: pointer;
 	}
 
 	&__photo {
