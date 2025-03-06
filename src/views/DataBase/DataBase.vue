@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import type { Face } from '../../components/utils/types.ts';
 
@@ -9,6 +9,8 @@ const DB = import.meta.env.VITE_SERVER_DB;
 const faces = ref<Face[]>([]);
 const newFace = ref<Face>({ id: '', name: '', photoUrl: '' });
 const vectors = ref<string[]>([]);
+const isSync = ref<boolean>(false);
+const syncRequired = computed(() => faces.value.length !== vectors.value.length);
 
 const urlToBase64 = async (imageUrl: string): Promise<string> => {
 	try {
@@ -30,11 +32,14 @@ const urlToBase64 = async (imageUrl: string): Promise<string> => {
 
 const fetchFaces = async () => {
 	try {
+		const uuid = uuidv4();
+		console.log('uuid', uuid);
+
 		const response = await fetch(`${HOST}/get_all_keys`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				request_id: uuidv4(),
+				request_id: uuid,
 			}),
 		});
 		if (!response.ok) throw new Error('Ошибка получения ключей');
@@ -134,6 +139,7 @@ const clearDatabase = async () => {
 
 const syncDB = async () => {
 	if (vectors.value.length === faces.value.length) return;
+	isSync.value = true;
 	const faceIds = faces.value.map((face) => face.id);
 	const vectorIds = new Set(vectors.value);
 
@@ -180,6 +186,7 @@ const syncDB = async () => {
 		}
 	}
 	fetchFaces();
+	isSync.value = false;
 };
 
 onMounted(fetchFaces);
@@ -188,10 +195,23 @@ onMounted(fetchFaces);
 <template>
 	<div class="database">
 		<div class="menu">
-			<div class="menu__item">Векторов в БД: {{ vectors.length }}</div>
-			<div class="menu__item">Объектов в локальной БД: {{ faces.length }}</div>
+			<div :class="{ menu__item: true, 'menu__item--syncRequired': syncRequired }">
+				Векторов в БД: {{ vectors.length }}
+			</div>
+			<div :class="{ menu__item: true, 'menu__item--syncRequired': syncRequired }">
+				Объектов в локальной БД: {{ faces.length }}
+			</div>
 			<div class="menu__sync">
-				<button class="menu__syncBtn" @click="syncDB">Синхронизация</button>
+				<button
+					:class="{
+						menu__syncBtn: true,
+						'menu__syncBtn--syncRequired': syncRequired,
+						'menu__syncBtn--isSync': true,
+					}"
+					@click="syncDB"
+				>
+					Синхронизация
+				</button>
 			</div>
 		</div>
 		<form class="database__form" @submit.prevent="addFace">
@@ -225,6 +245,7 @@ onMounted(fetchFaces);
 					<td class="database__td">
 						<div class="database__id">
 							<span
+								v-if="!vectors.includes(face.id)"
 								class="database__warning"
 								title="Отсутствует вектор в базе данных. Сделайте синхронизацию!"
 								>ⓘ</span
@@ -264,19 +285,21 @@ onMounted(fetchFaces);
 	display: flex;
 	margin: 10px;
 	padding: 10px;
-	border: 1px solid #030000;
 	justify-content: space-between;
-	flex-direction: row;
+	flex-direction: row-reverse;
 	align-items: center;
 }
 
 .menu__item {
-	border: 1px solid #060887;
+	font-weight: bold;
 	padding: 10px;
+
+	&--syncRequired {
+		color: #dc3545;
+	}
 }
 
 .menu__sync {
-	border: 1px solid #060887;
 	padding: 10px;
 	cursor: pointer;
 	display: flex;
@@ -285,15 +308,20 @@ onMounted(fetchFaces);
 }
 
 .menu__syncBtn {
-	background: none;
+	padding: 8px 12px;
+	background-color: #007bff;
+	color: #fff;
 	border: none;
+	border-radius: 5px;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	position: relative;
-	// width: 40px;
-	// height: 40px;
+
+	&--syncRequired {
+		background-color: #dc3545;
+	}
 }
 
 .menu__syncBtn::before {
@@ -301,6 +329,7 @@ onMounted(fetchFaces);
 	font-size: 24px;
 	display: inline-block;
 	transform-origin: center;
+	margin-right: 7px;
 }
 
 .menu__syncBtn:hover::before {
@@ -347,7 +376,7 @@ onMounted(fetchFaces);
 		}
 
 		&--danger {
-			background-color: #ff0000;
+			background-color: #dc3545;
 			margin-top: 10px;
 		}
 	}
