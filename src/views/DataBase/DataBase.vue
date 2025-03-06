@@ -413,17 +413,14 @@ onMounted(fetchFaces);
 	}
 
 	&__warning {
-		padding: 10px;
+		padding: 0 10px 0 0;
 		border-radius: $border-radius;
 		max-width: fit-content;
 		word-wrap: break-word;
 		font-size: 23px;
 		height: 40px;
 		opacity: 0.85;
-		margin: 20px 0;
-		// background-color: #f9ebd8;
 		color: $color-warning;
-		// transform: rotate(180deg);
 	}
 
 	&__warning:hover {

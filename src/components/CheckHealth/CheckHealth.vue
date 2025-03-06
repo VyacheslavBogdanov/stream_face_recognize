@@ -39,9 +39,8 @@ const filteredMessageTypes = computed(() => {
 @import '../../styles/main.scss';
 
 .header {
-	// display: flex;
-	// gap: 1rem;
 	width: 100%;
+	height: 100px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -52,6 +51,11 @@ const filteredMessageTypes = computed(() => {
 		0px 3px 8px -6px rgba(24, 39, 75, 0.05),
 		0px 10px 36px -4px rgba(17, 24, 41, 0.1);
 
+	&__nav {
+		font-size: 25px;
+		position: relative;
+	}
+
 	&__link {
 		color: rgb(0, 0, 0);
 		text-decoration: none;
@@ -60,7 +64,7 @@ const filteredMessageTypes = computed(() => {
 		transition: background 0.3s ease;
 
 		&.router-link-active {
-			background: #1f2c5649;
+			background: #e1e4ee;
 		}
 	}
 }
@@ -76,7 +80,7 @@ const filteredMessageTypes = computed(() => {
 	font-size: 23px;
 	height: 40px;
 	opacity: 0.85;
-	margin: 20px 0;
+	margin: 0 70px;
 
 	@media (max-width: 835px) {
 		font-size: 17px;
