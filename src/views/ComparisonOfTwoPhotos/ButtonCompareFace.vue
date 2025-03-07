@@ -31,7 +31,9 @@ const emit = defineEmits<{
 	transition: all 0.05s linear;
 	font-family: inherit;
 	margin: auto;
-	display: block;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
 	&:hover {
 		cursor: pointer;

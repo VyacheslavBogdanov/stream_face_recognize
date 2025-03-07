@@ -128,6 +128,5 @@ const handleImageError = () => {
 </script>
 
 <style scoped lang="scss">
-@import '../../styles/main.scss';
 @import './Style/UploadStyle.scss';
 </style>
