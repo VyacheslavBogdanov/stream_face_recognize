@@ -9,7 +9,12 @@
 			/>
 		</div>
 
-		<ButtonCompareFace :isDisabled="isDisabled" @compare="comparePhotos" />
+		<div class="comparison-of-photos__group">
+			<ButtonCompareFace :isDisabled="isDisabled" @compare="comparePhotos" />
+			<div v-if="infoCompare" class="comparison-of-photos__infoCompare">
+				<span>{{ infoCompare }}</span>
+			</div>
+		</div>
 
 		<div
 			v-if="comparisonResult?.class"
@@ -45,6 +50,7 @@ const targetImageBase64 = ref<string | null>(null);
 const sourceImageBase64 = ref<string | null>(null);
 const comparisonResult = ref<{ class: string; message: string } | null>(null);
 const targetBboxes = ref<number[]>([]);
+const infoCompare = ref<string | null>(null);
 
 const updateTargetImage = (imageData: string) => {
 	targetImageBase64.value = imageData;
@@ -63,6 +69,7 @@ const comparePhotos = async () => {
 			class: 'comparison-of-photos__message--info',
 			message: props.messageTypes.find((msg) => msg.class === 'compare--info')?.message,
 		};
+		infoCompare.value = null;
 		return;
 	}
 
@@ -91,6 +98,7 @@ const comparePhotos = async () => {
 			class: 'comparison-of-photos__message--error',
 			message: props.messageTypes.find((msg) => msg.class === 'error-server')?.message,
 		};
+		infoCompare.value = null;
 	}
 };
 
@@ -102,15 +110,19 @@ const processComparisonResult = (detected_faces: Face[]) => {
 		};
 	}
 
-	if (detected_faces.some((face) => !face.real)) {
+	const face = detected_faces[0];
+	const dist = face.dist;
+	const isReal = face.real ? 'Real' : 'Fake';
+	infoCompare.value = `${isReal} | Dist: ${dist !== null ? dist.toFixed(2) : 'null'}`;
+
+	if (!face.real) {
 		return {
 			class: 'comparison-of-photos__message--error',
 			message: props.messageTypes.find((msg) => msg.class === 'compare--error')?.message,
 		};
 	}
 
-	const dist = detected_faces[0].dist;
-	return dist > 0.25
+	return dist !== null && dist > 0.25
 		? {
 				class: 'comparison-of-photos__message--warning',
 				message: props.messageTypes.find((msg) => msg.class === 'compare--warning')
@@ -135,6 +147,35 @@ const processComparisonResult = (detected_faces: Face[]) => {
 	&__upload-container {
 		display: flex;
 		gap: 20px;
+	}
+
+	.comparison-of-photos__group {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		position: relative;
+	}
+
+	.comparison-of-photos__infoCompare {
+		position: absolute;
+		top: 0;
+		right: 0;
+		height: 50px;
+		padding: 0 30px;
+		border: 3px solid #513d3d;
+		border-radius: $border-radius;
+		background: $color-bg;
+		color: #333;
+		font-size: 18px;
+		font-weight: bold;
+		text-align: center;
+		width: 200px;
+		font-weight: 500;
+		font-family: inherit;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		box-sizing: border-box;
 	}
 
 	&__result {
