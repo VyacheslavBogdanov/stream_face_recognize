@@ -14,3 +14,8 @@ export interface Face {
 	real: boolean;
 }
 
+export interface FaceDB {
+	id: string;
+	name: string;
+	photoUrl: string;
+}

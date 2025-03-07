@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import type { Face } from '../../components/utils/types.ts';
+import type { FaceDB } from '../../components/utils/types.ts';
 
 const HOST = import.meta.env.VITE_SERVER_HOST;
 const DB = import.meta.env.VITE_SERVER_DB;
 
-const faces = ref<Face[]>([]);
-const newFace = ref<Face>({ id: '', name: '', photoUrl: '' });
+const faces = ref<FaceDB[]>([]);
+const newFace = ref<FaceDB>({ id: '', name: '', photoUrl: '' });
 const vectors = ref<string[]>([]);
 const isSync = ref<boolean>(false);
 const syncRequired = computed(() => faces.value.length !== vectors.value.length);
