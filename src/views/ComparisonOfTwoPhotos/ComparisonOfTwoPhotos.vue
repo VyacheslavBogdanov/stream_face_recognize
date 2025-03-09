@@ -66,8 +66,8 @@ const Base64Image = (base64String: string) =>
 const comparePhotos = async () => {
 	if (!targetImageBase64.value || !sourceImageBase64.value) {
 		comparisonResult.value = {
-			class: 'comparison-of-photos__message--info',
-			message: props.messageTypes.find((msg) => msg.class === 'compare--info')?.message,
+			class: 'comparison-of-photos__message--photo',
+			message: props.messageTypes.find((msg) => msg.class === 'compare--photo')?.message,
 		};
 		infoCompare.value = null;
 		return;
@@ -216,6 +216,10 @@ const processComparisonResult = (detected_faces: Face[]) => {
 		&--error {
 			background-color: #f2dee0;
 			color: #db1428;
+		}
+		&--photo {
+			background-color: rgb(176, 174, 174);
+			color: #333;
 		}
 	}
 }
