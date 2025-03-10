@@ -1,43 +1,18 @@
 {
   "people": [
     {
-      "id": "d7bb83e3-8b15-4c3d-a977-4e6975debe11",
-      "name": "Евгений",
-      "photoUrl": "https://cdn.trinixy.ru/pics6/20211229/222430_4_trinixy_ru.jpg"
-    },
-    {
-      "id": "7d0d84da-bf7b-4c80-b2e2-e346fc09b9a7",
-      "name": "Jake",
-      "photoUrl": "https://avatars.dzeninfra.ru/get-zen_doc/1811900/pub_5dd40d1d3676ed2b9e74d93d_5dd410579c52392b6e2b3d80/scale_1200"
-    },
-    {
-      "id": "5e7bc11c-1b3d-414f-98d3-870af07bb375",
-      "name": "TestFace",
-      "photoUrl": "https://kartinki.pics/uploads/posts/2022-03/1648048156_14-kartinkin-net-p-kartinki-litsa-cheloveka-15.jpg"
-    },
-    {
-      "id": "5f0ff194-6bdf-472c-ae14-294014331780",
-      "name": "123",
-      "photoUrl": "https://kartinki.pics/uploads/posts/2022-03/1648048156_14-kartinkin-net-p-kartinki-litsa-cheloveka-15.jpg"
-    },
-    {
-      "id": "c3e2ee3e-a3e8-4303-804f-c45a59dbd42e",
-      "name": "qwerty",
-      "photoUrl": "https://kartinki.pics/uploads/posts/2022-03/1648048156_14-kartinkin-net-p-kartinki-litsa-cheloveka-15.jpg"
-    },
-    {
-      "id": "569b1956-b0b6-43b9-b85a-30e109509365",
-      "name": "adssd",
-      "photoUrl": "https://kartinki.pics/uploads/posts/2022-03/1648048156_14-kartinkin-net-p-kartinki-litsa-cheloveka-15.jpg"
-    },
-    {
-      "id": "a1a12e3b-7743-4730-a765-b3ec456fd082",
-      "name": "ыфвф",
+      "id": "f67b58bf-08c6-4c70-90b5-a864fd979bd0",
+      "name": "SAs",
       "photoUrl": "https://barbercompany.com/image/catalog/Blog/2024/buzz-cut.jpg"
     },
     {
-      "id": "785c2bf5-f14e-4c84-a296-489137b41342",
-      "name": "вфыв",
+      "id": "a507bc2e-842a-4e5e-a047-d2a3a74cb72d",
+      "name": "asdqs",
+      "photoUrl": "https://barbercompany.com/image/catalog/Blog/2024/buzz-cut.jpg"
+    },
+    {
+      "id": "f7c71258-1004-45a2-9a87-f51f574948b6",
+      "name": "sadsa",
       "photoUrl": "https://barbercompany.com/image/catalog/Blog/2024/buzz-cut.jpg"
     }
   ]

@@ -41,6 +41,7 @@ const filteredMessageTypes = computed(() => {
 .header {
 	width: 100%;
 	height: 100px;
+	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -70,7 +71,8 @@ const filteredMessageTypes = computed(() => {
 }
 
 .health {
-	position: relative;
+	position: absolute;
+	left: 20%;
 	display: flex;
 	align-items: center;
 	padding: 10px 30px 10px 40px;
@@ -89,7 +91,7 @@ const filteredMessageTypes = computed(() => {
 	&__icon {
 		display: flex;
 		position: absolute;
-		transform: rotate(180deg);
+		align-items: center;
 		left: 10px;
 		height: 30px;
 	}

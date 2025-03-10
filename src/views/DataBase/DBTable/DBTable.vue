@@ -79,17 +79,18 @@ const emit = defineEmits(['deleteFace']);
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	min-width: 100px;
+	margin-left: 25px;
 }
 
 .database__warning {
-	padding: 0 10px 0 0;
-	border-radius: $border-radius;
-	max-width: fit-content;
-	word-wrap: break-word;
+	position: absolute;
+	left: 12%;
 	font-size: 23px;
-	height: 40px;
 	opacity: 0.85;
 	color: $color-warning;
+	cursor: pointer;
+	margin-left: 25px;
 }
 
 .database__warning:hover {
