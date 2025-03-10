@@ -32,22 +32,22 @@ const urlToBase64 = async (imageUrl: string): Promise<string> => {
 
 const fetchFaces = async () => {
 	try {
-		const uuid = uuidv4();
-		console.log('uuid', uuid);
+		// const uuid = uuidv4();
+		// console.log('uuid', uuid);
 
-		const response = await fetch(`${HOST}/get_all_keys`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				request_id: uuid,
-			}),
-		});
-		if (!response.ok) throw new Error('Ошибка получения ключей');
-		const allKeys = await response.json();
-		console.log('allKeys', allKeys);
+		// const response = await fetch(`${HOST}/get_all_keys`, {
+		// 	method: 'POST',
+		// 	headers: { 'Content-Type': 'application/json' },
+		// 	body: JSON.stringify({
+		// 		request_id: uuid,
+		// 	}),
+		// });
+		// if (!response.ok) throw new Error('Ошибка получения ключей');
+		// const allKeys = await response.json();
+		// console.log('allKeys', allKeys);
 
-		vectors.value = allKeys.result;
-		console.log('vectors.value', vectors.value);
+		// vectors.value = allKeys.result;
+		// console.log('vectors.value', vectors.value);
 
 		const db = await fetch(DB);
 		if (!db.ok) throw new Error('Ошибка загрузки базы данных');
