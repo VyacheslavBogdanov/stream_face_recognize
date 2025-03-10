@@ -13,7 +13,7 @@
 				:class="{ 'upload__url--active': imageUrl && !isInvalidUrl }"
 				:disabled="isDisabled"
 			/>
-			<button class="upload__clear" @click="clearUpload" :disabled="isDisabled">🗑</button>
+			<button class="upload__clear" @click="onClearClick" :disabled="isDisabled">🗑</button>
 		</div>
 		<div
 			class="upload"
@@ -39,8 +39,9 @@
 
 <script setup lang="ts">
 import { ref, defineEmits, defineProps } from 'vue';
+import { ClearUploadSource } from '../ComparisonOfTwoPhotos/utils/useClearUpload';
 
-const emit = defineEmits(['update:imageData']);
+const emit = defineEmits(['update:imageData', 'clear']);
 defineProps<{ isDisabled: boolean }>();
 
 const fileName = ref<string | null>(null);
@@ -50,15 +51,18 @@ const fileInputRef = ref<HTMLInputElement | null>(null);
 const isInvalidUrl = ref<boolean>(false);
 const imageBase64 = ref<string>('');
 
-const clearUpload = () => {
-	imageUrl.value = '';
-	previewSrc.value = null;
-	fileName.value = null;
-	isInvalidUrl.value = false;
-	imageBase64.value = '';
-	if (fileInputRef.value) fileInputRef.value.value = '';
-
-	emit('update:imageData', '');
+const clearUpload = ClearUploadSource(
+	imageUrl,
+	previewSrc,
+	fileName,
+	isInvalidUrl,
+	imageBase64,
+	fileInputRef,
+	emit,
+);
+const onClearClick = () => {
+	clearUpload();
+	emit('clear');
 };
 
 const onFileChange = (event: Event) => {

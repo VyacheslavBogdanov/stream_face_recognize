@@ -1,11 +1,16 @@
 <template>
 	<div class="comparison-of-photos">
 		<div class="comparison-of-photos__upload-container">
-			<UploadSource @update:imageData="updateSourceImage" :isDisabled="isDisabled" />
+			<UploadSource
+				@update:imageData="updateSourceImage"
+				:isDisabled="isDisabled"
+				@clear="clearMessages"
+			/>
 			<UploadTarget
 				@update:imageData="updateTargetImage"
 				:bboxes="targetBboxes"
 				:isDisabled="isDisabled"
+				@clear="clearMessages"
 			/>
 		</div>
 
@@ -133,6 +138,13 @@ const processComparisonResult = (detected_faces: Face[]) => {
 				message: props.messageTypes.find((msg) => msg.class === 'compare--success')
 					?.message,
 			};
+};
+const clearMessages = () => {
+	comparisonResult.value = {
+		class: 'comparison-of-photos__message--photo',
+		message: props.messageTypes.find((msg) => msg.class === 'compare--photo')?.message,
+	};
+	infoCompare.value = null;
 };
 </script>
 
