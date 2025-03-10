@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import type { Face } from '../../components/utils/types.ts';
 
@@ -9,6 +9,8 @@ const DB = import.meta.env.VITE_SERVER_DB;
 const faces = ref<Face[]>([]);
 const newFace = ref<Face>({ id: '', name: '', photoUrl: '' });
 const vectors = ref<string[]>([]);
+const isSync = ref<boolean>(false);
+const syncRequired = computed(() => faces.value.length !== vectors.value.length);
 
 const urlToBase64 = async (imageUrl: string): Promise<string> => {
 	try {
@@ -30,11 +32,14 @@ const urlToBase64 = async (imageUrl: string): Promise<string> => {
 
 const fetchFaces = async () => {
 	try {
+		const uuid = uuidv4();
+		console.log('uuid', uuid);
+
 		const response = await fetch(`${HOST}/get_all_keys`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				request_id: uuidv4(),
+				request_id: uuid,
 			}),
 		});
 		if (!response.ok) throw new Error('Ошибка получения ключей');
@@ -134,27 +139,54 @@ const clearDatabase = async () => {
 
 const syncDB = async () => {
 	if (vectors.value.length === faces.value.length) return;
-	try {
-		await Promise.all(
-			faces.value.map(async (face) => {
-				const base64Image = await urlToBase64(face.photoUrl);
-				const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+	isSync.value = true;
+	const faceIds = faces.value.map((face) => face.id);
+	const vectorIds = new Set(vectors.value);
 
-				return fetch(`${HOST}/add_new_face`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						request_id: uuidv4(),
-						id: face.id,
-						image: imageBase64,
+	if (vectors.value.length < faces.value.length) {
+		try {
+			await Promise.all(
+				faces.value
+					.filter((face) => !vectorIds.has(face.id))
+					.map(async (face) => {
+						const base64Image = await urlToBase64(face.photoUrl);
+						const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+
+						return fetch(`${HOST}/add_new_face`, {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({
+								request_id: uuidv4(),
+								id: face.id,
+								image: imageBase64,
+							}),
+						});
 					}),
-				});
-			}),
-		);
-		fetchFaces();
-	} catch (error) {
-		console.error(error);
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	} else {
+		const extraVectors = vectors.value.filter((id) => !faceIds.includes(id));
+		try {
+			await Promise.all(
+				extraVectors.map(async (id) => {
+					return fetch(`${HOST}/delete_face`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							request_id: uuidv4(),
+							items: [id],
+						}),
+					});
+				}),
+			);
+		} catch (error) {
+			console.error(error);
+		}
 	}
+	fetchFaces();
+	isSync.value = false;
 };
 
 onMounted(fetchFaces);
@@ -163,9 +195,24 @@ onMounted(fetchFaces);
 <template>
 	<div class="database">
 		<div class="menu">
-			<div class="menu__item">Векторов в БД: {{ vectors.length }}</div>
-			<div class="menu__item">Объектов в локальной БД: {{ faces.length }}</div>
-			<div class="menu__sync" @click="syncDB">Синхронизация локальной БД и БД</div>
+			<div :class="{ menu__item: true, 'menu__item--syncRequired': syncRequired }">
+				Векторов в БД: {{ vectors.length }}
+			</div>
+			<div :class="{ menu__item: true, 'menu__item--syncRequired': syncRequired }">
+				Объектов в локальной БД: {{ faces.length }}
+			</div>
+			<div class="menu__sync">
+				<button
+					:class="{
+						menu__syncBtn: true,
+						'menu__syncBtn--syncRequired': syncRequired,
+						'menu__syncBtn--isSync': true,
+					}"
+					@click="syncDB"
+				>
+					Синхронизация
+				</button>
+			</div>
 		</div>
 		<form class="database__form" @submit.prevent="addFace">
 			<input
@@ -195,12 +242,22 @@ onMounted(fetchFaces);
 			</thead>
 			<tbody>
 				<tr v-for="face in faces" :key="face.id">
-					<td class="dtabase__td">{{ face.id }}</td>
-					<td class="dtabase__td">{{ face.name }}</td>
-					<td class="dtabase__td">
+					<td class="database__td">
+						<div class="database__id">
+							<span
+								v-if="!vectors.includes(face.id)"
+								class="database__warning"
+								title="Отсутствует вектор в базе данных. Сделайте синхронизацию!"
+								>ⓘ</span
+							>
+							<span>{{ face.id }}</span>
+						</div>
+					</td>
+					<td class="database__td">{{ face.name }}</td>
+					<td class="database__td">
 						<img :src="face.photoUrl" :alt="face.name" class="database__photo" />
 					</td>
-					<td class="dtabase__td">
+					<td class="database__td">
 						<button
 							@click="deleteFace(face.id)"
 							class="database__button database__button--delete"
@@ -223,26 +280,71 @@ onMounted(fetchFaces);
 </template>
 
 <style lang="scss" scoped>
+@import '../../styles/main.scss';
 .menu {
 	display: flex;
 	margin: 10px;
 	padding: 10px;
-	border: 1px solid #030000;
 	justify-content: space-between;
-	flex-direction: row;
+	flex-direction: row-reverse;
 	align-items: center;
+}
 
-	&__item {
-		border: 1px solid #060887;
-		padding: 10px;
-	}
+.menu__item {
+	font-weight: bold;
+	padding: 10px;
 
-	&__sync {
-		border: 1px solid #060887;
-		padding: 10px;
-		cursor: pointer;
+	&--syncRequired {
+		color: #dc3545;
 	}
 }
+
+.menu__sync {
+	padding: 10px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.menu__syncBtn {
+	padding: 8px 12px;
+	background-color: #007bff;
+	color: #fff;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+
+	&--syncRequired {
+		background-color: #dc3545;
+	}
+}
+
+.menu__syncBtn::before {
+	content: '\21BB';
+	font-size: 24px;
+	display: inline-block;
+	transform-origin: center;
+	margin-right: 7px;
+}
+
+.menu__syncBtn:hover::before {
+	animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
 .database {
 	width: 70%;
 	margin: 55px;
@@ -274,7 +376,7 @@ onMounted(fetchFaces);
 		}
 
 		&--danger {
-			background-color: #ff0000;
+			background-color: #dc3545;
 			margin-top: 10px;
 		}
 	}
@@ -301,6 +403,28 @@ onMounted(fetchFaces);
 				0px 10px 70px -4px rgba(17, 24, 41, 0.1);
 			padding: 25px;
 		}
+	}
+
+	&__id {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	&__warning {
+		padding: 0 10px 0 0;
+		border-radius: $border-radius;
+		max-width: fit-content;
+		word-wrap: break-word;
+		font-size: 23px;
+		height: 40px;
+		opacity: 0.85;
+		color: $color-warning;
+	}
+
+	&__warning:hover {
+		cursor: pointer;
 	}
 
 	&__photo {
