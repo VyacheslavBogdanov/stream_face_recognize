@@ -6,16 +6,9 @@ export const messageTypes: MessageType[] = [
 
 
 	{ class: 'error-server', message: 'Ошибка при запросе'},
-
     { class: 'compare--photo', message: 'Загрузите оба изображения'},
-	
-     
-    
-
     { class: 'compare--info', message: 'Загрузите оба изображения'},
-
 	{ class: 'compare--error', message: 'На одной из фотографий лиц не обнаружено' },
-
 	{ class: 'compare--error', message: 'Попытка обмана системы' },
 	{ class: 'compare--warning', message: 'Скорее всего, это один и тот же человек' },
 	{ class: 'compare--success', message: 'Это разные люди' },
