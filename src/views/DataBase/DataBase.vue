@@ -36,24 +36,24 @@ const urlToBase64 = async (imageUrl: string): Promise<string> => {
 
 const fetchFaces = async () => {
 	try {
-		// const uuid = uuidv4();
-		// console.log('uuid', uuid);
+		const uuid = uuidv4();
+		console.log('uuid', uuid);
 
-		// const response = await fetch(`${HOST}/get_all_keys`, {
-		// 	method: 'POST',
-		// 	headers: { 'Content-Type': 'application/json' },
-		// 	body: JSON.stringify({ request_id: uuid }),
-		// });
-		// if (!response.ok) throw new Error('Ошибка получения ключей');
-		// const allKeys = await response.json();
-		// console.log('allKeys', allKeys);
-
-		// vectors.value = allKeys.result;
-		// console.log('vectors.value', vectors.value);
+		const response = await fetch(`${HOST}/get_all_keys`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ request_id: uuid }),
+		});
+		if (!response.ok) throw new Error('Ошибка получения ключей');
+		const allKeys = await response.json();
+		console.log('allKeys', allKeys);
+		vectors.value = allKeys.result;
+		console.log('vectors.value', vectors.value);
 
 		const db = await fetch(DB);
 		if (!db.ok) throw new Error('Ошибка загрузки базы данных');
-		faces.value = await db.json();
+		const data = await db.json();
+		faces.value = Array.isArray(data) ? data : [data];
 		console.log('faces.value', faces.value);
 	} catch (error) {
 		console.error(error);
@@ -64,19 +64,19 @@ const addFace = async () => {
 	if (!newFace.value.name || !newFace.value.photoUrl) return;
 	const id = uuidv4();
 	try {
-		const base64Image = await urlToBase64(newFace.value.photoUrl);
-		const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+		// const base64Image = await urlToBase64(newFace.value.photoUrl);
+		// const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
 
-		const response = await fetch(`${HOST}/add_new_face`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				request_id: uuidv4(),
-				id: id,
-				image: imageBase64,
-			}),
-		});
-		if (!response.ok) throw new Error('Ошибка добавления вектора');
+		// const response = await fetch(`${HOST}/add_new_face`, {
+		// 	method: 'POST',
+		// 	headers: { 'Content-Type': 'application/json' },
+		// 	body: JSON.stringify({
+		// 		request_id: uuidv4(),
+		// 		id: id,
+		// 		image: imageBase64,
+		// 	}),
+		// });
+		// if (!response.ok) throw new Error('Ошибка добавления вектора');
 
 		const db = await fetch(DB, {
 			method: 'POST',
@@ -88,7 +88,8 @@ const addFace = async () => {
 			}),
 		});
 		if (!db.ok) throw new Error('Ошибка добавления объекта в базу данных');
-		faces.value = await db.json();
+		const data = await db.json();
+		faces.value = Array.isArray(data) ? data : [data];
 		newFace.value = { id: '', name: '', photoUrl: '' };
 		fetchFaces();
 	} catch (error) {

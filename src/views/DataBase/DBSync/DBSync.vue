@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { FaceDB } from '../../../components/utils/types.ts';
 const props = defineProps<{
 	vectors: string[];
-	faces: { id: string }[];
+	faces: FaceDB[];
 	syncRequired: boolean;
 }>();
 const emit = defineEmits(['syncDB']);

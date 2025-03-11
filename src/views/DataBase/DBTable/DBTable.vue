@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { FaceDB } from '../../../components/utils/types.ts';
 const props = defineProps<{
-	faces: { id: string; name: string; photoUrl: string }[];
+	faces: FaceDB[];
 	vectors: string[];
 }>();
 const emit = defineEmits(['deleteFace']);

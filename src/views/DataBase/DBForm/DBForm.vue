@@ -1,10 +1,6 @@
 <script setup lang="ts">
-interface Face {
-	name: string;
-	photoUrl: string;
-}
-
-const props = defineProps<{ newFace: Face }>();
+import type { FaceDB } from '../../../components/utils/types.ts';
+const props = defineProps<{ newFace: FaceDB }>();
 const emit = defineEmits(['update:newFace', 'addFace']);
 </script>
 
