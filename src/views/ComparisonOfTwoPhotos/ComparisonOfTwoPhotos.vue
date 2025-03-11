@@ -1,15 +1,15 @@
 <template>
 	<div class="comparison">
 		<div class="comparison__upload">
-			<UploadSource
-				@update:imageData="updateSourceImage"
+			<UploadTarget
+				@update:imageData="updateTargetImage"
 				:isDisabled="isDisabled"
 				@clear="clearMessages"
 			/>
-			<UploadTarget
-				@update:imageData="updateTargetImage"
-				:bboxes="targetBboxes"
+			<UploadSource
+				@update:imageData="updateSourceImage"
 				:isDisabled="isDisabled"
+				:bboxes="targetBboxes"
 				@clear="clearMessages"
 			/>
 		</div>
@@ -36,8 +36,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import UploadTarget from './UploadTarget.vue';
 import UploadSource from './UploadSource.vue';
+import UploadTarget from './UploadTarget.vue';
 import ButtonCompareFace from './ButtonCompareFace.vue';
 import { MessageType } from '../../components/mocks/db';
 import type { Face } from '../../components/utils/types';
@@ -67,11 +67,18 @@ const Base64Image = (base64String: string) =>
 
 const comparePhotos = async () => {
 	if (!targetImageBase64.value || !sourceImageBase64.value) {
-		comparisonResult.value = {
+		const tempMessage = {
 			class: 'comparison__message--photo',
 			message: props.messageTypes.find((msg) => msg.class === 'compare--photo')?.message,
 		};
+		comparisonResult.value = tempMessage;
 		infoCompare.value = null;
+		setTimeout(() => {
+			if (comparisonResult.value === tempMessage) {
+				comparisonResult.value = null;
+			}
+		}, 5000);
+
 		return;
 	}
 
@@ -138,11 +145,19 @@ const processComparisonResult = (detected_faces: Face[]) => {
 };
 
 const clearMessages = () => {
-	comparisonResult.value = {
+	const tempMessage = {
 		class: 'comparison__message--photo',
-		message: props.messageTypes.find((msg) => msg.class === 'compare--photo')?.message,
+		message: 'Загрузите изображение',
 	};
+	comparisonResult.value = tempMessage;
 	infoCompare.value = null;
+	targetBboxes.value = [];
+
+	setTimeout(() => {
+		if (comparisonResult.value === tempMessage) {
+			comparisonResult.value = null;
+		}
+	}, 5000);
 };
 </script>
 
@@ -172,7 +187,7 @@ const clearMessages = () => {
 		right: 0;
 		height: 50px;
 		padding: 0 30px;
-		border: 3px solid #513d3d;
+		border: $border-width solid #513d3d;
 		border-radius: $border-radius;
 		background: $color-bg;
 		color: #333;
@@ -182,6 +197,7 @@ const clearMessages = () => {
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		box-sizing: border-box;
 	}
 
 	&__result {
@@ -189,16 +205,21 @@ const clearMessages = () => {
 		display: flex;
 		align-items: center;
 		padding: 10px 30px 10px 40px;
-		border-radius: 8px;
+		border-radius: $border-radius;
 		font-size: 23px;
+		height: 40px;
 		max-width: fit-content;
 		margin: auto;
+		bottom: 7.5px;
 	}
 
 	&__icon {
+		display: flex;
 		position: absolute;
 		left: 10px;
 		height: 30px;
+		justify-content: center;
+		align-items: center;
 	}
 
 	&__message {
@@ -214,22 +235,22 @@ const clearMessages = () => {
 
 		&--success {
 			background: #e0fde7;
-			color: #2a9b44;
+			color: $color-success;
 		}
 
 		&--warning {
 			background: #f9ebd8;
-			color: #d77417;
+			color: $color-warning;
 		}
 
 		&--error {
 			background: #f2dee0;
-			color: #db1428;
+			color: $color-error;
 		}
 
 		&--photo {
-			background: #b0aeae;
-			color: #333;
+			background: #cecece;
+			color: $color-default;
 		}
 	}
 }
