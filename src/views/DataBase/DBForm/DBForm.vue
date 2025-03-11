@@ -5,17 +5,17 @@ const emit = defineEmits(['update:newFace', 'addFace']);
 </script>
 
 <template>
-	<form class="database__form" @submit.prevent="$emit('addFace')">
+	<form class="form" @submit.prevent="$emit('addFace')">
 		<input
 			type="text"
 			placeholder="Введите имя"
-			class="database__input"
+			class="form__input"
 			required
-			:value="newFace.name"
+			:value="props.newFace.name"
 			@input="
 				(e) =>
 					emit('update:newFace', {
-						...newFace,
+						...props.newFace,
 						name: (e.target as HTMLInputElement).value,
 					})
 			"
@@ -23,43 +23,43 @@ const emit = defineEmits(['update:newFace', 'addFace']);
 		<input
 			type="url"
 			placeholder="Введите URL изображения"
-			class="database__input"
+			class="form__input"
 			required
-			:value="newFace.photoUrl"
+			:value="props.newFace.photoUrl"
 			@input="
 				(e) =>
 					emit('update:newFace', {
-						...newFace,
+						...props.newFace,
 						photoUrl: (e.target as HTMLInputElement).value,
 					})
 			"
 		/>
-		<button type="submit" class="database__button">Добавить в БД</button>
+		<button type="submit" class="form__button">Добавить в БД</button>
 	</form>
 </template>
 
 <style lang="scss" scoped>
 @import '../../../styles/main.scss';
 
-.database__form {
+.form {
 	display: flex;
 	gap: 10px;
 	margin-bottom: 20px;
-}
 
-.database__input {
-	flex: 1;
-	padding: 8px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-}
+	&__input {
+		flex: 1;
+		padding: 8px;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+	}
 
-.database__button {
-	padding: 8px 12px;
-	background-color: #007bff;
-	color: #fff;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
+	&__button {
+		padding: 8px 12px;
+		background-color: #007bff;
+		color: #fff;
+		border: none;
+		border-radius: 5px;
+		cursor: pointer;
+	}
 }
 </style>
