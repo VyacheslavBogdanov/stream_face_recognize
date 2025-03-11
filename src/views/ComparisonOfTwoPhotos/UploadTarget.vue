@@ -39,8 +39,9 @@
 				accept="image/*"
 				@change="onFileChange"
 				:disabled="isDisabled"
+				:title="fileName || 'Выберите файл для загрузки'"
 			/>
-			<span v-if="!previewSrc" class="upload__file-placeholder">Upload Source Image</span>
+			<span v-if="!previewSrc" class="upload__file-placeholder">Загрузите изображение</span>
 		</div>
 	</div>
 </template>

@@ -52,8 +52,9 @@
 				accept="image/*"
 				@change="onFileChange"
 				:disabled="isDisabled"
+				:title="fileName || 'Выберите файл для загрузки'"
 			/>
-			<span v-if="!previewSrc" class="upload__file-placeholder"> Upload Target Image </span>
+			<span v-if="!previewSrc" class="upload__file-placeholder"> Загрузите изображение </span>
 		</div>
 	</div>
 </template>
@@ -196,12 +197,11 @@ const handleImageError = () => {
 </script>
 
 <style scoped lang="scss">
-@import '../../styles/main.scss';
 @import './Style/UploadStyle.scss';
 
 .upload__bbox {
 	position: absolute;
-	border: 2px solid red;
+	border: 1.5px solid red;
 	box-sizing: border-box;
 }
 </style>

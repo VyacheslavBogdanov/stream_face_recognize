@@ -67,18 +67,14 @@ const Base64Image = (base64String: string) =>
 
 const comparePhotos = async () => {
 	if (!targetImageBase64.value || !sourceImageBase64.value) {
-		const tempMessage = {
+		comparisonResult.value = {
 			class: 'comparison__message--photo',
 			message: props.messageTypes.find((msg) => msg.class === 'compare--photo')?.message,
 		};
-		comparisonResult.value = tempMessage;
 		infoCompare.value = null;
 		setTimeout(() => {
-			if (comparisonResult.value === tempMessage) {
-				comparisonResult.value = null;
-			}
-		}, 5000);
-
+			comparisonResult.value = null;
+		}, 1500);
 		return;
 	}
 
@@ -96,6 +92,28 @@ const comparePhotos = async () => {
 				target_image: Base64ImageTarget,
 			}),
 		});
+
+		if (response.status === 424) {
+			comparisonResult.value = {
+				class: 'comparison__message--error',
+				message: props.messageTypes.find((msg) => msg.class === 'compare--error')?.message,
+			};
+			infoCompare.value = null;
+			return;
+		}
+
+		if (response.status === 422) {
+			const errorData = await response.json();
+			console.error('Ошибка 422:', errorData?.detail);
+
+			comparisonResult.value = {
+				class: 'comparison__message--error',
+				message: props.messageTypes.find((msg) => msg.class === 'compare--validation-error')
+					?.message,
+			};
+			infoCompare.value = null;
+			return;
+		}
 
 		if (!response.ok) throw new Error();
 
@@ -127,7 +145,7 @@ const processComparisonResult = (detected_faces: Face[]) => {
 	if (!face.real) {
 		return {
 			class: 'comparison__message--error',
-			message: props.messageTypes.find((msg) => msg.class === 'compare--error')?.message,
+			message: props.messageTypes.find((msg) => msg.class === 'compare--fake-face')?.message,
 		};
 	}
 
@@ -145,19 +163,9 @@ const processComparisonResult = (detected_faces: Face[]) => {
 };
 
 const clearMessages = () => {
-	const tempMessage = {
-		class: 'comparison__message--photo',
-		message: 'Загрузите изображение',
-	};
-	comparisonResult.value = tempMessage;
+	comparisonResult.value = null;
 	infoCompare.value = null;
 	targetBboxes.value = [];
-
-	setTimeout(() => {
-		if (comparisonResult.value === tempMessage) {
-			comparisonResult.value = null;
-		}
-	}, 5000);
 };
 </script>
 

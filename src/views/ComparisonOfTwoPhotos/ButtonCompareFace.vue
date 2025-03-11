@@ -57,10 +57,10 @@ const emit = defineEmits<{
 
 	&:disabled {
 		cursor: not-allowed;
-		background-color: $color-bg;
-		border-color: #bfbfbf;
+		background-color: #ededed;
+		border-color: #929191;
 		color: #a0a0a0;
-		opacity: 0.7;
+
 		transition: none;
 	}
 
