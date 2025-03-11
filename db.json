@@ -1,11 +1,6 @@
 {
   "people": [
     {
-      "id": "32eef92b-dfc6-4a15-8e7c-e9f938e22c72",
-      "name": "фывф",
-      "photoUrl": "https://img.freepik.com/free-photo/portrait-concentrated-young-bearded-man_171337-17191.jpg"
-    },
-    {
       "id": "c219917b-4aad-44a0-8a26-c55a6b8f532b",
       "name": "выфвфы",
       "photoUrl": "https://img.freepik.com/free-photo/portrait-concentrated-young-bearded-man_171337-17191.jpg"
@@ -41,13 +36,13 @@
       "photoUrl": "https://img.freepik.com/free-photo/portrait-concentrated-young-bearded-man_171337-17191.jpg"
     },
     {
-      "id": "6b0f8c96-b7c1-4d8d-9d57-28aca84c94c3",
-      "name": "dasdsa",
+      "id": "2d37c4a3-800b-452b-93ae-757d9d8a9cfe",
+      "name": "qasdas",
       "photoUrl": "https://img.freepik.com/free-photo/portrait-concentrated-young-bearded-man_171337-17191.jpg"
     },
     {
-      "id": "2d37c4a3-800b-452b-93ae-757d9d8a9cfe",
-      "name": "qasdas",
+      "id": "48369ee9-f5d5-476d-9199-aac3578ef529",
+      "name": "awe",
       "photoUrl": "https://img.freepik.com/free-photo/portrait-concentrated-young-bearded-man_171337-17191.jpg"
     }
   ]
