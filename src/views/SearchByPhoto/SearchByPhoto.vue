@@ -117,6 +117,7 @@ const searchFaces = async () => {
 		});
 
 		const data = await response.json();
+		console.log('data', data);
 
 		if (data.detected_faces && data.detected_faces.length > 0) {
 			const foundId = data.detected_faces[0].id;

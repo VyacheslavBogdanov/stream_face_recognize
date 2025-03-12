@@ -8,7 +8,7 @@
 			<div class="health__icon">ⓘ</div>
 			<span>{{ type.message }}</span>
 		</div>
-		<nav class="header__nav">
+		<nav :class="['header__nav', { 'header__nav--disabled': props.status === 'inactive' }]">
 			<router-link to="/" class="header__link">Поиск по фото</router-link>
 			<router-link to="/comparison-of-two-photos" class="header__link"
 				>Сравнение двух фото</router-link
@@ -55,6 +55,11 @@ const filteredMessageTypes = computed(() => {
 	&__nav {
 		font-size: 25px;
 		position: relative;
+
+		&--disabled {
+			pointer-events: none;
+			opacity: 0.5;
+		}
 	}
 
 	&__link {

@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { FaceDB } from '../../../components/utils/types.ts';
+const syncRequired = computed(() => props.faces.length !== props.vectors.length);
 const props = defineProps<{
 	vectors: string[];
 	faces: FaceDB[];
-	syncRequired: boolean;
 }>();
 const emit = defineEmits(['syncDB']);
 </script>
@@ -84,9 +85,9 @@ const emit = defineEmits(['syncDB']);
 		margin-right: 7px;
 	}
 
-	&__syncBtn:hover::before {
-		animation: rotate 2s linear infinite;
-	}
+	// &__syncBtn:hover::before {
+	// 	animation: rotate 2s linear infinite;
+	// }
 
 	@keyframes rotate {
 		0% {

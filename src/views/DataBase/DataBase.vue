@@ -14,7 +14,6 @@ const faces = ref<FaceDB[]>([]);
 const newFace = ref<FaceDB>({ id: '', name: '', photoUrl: '' });
 const vectors = ref<string[]>([]);
 const isSync = ref<boolean>(false);
-const syncRequired = computed(() => faces.value.length !== vectors.value.length);
 
 const urlToBase64 = async (imageUrl: string): Promise<string> => {
 	try {
@@ -190,7 +189,7 @@ onMounted(fetchFaces);
 
 <template>
 	<div class="database">
-		<DBSync :vectors="vectors" :faces="faces" :syncRequired="syncRequired" @syncDB="syncDB" />
+		<DBSync :vectors="vectors" :faces="faces" @syncDB="syncDB" />
 		<DBForm :newFace="newFace" @update:newFace="(val) => (newFace = val)" @addFace="addFace" />
 		<DBTable :faces="faces" :vectors="vectors" @deleteFace="deleteFace" />
 		<DBClear :faces="faces" @clearDatabase="clearDatabase" />

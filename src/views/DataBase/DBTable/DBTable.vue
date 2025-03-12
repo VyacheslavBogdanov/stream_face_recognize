@@ -62,6 +62,7 @@ const emit = defineEmits(['deleteFace']);
 
 	th,
 	td {
+		height: 55px;
 		border: 1px solid #ccc;
 		padding: 5px;
 	}
