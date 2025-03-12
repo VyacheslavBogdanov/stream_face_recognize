@@ -6,7 +6,21 @@ const props = defineProps<{
 	vectors: string[];
 }>();
 const emit = defineEmits(['deleteFace']);
+
 const hoveredFace = ref<string | null>(null);
+const tooltipStyle = ref({ top: '0px', left: '0px' });
+
+const showTooltip = (event: MouseEvent, faceId: string) => {
+	hoveredFace.value = faceId;
+	tooltipStyle.value = {
+		top: `${event.clientY - 230}px`,
+		left: `${event.clientX + 15}px`,
+	};
+};
+
+const hideTooltip = () => {
+	hoveredFace.value = null;
+};
 </script>
 
 <template>
@@ -33,19 +47,14 @@ const hoveredFace = ref<string | null>(null);
 					</div>
 				</td>
 				<td class="table__td">{{ face.name }}</td>
-				<!-- <td class="table__td">
-					<img :src="face.photoUrl" :alt="face.name" class="table__photo" />
-				</td> -->
 				<td class="table__td">
 					<div
 						class="table__photo-wrapper"
-						@mouseenter="hoveredFace = face.id"
-						@mouseleave="hoveredFace = null"
+						@mouseenter="showTooltip($event, face.id)"
+						@mousemove="showTooltip($event, face.id)"
+						@mouseleave="hideTooltip"
 					>
 						<img :src="face.photoUrl" :alt="face.name" class="table__photo" />
-						<div v-if="hoveredFace === face.id" class="table__tooltip">
-							<img :src="face.photoUrl" :alt="face.name" class="table__tooltip-img" />
-						</div>
 					</div>
 				</td>
 				<td class="table__td">
@@ -60,6 +69,13 @@ const hoveredFace = ref<string | null>(null);
 		</tbody>
 	</table>
 	<div v-else>В базе данных нет объектов</div>
+	<div v-if="hoveredFace" class="table__tooltip" :style="tooltipStyle">
+		<img
+			:src="faces.find((face) => face.id === hoveredFace)?.photoUrl"
+			:alt="faces.find((face) => face.id === hoveredFace)?.name"
+			class="table__tooltip-img"
+		/>
+	</div>
 </template>
 
 <style lang="scss" scoped>
@@ -129,20 +145,20 @@ const hoveredFace = ref<string | null>(null);
 	}
 
 	&__tooltip {
-		position: absolute;
-		top: 300px;
-		left: 70%;
-		transform: translateX(-50%);
-		background: rgba(0, 0, 0, 0.8);
-		padding: 5px;
+		background: #ffffff;
+		box-shadow:
+			0px 3px 8px -30px rgba(24, 39, 75, 0.05),
+			0px 10px 70px -4px rgba(17, 24, 41, 0.1);
+		position: fixed;
+		padding: 0;
 		border-radius: 5px;
-		box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-		z-index: 10;
+		z-index: 1000;
+		pointer-events: none;
 	}
 
 	&__tooltip-img {
-		width: 120px;
-		height: 120px;
+		width: 240px;
+		height: 240px;
 		object-fit: cover;
 		border-radius: 5px;
 	}
