@@ -19,7 +19,6 @@ const emit = defineEmits(['clearDatabase']);
 	margin-top: 10px;
 	color: #fff;
 	border: none;
-	border-radius: 5px;
 	cursor: pointer;
 }
 </style>

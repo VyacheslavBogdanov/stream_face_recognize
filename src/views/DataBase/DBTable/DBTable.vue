@@ -139,7 +139,6 @@ const hideTooltip = () => {
 		padding: 8px 12px;
 		color: #fff;
 		border: none;
-		border-radius: 5px;
 		cursor: pointer;
 		background-color: #dc3545;
 	}

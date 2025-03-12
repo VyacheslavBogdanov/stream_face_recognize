@@ -65,7 +65,6 @@ const emit = defineEmits(['syncDB']);
 		background-color: #007bff;
 		color: #fff;
 		border: none;
-		border-radius: 5px;
 		cursor: pointer;
 		display: flex;
 		align-items: center;

@@ -1,3 +1,19 @@
 {
-  "people": []
+  "people": [
+    {
+      "id": "c608bb6a-04ef-4b0c-abdb-dcef45d78ade",
+      "name": "asd",
+      "photoUrl": "https://img.freepik.com/free-photo/portrait-concentrated-young-bearded-man_171337-17191.jpg"
+    },
+    {
+      "id": "e8fb9ee7-a0c2-43cd-9882-47c951d0454f",
+      "name": "asd",
+      "photoUrl": "https://img.freepik.com/free-photo/portrait-concentrated-young-bearded-man_171337-17191.jpg"
+    },
+    {
+      "id": "e77de8af-befb-4a67-adfb-d17acb29b4ff",
+      "name": "ads",
+      "photoUrl": "https://img.freepik.com/free-photo/portrait-concentrated-young-bearded-man_171337-17191.jpg"
+    }
+  ]
 }

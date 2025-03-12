@@ -46,11 +46,14 @@ const emit = defineEmits(['update:newFace', 'addFace']);
 	gap: 10px;
 	margin-bottom: 20px;
 
+	th,
 	&__input {
 		flex: 1;
 		padding: 8px;
 		border: 1px solid #ccc;
-		border-radius: 5px;
+		box-shadow:
+			0px 3px 8px -6px rgba(24, 39, 75, 0.05),
+			0px 10px 36px -4px rgba(17, 24, 41, 0.1);
 	}
 
 	&__button {
@@ -58,8 +61,10 @@ const emit = defineEmits(['update:newFace', 'addFace']);
 		background-color: #007bff;
 		color: #fff;
 		border: none;
-		border-radius: 5px;
 		cursor: pointer;
+		box-shadow:
+			0px 3px 8px -6px rgba(24, 39, 75, 0.05),
+			0px 10px 36px -4px rgba(17, 24, 41, 0.1);
 	}
 }
 </style>
