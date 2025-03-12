@@ -19,6 +19,7 @@
 					placeholder="Введите URL"
 					class="upload__url-input"
 					:disabled="isDisabled"
+					@input="handleUrlUpload"
 				/>
 			</div>
 		</div>
@@ -36,6 +37,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
+
 const props = defineProps<{
 	status: string;
 }>();
@@ -62,6 +64,25 @@ const handleFileUpload = (event: Event) => {
 			previewImage.value = reader.result as string;
 		};
 		reader.readAsDataURL(file);
+	}
+};
+
+const handleUrlUpload = async () => {
+	if (imageUrl.value) {
+		try {
+			const image = new Image();
+			image.src = imageUrl.value;
+			image.onload = () => {
+				previewImage.value = imageUrl.value;
+			};
+			image.onerror = () => {
+				console.error('Ошибка загрузки изображения по URL');
+				previewImage.value = null; // Очистить превью, если URL невалиден
+			};
+		} catch (error) {
+			console.error('Ошибка при обработке URL:', error);
+			previewImage.value = null;
+		}
 	}
 };
 

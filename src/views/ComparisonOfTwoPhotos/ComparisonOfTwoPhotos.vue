@@ -1,30 +1,32 @@
 <template>
-	<div class="comparison-of-photos">
-		<div class="comparison-of-photos__upload-container">
-			<UploadSource @update:imageData="updateSourceImage" :isDisabled="isDisabled" />
+	<div class="comparison">
+		<div class="comparison__upload">
 			<UploadTarget
 				@update:imageData="updateTargetImage"
-				:bboxes="targetBboxes"
 				:isDisabled="isDisabled"
+				@clear="clearMessages"
+			/>
+			<UploadSource
+				@update:imageData="updateSourceImage"
+				:isDisabled="isDisabled"
+				:bboxes="targetBboxes"
+				@clear="clearMessages"
 			/>
 		</div>
 
-		<div class="comparison-of-photos__group">
+		<div class="comparison__group">
 			<ButtonCompareFace :isDisabled="isDisabled" @compare="comparePhotos" />
-			<div v-if="infoCompare" class="comparison-of-photos__infoCompare">
+			<div v-if="infoCompare" class="comparison__info">
 				<span>{{ infoCompare }}</span>
 			</div>
 		</div>
 
-		<div
-			v-if="comparisonResult?.class"
-			:class="['comparison-of-photos__result', comparisonResult.class]"
-		>
+		<div v-if="comparisonResult?.class" :class="['comparison__result', comparisonResult.class]">
 			<div
 				v-if="comparisonResult?.message"
-				:class="['comparison-of-photos__message', comparisonResult.class]"
+				:class="['comparison__message', comparisonResult.class]"
 			>
-				<div class="comparison-of-photos__icon">ⓘ</div>
+				<div class="comparison__icon">ⓘ</div>
 				<span>{{ comparisonResult.message }}</span>
 			</div>
 		</div>
@@ -34,8 +36,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import UploadTarget from './UploadTarget.vue';
 import UploadSource from './UploadSource.vue';
+import UploadTarget from './UploadTarget.vue';
 import ButtonCompareFace from './ButtonCompareFace.vue';
 import { MessageType } from '../../components/mocks/db';
 import type { Face } from '../../components/utils/types';
@@ -66,10 +68,13 @@ const Base64Image = (base64String: string) =>
 const comparePhotos = async () => {
 	if (!targetImageBase64.value || !sourceImageBase64.value) {
 		comparisonResult.value = {
-			class: 'comparison-of-photos__message--photo',
+			class: 'comparison__message--photo',
 			message: props.messageTypes.find((msg) => msg.class === 'compare--photo')?.message,
 		};
 		infoCompare.value = null;
+		setTimeout(() => {
+			comparisonResult.value = null;
+		}, 1500);
 		return;
 	}
 
@@ -88,6 +93,28 @@ const comparePhotos = async () => {
 			}),
 		});
 
+		if (response.status === 424) {
+			comparisonResult.value = {
+				class: 'comparison__message--error',
+				message: props.messageTypes.find((msg) => msg.class === 'compare--error')?.message,
+			};
+			infoCompare.value = null;
+			return;
+		}
+
+		if (response.status === 422) {
+			const errorData = await response.json();
+			console.error('Ошибка 422:', errorData?.detail);
+
+			comparisonResult.value = {
+				class: 'comparison__message--error',
+				message: props.messageTypes.find((msg) => msg.class === 'compare--validation-error')
+					?.message,
+			};
+			infoCompare.value = null;
+			return;
+		}
+
 		if (!response.ok) throw new Error();
 
 		const result = await response.json();
@@ -95,7 +122,7 @@ const comparePhotos = async () => {
 		targetBboxes.value = result.detected_faces?.[0]?.bbox || [];
 	} catch {
 		comparisonResult.value = {
-			class: 'comparison-of-photos__message--error',
+			class: 'comparison__message--error',
 			message: props.messageTypes.find((msg) => msg.class === 'error-server')?.message,
 		};
 		infoCompare.value = null;
@@ -105,7 +132,7 @@ const comparePhotos = async () => {
 const processComparisonResult = (detected_faces: Face[]) => {
 	if (detected_faces.length === 0) {
 		return {
-			class: 'comparison-of-photos__message--error',
+			class: 'comparison__message--error',
 			message: props.messageTypes.find((msg) => msg.class === 'compare--error')?.message,
 		};
 	}
@@ -117,61 +144,64 @@ const processComparisonResult = (detected_faces: Face[]) => {
 
 	if (!face.real) {
 		return {
-			class: 'comparison-of-photos__message--error',
-			message: props.messageTypes.find((msg) => msg.class === 'compare--error')?.message,
+			class: 'comparison__message--error',
+			message: props.messageTypes.find((msg) => msg.class === 'compare--fake-face')?.message,
 		};
 	}
 
 	return dist !== null && dist > 0.25
 		? {
-				class: 'comparison-of-photos__message--warning',
+				class: 'comparison__message--warning',
 				message: props.messageTypes.find((msg) => msg.class === 'compare--warning')
 					?.message,
 			}
 		: {
-				class: 'comparison-of-photos__message--success',
+				class: 'comparison__message--success',
 				message: props.messageTypes.find((msg) => msg.class === 'compare--success')
 					?.message,
 			};
+};
+
+const clearMessages = () => {
+	comparisonResult.value = null;
+	infoCompare.value = null;
+	targetBboxes.value = [];
 };
 </script>
 
 <style scoped lang="scss">
 @import '../../styles/main.scss';
 
-.comparison-of-photos {
+.comparison {
 	display: flex;
 	flex-direction: column;
 	gap: 20px;
 
-	&__upload-container {
+	&__upload {
 		display: flex;
 		gap: 20px;
 	}
 
-	.comparison-of-photos__group {
+	&__group {
 		display: flex;
 		align-items: center;
 		gap: 20px;
 		position: relative;
 	}
 
-	.comparison-of-photos__infoCompare {
+	&__info {
 		position: absolute;
 		top: 0;
 		right: 0;
 		height: 50px;
 		padding: 0 30px;
-		border: 3px solid #513d3d;
+		border: $border-width solid #513d3d;
 		border-radius: $border-radius;
 		background: $color-bg;
 		color: #333;
 		font-size: 18px;
-		font-weight: bold;
 		text-align: center;
 		width: 200px;
-		font-weight: 500;
-		font-family: inherit;
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -183,16 +213,21 @@ const processComparisonResult = (detected_faces: Face[]) => {
 		display: flex;
 		align-items: center;
 		padding: 10px 30px 10px 40px;
-		border-radius: 8px;
+		border-radius: $border-radius;
 		font-size: 23px;
+		height: 40px;
 		max-width: fit-content;
 		margin: auto;
+		bottom: 7.5px;
 	}
 
 	&__icon {
+		display: flex;
 		position: absolute;
 		left: 10px;
 		height: 30px;
+		justify-content: center;
+		align-items: center;
 	}
 
 	&__message {
@@ -202,24 +237,28 @@ const processComparisonResult = (detected_faces: Face[]) => {
 		border-radius: 5px;
 
 		&--info {
-			background-color: #e3e3ff;
+			background: #e3e3ff;
 			color: $color-primary;
 		}
+
 		&--success {
-			background-color: #e0fde7;
-			color: #2a9b44;
+			background: #e0fde7;
+			color: $color-success;
 		}
+
 		&--warning {
-			background-color: #f9ebd8;
-			color: #d77417;
+			background: #f9ebd8;
+			color: $color-warning;
 		}
+
 		&--error {
-			background-color: #f2dee0;
-			color: #db1428;
+			background: #f2dee0;
+			color: $color-error;
 		}
+
 		&--photo {
-			background-color: rgb(176, 174, 174);
-			color: #333;
+			background: #cecece;
+			color: $color-default;
 		}
 	}
 }
