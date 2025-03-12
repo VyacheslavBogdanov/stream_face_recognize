@@ -10,6 +10,7 @@ export const messageTypes: MessageType[] = [
 	{ class: 'compare--error', message: 'Попытка обмана системы' },
 	{ class: 'compare--warning', message: 'Скорее всего, это один и тот же человек' },
 	{ class: 'compare--success', message: 'Это разные люди' },
+	{ class: 'compare--validation-error', message: 'Ошибка валидации, 422'}
 ];
 
 const mockAPI = (endpoint: string): Promise<MockAPIResponse> => {

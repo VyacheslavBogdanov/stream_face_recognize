@@ -1,6 +1,6 @@
 <template>
-	<button class="compare-button" @click="emit('compare')" :disabled="isDisabled">
-		<span class="compare-button__name">Сравнить</span>
+	<button class="comparison-button" @click="emit('compare')" :disabled="isDisabled">
+		<span class="comparison-button__name">Сравнить</span>
 	</button>
 </template>
 
@@ -17,13 +17,13 @@ const emit = defineEmits<{
 <style scoped lang="scss">
 @import '../../styles/main.scss';
 
-.compare-button {
+.comparison-button {
 	width: 250px;
 	position: relative;
 	height: 50px;
 	padding: 0 30px;
 	color: #513d3d;
-	border: 1px solid #513d3d;
+	border: $border-width solid #513d3d;
 	background-color: $color-bg;
 	border-radius: $border-radius;
 	user-select: none;
@@ -57,10 +57,10 @@ const emit = defineEmits<{
 
 	&:disabled {
 		cursor: not-allowed;
-		background-color: $color-bg;
-		border-color: #bfbfbf;
+		background-color: #ededed;
+		border-color: #929191;
 		color: #a0a0a0;
-		opacity: 0.7;
+
 		transition: none;
 	}
 

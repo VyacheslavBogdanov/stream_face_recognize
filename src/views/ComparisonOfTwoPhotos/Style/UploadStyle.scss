@@ -1,50 +1,48 @@
 @import '../../../styles/main.scss';
 
-.upload-wrapper {
+.upload {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	position: relative;
+	width: 500px;
+	padding-top: 40px;
+	box-sizing: border-box;
 }
 
-.upload-url-container {
+.upload__error-message {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+	text-align: center;
+	color: $color-error;
+}
+
+.upload__url-container {
 	position: relative;
-	width: 400px;
-	height: 30px;
+	width: 100%;
+	height: 20px;
 	display: flex;
 	align-items: center;
 	margin-bottom: 20px;
 }
 
-.upload__clear {
-	position: absolute;
-	right: 10px;
-	background: none;
-	border: none;
-	cursor: pointer;
-	font-size: 15px;
-	top: 50%;
-	transform: translateY(-50%);
-	right: 10px;
-}
-
-.upload__url,
-.upload {
-	width: 400px;
-	box-sizing: border-box;
-}
-
-.upload__url {
-	padding: 8px;
-	border: 1px dashed #513d3d;
-	border-radius: 8px;
-	padding: 8px 40px 8px 12px;
-	outline: none;
-	text-align: center;
-	transition: border-color 0.1s ease;
-	background-color: $color-bg;
+.upload__url-input {
 	width: 100%;
 	height: 100%;
+	padding: 8px 40px 8px 12px;
+	border: $border-width solid #513d3d;
+	border-radius: $border-radius;
+	outline: none;
+	text-align: center;
+	transition: border-color 0.2s ease;
+	background-color: $color-bg;
+
+	&:focus {
+		border-color: $border-color;
+	}
 
 	&::placeholder {
 		color: #333;
@@ -53,72 +51,105 @@
 	&:hover {
 		border-color: $border-color;
 	}
+
+
+	&:disabled {
+        background-color: #f2f2f2;
+        border-color: #ccc;
+        color: #aaa;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+    &:disabled::placeholder {
+        color: #aaa;
+    }
 }
 
-.upload__url--active {
-	border-color: $border-color;
+.upload__clear-btn {
+	position: absolute;
+	right: 10px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 15px;
+	top: 50%;
+	transform: translateY(-50%);
+
+	&:disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
 }
 
-.upload__error-message {
-	color: red;
-	font-size: 16px;
-	text-align: center;
-	height: 20px;
-	visibility: hidden;
-}
-
-.upload__error-message span {
-	visibility: visible;
-}
-
-.upload {
-	height: 400px;
+.upload__file-container {
+	width: 100%;
+	height: 500px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	border: 1px dashed #513d3d;
-	border-radius: 8px;
+	border: $border-width solid #513d3d;
+	border-radius: $border-radius;
 	background-color: $color-bg;
 	text-align: center;
 	position: relative;
 	cursor: pointer;
 	overflow: hidden;
-	transition: border 0.1s ease;
+	transition: border-color 0.2s ease;
 
 	&:hover {
 		border-color: $border-color;
 	}
+
+	&--preview-loaded {
+		border: none;
+	}
+
+
+	&:disabled {
+        background-color: #f2f2f2;
+        border-color: #ccc;
+        cursor: not-allowed;
+    }
 }
 
-.upload--preview-loaded {
-	border: none;
-}
-
-.upload__input {
+.upload__file-input {
 	opacity: 0;
 	position: absolute;
 	width: 100%;
 	height: 100%;
 	cursor: pointer;
 	z-index: 2;
+
+
+	&:disabled {
+        cursor: not-allowed;
+		background-color: #f2f2f2;
+        border-color: #ccc;
+        pointer-events: none;
+    }
 }
 
-.upload__text {
+.upload__file-placeholder {
 	position: absolute;
 	color: #333;
 	font-size: 16px;
+
+
+	&:disabled {
+        color: #aaa;
+    }
 }
 
 .upload__preview {
 	width: 100%;
 	height: 100%;
-	border-radius: 8px;
+	border-radius: $border-radius;
 	overflow: hidden;
 }
 
-.upload__preview img {
+.upload__preview-image {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	border-radius: 8px;
+	border-radius: $border-radius;
 }
