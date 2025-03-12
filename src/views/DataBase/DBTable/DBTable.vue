@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import type { FaceDB } from '../../../components/utils/types.ts';
 const props = defineProps<{
 	faces: FaceDB[];
 	vectors: string[];
 }>();
 const emit = defineEmits(['deleteFace']);
+const hoveredFace = ref<string | null>(null);
 </script>
 
 <template>
@@ -31,8 +33,20 @@ const emit = defineEmits(['deleteFace']);
 					</div>
 				</td>
 				<td class="table__td">{{ face.name }}</td>
-				<td class="table__td">
+				<!-- <td class="table__td">
 					<img :src="face.photoUrl" :alt="face.name" class="table__photo" />
+				</td> -->
+				<td class="table__td">
+					<div
+						class="table__photo-wrapper"
+						@mouseenter="hoveredFace = face.id"
+						@mouseleave="hoveredFace = null"
+					>
+						<img :src="face.photoUrl" :alt="face.name" class="table__photo" />
+						<div v-if="hoveredFace === face.id" class="table__tooltip">
+							<img :src="face.photoUrl" :alt="face.name" class="table__tooltip-img" />
+						</div>
+					</div>
 				</td>
 				<td class="table__td">
 					<button
@@ -112,6 +126,25 @@ const emit = defineEmits(['deleteFace']);
 		border-radius: 5px;
 		cursor: pointer;
 		background-color: #dc3545;
+	}
+
+	&__tooltip {
+		position: absolute;
+		top: 300px;
+		left: 70%;
+		transform: translateX(-50%);
+		background: rgba(0, 0, 0, 0.8);
+		padding: 5px;
+		border-radius: 5px;
+		box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+		z-index: 10;
+	}
+
+	&__tooltip-img {
+		width: 120px;
+		height: 120px;
+		object-fit: cover;
+		border-radius: 5px;
 	}
 }
 </style>
