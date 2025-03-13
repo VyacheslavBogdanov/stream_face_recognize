@@ -39,6 +39,6 @@ onMounted(loadMessageTypes);
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	background: #f4f6fb;
+	background: $background-color;
 }
 </style>

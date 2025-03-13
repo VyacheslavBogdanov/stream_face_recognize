@@ -58,8 +58,8 @@ const emit = defineEmits(['update:newFace', 'addFace']);
 
 	&__button {
 		padding: 8px 12px;
-		background-color: #007bff;
-		color: #fff;
+		background-color: $button-color;
+		color: $background-color;
 		border: none;
 		cursor: pointer;
 		box-shadow:

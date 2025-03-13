@@ -1,19 +1,39 @@
 {
   "people": [
     {
-      "id": "c608bb6a-04ef-4b0c-abdb-dcef45d78ade",
-      "name": "asd",
-      "photoUrl": "https://img.freepik.com/free-photo/portrait-concentrated-young-bearded-man_171337-17191.jpg"
+      "id": "ec257866-895b-4254-a130-ddf64e7adbeb",
+      "name": "Test Face",
+      "photoUrl": "https://babycolor.ru/raskraski/raskraska-litco-008.jpg"
     },
     {
-      "id": "e8fb9ee7-a0c2-43cd-9882-47c951d0454f",
-      "name": "asd",
-      "photoUrl": "https://img.freepik.com/free-photo/portrait-concentrated-young-bearded-man_171337-17191.jpg"
+      "id": "2089b73a-7571-44c9-a887-738f9cb01322",
+      "name": "David",
+      "photoUrl": "https://oldboybarbershop.com/sites/default/files/2020-02/blog-kak-podobrat-pravilnuyu-strizhku-po-forme-lica-4.jpg"
     },
     {
-      "id": "e77de8af-befb-4a67-adfb-d17acb29b4ff",
-      "name": "ads",
-      "photoUrl": "https://img.freepik.com/free-photo/portrait-concentrated-young-bearded-man_171337-17191.jpg"
+      "id": "f9598ccb-5b4f-495b-8ed2-819cb80a4dfc",
+      "name": "Егор",
+      "photoUrl": "https://i.pinimg.com/236x/5f/11/ac/5f11ac8761ad69695d36ea4281c4c41e.jpg"
+    },
+    {
+      "id": "3ece7082-6108-430f-8fa9-dadd7db734d7",
+      "name": "Михаил",
+      "photoUrl": "https://img.freepik.com/free-photo/portrait-handsome-brunet-unshaven-adult-man-looks-with-calm-confident-expression-has-serious-look-wears-casual-jumper-poses-making-photo-against-white-background-being-hard-impress_273609-57668.jpg?semt=ais_hybrid"
+    },
+    {
+      "id": "f9d7f058-6734-45f3-b539-6086020ffc90",
+      "name": "Денис",
+      "photoUrl": "https://img.freepik.com/premium-photo/caucasian-young-mans-close-up-portrait-blue-studio-background-beautiful-male-model_489646-6899.jpg?semt=ais_hybrid"
+    },
+    {
+      "id": "1f582349-365a-4291-a497-835926f6faa3",
+      "name": "Дмитрий",
+      "photoUrl": "https://s14.stc.all.kpcdn.net/woman/wp-content/uploads/2023/07/krop-barber-roman-vito.jpg"
+    },
+    {
+      "id": "0d6dffb2-8f3e-4810-9956-3fc75d9ad031",
+      "name": "Олег",
+      "photoUrl": "https://blog.edutop.pro/wp-content/uploads/2015/09/nachesannaya-cheska-Besthairstyles-2015.jpg"
     }
   ]
 }
