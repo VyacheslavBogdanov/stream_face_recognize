@@ -105,11 +105,10 @@ const isInvalidUrl = ref<boolean>(false);
 const foundPeople = ref<{ id: string; name: string; photoUrl: string; bbox?: number[] }[]>([]);
 const errorMessage = ref('');
 const scaledBboxes = ref<{ left: number; top: number; width: number; height: number }[]>([]);
+const imageElement = ref<HTMLImageElement | null>(null);
 
 const isDisabled = computed(() => props.status === 'inactive');
 const canSearch = computed(() => !!selectedFile.value || !!imageUrl.value);
-
-const imageElement = ref<HTMLImageElement | null>(null);
 
 const updateBoundingBoxes = () => {
 	if (!imageElement.value || foundPeople.value.length === 0 || !foundPeople.value[0].bbox) return;
@@ -131,44 +130,33 @@ const updateBoundingBoxes = () => {
 
 const handleFileUpload = (event: Event) => {
 	const target = event.target as HTMLInputElement;
-	if (target.files && target.files[0]) {
-		selectedFile.value = target.files[0];
-		imageUrl.value = '';
-		isInvalidUrl.value = false;
+	if (!target.files?.[0]) return;
 
-		const reader = new FileReader();
-		reader.onload = () => {
-			previewImage.value = reader.result as string;
-		};
-		reader.readAsDataURL(target.files[0]);
-	}
+	selectedFile.value = target.files[0];
+	imageUrl.value = '';
+	isInvalidUrl.value = false;
+
+	const reader = new FileReader();
+	reader.onload = () => (previewImage.value = reader.result as string);
+	reader.readAsDataURL(target.files[0]);
 };
 
 const onUrlChange = async () => {
-	if (!imageUrl.value) {
-		clearUpload();
-		return;
-	}
+	if (!imageUrl.value) return clearUpload();
 
 	try {
 		const response = await fetch(imageUrl.value);
-		if (!response.ok) throw new Error('Ошибка загрузки URL');
+		if (!response.ok) throw new Error();
 
 		const blob = await response.blob();
 		const reader = new FileReader();
-
-		reader.onload = () => {
-			if (reader.result) {
-				previewImage.value = reader.result as string;
-
-				isInvalidUrl.value = false;
-			}
-		};
-
+		reader.onload = () => (previewImage.value = reader.result as string);
 		reader.readAsDataURL(blob);
+
+		isInvalidUrl.value = false;
 	} catch {
+		clearUpload();
 		isInvalidUrl.value = true;
-		previewImage.value = null;
 	}
 };
 
@@ -202,8 +190,8 @@ const searchFaces = async () => {
 		let base64Image = '';
 		if (selectedFile.value) {
 			base64Image = await fileToBase64(selectedFile.value);
-		} else if (imageUrl.value) {
-			base64Image = await urlToBase64(imageUrl.value);
+		} else if (previewImage.value) {
+			base64Image = previewImage.value;
 		}
 
 		const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
@@ -238,16 +226,14 @@ const searchFaces = async () => {
 
 const getPersonById = async (id) => {
 	try {
-		const url = `${DB}`;
-		const response = await fetch(url);
+		const response = await fetch(DB);
 		if (!response.ok) throw new Error(`Ошибка загрузки данных для ID: ${id}`);
 
 		const dbData = await response.json();
-		if (!Array.isArray(dbData)) throw new Error('Данные базы не являются массивом');
-
 		const person = dbData.find((p) => p.id === id);
+
 		if (!person) {
-			errorMessage.value = `Данный человек в базе не найден`;
+			errorMessage.value = `Человек с ID ${id} не найден в базе`;
 			return null;
 		}
 
@@ -258,21 +244,42 @@ const getPersonById = async (id) => {
 		return null;
 	}
 };
-
-const urlToBase64 = async (url: string): Promise<string> => {
-	try {
-		const response = await fetch(url);
-		const blob = await response.blob();
-		return await fileToBase64(blob as File);
-	} catch {
-		return '';
-	}
-};
 </script>
 
 <style lang="scss" scoped>
 @import '../../styles/main.scss';
 
+.upload__image-group {
+	display: flex;
+	gap: 20px;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+}
+
+.upload__file-container,
+.upload__result-container {
+	width: 500px;
+	height: 500px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border: 2px solid #513d3d;
+	border-radius: 10px;
+	background-color: #f8f8f8;
+	text-align: center;
+	position: relative;
+	cursor: pointer;
+	overflow: hidden;
+	transition: border-color 0.2s ease;
+}
+
+.upload__file-preview,
+.upload__result-image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
 // .upload__not-found-message {
 // 	margin-top: 10px;
 // 	color: red;
@@ -347,13 +354,13 @@ const urlToBase64 = async (url: string): Promise<string> => {
 // 	color: $color-error;
 // }
 
-.upload__image-group {
-	display: flex;
-	gap: 20px;
-	align-items: center;
-	justify-content: center;
-	width: 1000px;
-}
+// .upload__image-group {
+// 	display: flex;
+// 	gap: 20px;
+// 	align-items: center;
+// 	justify-content: center;
+// 	width: 1000px;
+// }
 
 // .upload {
 // 	display: flex;
@@ -374,30 +381,30 @@ const urlToBase64 = async (url: string): Promise<string> => {
 // 	overflow: hidden;
 // 	transition: border-color 0.2s ease;
 
-.upload__result-container {
-	width: 100%;
-	height: 500px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	border: $border-width solid #513d3d;
-	border-radius: $border-radius;
-	background-color: $color-bg;
-	text-align: center;
-	position: relative;
-	cursor: pointer;
-	overflow: hidden;
-	transition: border-color 0.2s ease;
-}
-.upload__file-input {
-	opacity: 0;
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	cursor: pointer;
-	z-index: 2;
-	box-sizing: border-box;
-}
+// .upload__result-container {
+// 	width: 100%;
+// 	height: 500px;
+// 	display: flex;
+// 	justify-content: center;
+// 	align-items: center;
+// 	border: $border-width solid #513d3d;
+// 	border-radius: $border-radius;
+// 	background-color: $color-bg;
+// 	text-align: center;
+// 	position: relative;
+// 	cursor: pointer;
+// 	overflow: hidden;
+// 	transition: border-color 0.2s ease;
+// }
+// .upload__file-input {
+// 	opacity: 0;
+// 	position: absolute;
+// 	width: 100%;
+// 	height: 100%;
+// 	cursor: pointer;
+// 	z-index: 2;
+// 	box-sizing: border-box;
+// }
 
 // 	&:disabled {
 // 		cursor: not-allowed;
@@ -417,12 +424,12 @@ const urlToBase64 = async (url: string): Promise<string> => {
 // 	}
 // }
 
-.upload__file-preview,
-.upload__result-image {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-}
+// .upload__file-preview,
+// .upload__result-image {
+// 	width: 100%;
+// 	height: 100%;
+// 	object-fit: cover;
+// }
 
 // .upload__bbox {
 // 	position: absolute;
