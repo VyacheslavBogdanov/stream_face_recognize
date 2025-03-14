@@ -60,6 +60,10 @@ const filteredMessageTypes = computed(() => {
 			pointer-events: none;
 			opacity: 0.5;
 		}
+
+		@media (max-width: 1800px) {
+			font-size: 20px;
+		}
 	}
 
 	&__link {
@@ -73,42 +77,47 @@ const filteredMessageTypes = computed(() => {
 			background: #e1e4ee;
 		}
 	}
-}
 
-.health {
-	position: absolute;
-	left: 20%;
-	display: flex;
-	align-items: center;
-	padding: 10px 30px 10px 40px;
-	border-radius: $border-radius;
-	max-width: fit-content;
-	word-wrap: break-word;
-	font-size: 23px;
-	height: 40px;
-	opacity: 0.85;
-	margin: 0 70px;
-
-	@media (max-width: 835px) {
-		font-size: 17px;
-	}
-
-	&__icon {
-		display: flex;
+	.health {
 		position: absolute;
+		left: 20%;
+		display: flex;
 		align-items: center;
-		left: 10px;
-		height: 30px;
-	}
+		padding: 10px 20px 10px 40px;
+		border-radius: $border-radius;
+		max-width: fit-content;
+		word-wrap: break-word;
+		font-size: 23px;
+		height: 40px;
+		opacity: 0.85;
+		margin: 0 70px;
 
-	&--success {
-		background-color: #e0fde7;
-		color: $color-success;
-	}
+		&__icon {
+			display: flex;
+			position: absolute;
+			align-items: center;
+			left: 10px;
+			height: 30px;
+		}
 
-	&--warning {
-		background-color: #f9ebd8;
-		color: $color-warning;
+		&--success {
+			background-color: #e0fde7;
+			color: $color-success;
+		}
+
+		&--warning {
+			background-color: #f9ebd8;
+			color: $color-warning;
+		}
+
+		@media (max-width: 2440px) {
+			left: 0;
+		}
+
+		@media (max-width: 1800px) {
+			font-size: 17px;
+			padding: 5px 20px 5px 40px;
+		}
 	}
 }
 </style>

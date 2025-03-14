@@ -5,6 +5,7 @@ const syncRequired = computed(() => props.faces.length !== props.vectors.length)
 const props = defineProps<{
 	vectors: string[];
 	faces: FaceDB[];
+	isSync: boolean;
 }>();
 const emit = defineEmits(['syncDB']);
 </script>
@@ -22,7 +23,7 @@ const emit = defineEmits(['syncDB']);
 				:class="{
 					sync__syncBtn: true,
 					'sync__syncBtn--syncRequired': syncRequired,
-					'sync__syncBtn--isSync': true,
+					'sync__syncBtn--isSync': props.isSync,
 				}"
 				@click="$emit('syncDB')"
 			>
@@ -48,7 +49,7 @@ const emit = defineEmits(['syncDB']);
 		padding: 10px;
 
 		&--syncRequired {
-			color: #dc3545;
+			color: $button-color-red;
 		}
 	}
 
@@ -62,10 +63,9 @@ const emit = defineEmits(['syncDB']);
 
 	&__syncBtn {
 		padding: 8px 12px;
-		background-color: #007bff;
-		color: #fff;
+		background-color: $button-color;
+		color: $background-color;
 		border: none;
-		border-radius: 5px;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
@@ -74,6 +74,10 @@ const emit = defineEmits(['syncDB']);
 
 		&--syncRequired {
 			background-color: #dc3545;
+		}
+
+		&--isSync::before {
+			animation: rotate 2s linear infinite;
 		}
 	}
 
@@ -84,10 +88,6 @@ const emit = defineEmits(['syncDB']);
 		transform-origin: center;
 		margin-right: 7px;
 	}
-
-	// &__syncBtn:hover::before {
-	// 	animation: rotate 2s linear infinite;
-	// }
 
 	@keyframes rotate {
 		0% {

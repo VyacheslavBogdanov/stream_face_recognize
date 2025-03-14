@@ -10,10 +10,10 @@ export function useHealthCheck() {
 			const response = await fetch(`${Url}/health`);
 
 			if (response.ok) {
-				// const data = await response.json();
+				const data = await response.json();
 
 				// Для тестирования
-				const data = { result: 0 };
+				// const data = { result: 0 };
 
 				if (data.result === 1) {
 					status.value = 'active';

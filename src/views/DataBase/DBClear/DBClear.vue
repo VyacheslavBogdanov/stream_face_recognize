@@ -15,11 +15,10 @@ const emit = defineEmits(['clearDatabase']);
 
 .clearButton {
 	padding: 8px 12px;
-	background-color: #dc3545;
+	background-color: $button-color-red;
 	margin-top: 10px;
-	color: #fff;
+	color: $background-color;
 	border: none;
-	border-radius: 5px;
 	cursor: pointer;
 }
 </style>
