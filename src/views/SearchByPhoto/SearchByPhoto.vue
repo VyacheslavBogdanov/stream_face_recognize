@@ -19,7 +19,10 @@
 		</div>
 
 		<div class="upload__image-group">
-			<div class="upload__file-container">
+			<div
+				class="upload__file-container"
+				:class="{ 'upload__file-container-loaded': previewImage }"
+			>
 				<div class="upload__file">
 					<span v-if="!previewImage" class="upload__file-placeholder">
 						Загрузить изображение
@@ -40,7 +43,11 @@
 				</div>
 			</div>
 
-			<div class="upload__result-container" v-if="foundPeople.length">
+			<div
+				class="upload__result-container"
+				v-if="foundPeople.length"
+				:class="{ 'upload__result-container-loaded': previewImage }"
+			>
 				<div class="upload__result">
 					<img
 						ref="imageElement"
@@ -84,6 +91,7 @@
 			<span class="upload__button-text">Поиск</span>
 		</button>
 		<div v-if="errorMessage" :class="['upload__error-msg', errorMessage.class]">
+			<div class="upload__icon">ⓘ</div>
 			<span>{{ errorMessage.message }}</span>
 		</div>
 	</div>
@@ -223,11 +231,11 @@ const sendRecognitionRequest = async (base64Image: string) => {
 		}
 	}
 };
+
 const getPersonById = async (id: string) => {
 	try {
 		const response = await fetch(DB);
 		if (!response.ok) throw new Error(`Ошибка загрузки данных для ID: ${id}`);
-
 
 		const dbData: { id: string; name: string; photoUrl: string }[] = await response.json();
 		const person = dbData.find((p) => p.id === id);
@@ -235,41 +243,17 @@ const getPersonById = async (id: string) => {
 		if (!person) {
 			errorMessage.value = {
 				message: props.messageTypes.find((msg) => msg.class === 'search-error')?.message,
-				class: 'upload__error-msg-error',
+				class: 'upload__error-msg--error',
 			};
-
 			foundPeople.value = [];
 			return null;
-
-		const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
-
-		const response = await fetch(`${HOST}/recognize_many`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				request_id: uuidv4(),
-				rec_threshold: 1,
-				image: imageBase64,
-			}),
-		});
-
-		const data = await response.json();
-		console.log('data', data);
-
-		if (data.detected_faces && data.detected_faces.length > 0) {
-			const foundId = data.detected_faces[0].id;
-			foundImageUrl.value = `${DB}/${foundId}.jpg`;
-		} else {
-			foundImageUrl.value = null;
-
 		}
-
 		return person;
 	} catch (error) {
 		console.error(error);
 		errorMessage.value = {
 			message: 'Ошибка при загрузке данных',
-			class: 'upload__error-msg',
+			class: 'upload__error-msg-error',
 		};
 		return null;
 	}
@@ -278,12 +262,65 @@ const getPersonById = async (id: string) => {
 
 <style lang="scss" scoped>
 @import '../../styles/main.scss';
-// @import '../ComparisonOfTwoPhotos/Style/UploadStyle.scss';
 
 .upload {
+	position: relative;
 	display: flex;
 	flex-direction: column;
-	gap: 20px;
+	align-items: center;
+	padding-top: 30px;
+}
+.upload__error-message {
+	position: absolute;
+	top: 10px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 100%;
+	text-align: center;
+	color: $color-error;
+}
+
+.upload__url-input {
+	width: 500px;
+	height: 20px;
+	padding: 8px 40px 8px 12px;
+	border: $border-width solid #513d3d;
+	border-radius: 8px;
+	outline: none;
+	text-align: center;
+	transition: border-color 0.2s ease;
+	background-color: #f8f8f8;
+
+	&:focus {
+		border-color: $border-color;
+	}
+
+	&::placeholder {
+		color: #333;
+	}
+
+	&:hover {
+		border-color: $border-color;
+	}
+}
+.upload__url-container {
+	width: 500px;
+	display: flex;
+	justify-content: center;
+	margin-bottom: 10px;
+	position: relative;
+}
+
+.upload__clear-btn {
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 15px;
+	color: #513d3d;
 }
 
 .upload__error-msg {
@@ -302,6 +339,15 @@ const getPersonById = async (id: string) => {
 		background: #f2dee0;
 		color: $color-error;
 	}
+	.upload__icon {
+		position: absolute;
+		left: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 30px;
+		height: 30px;
+	}
 }
 
 .upload__image-group {
@@ -318,14 +364,32 @@ const getPersonById = async (id: string) => {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	border: 2px solid #513d3d;
-	border-radius: 10px;
+	border: $border-width solid #513d3d;
+	border-radius: 8px;
 	background-color: #f8f8f8;
 	text-align: center;
 	position: relative;
-	cursor: pointer;
 	overflow: hidden;
+	cursor: pointer;
 	transition: border-color 0.2s ease;
+
+	&:hover {
+		border-color: $border-color;
+	}
+	&.upload__file-container-loaded {
+		border: none;
+	}
+}
+
+.upload__file-input {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	cursor: pointer;
+	z-index: 2;
 }
 .upload__result-container {
 	width: 500px;
@@ -333,14 +397,16 @@ const getPersonById = async (id: string) => {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	border: 2px solid #513d3d;
+	border: $border-width solid #513d3d;
 	border-radius: 10px;
 	background-color: #f8f8f8;
 	text-align: center;
 	position: relative;
-	cursor: pointer;
 	overflow: hidden;
-	transition: border-color 0.2s ease;
+
+	&.upload__result-container-loaded {
+		border: none;
+	}
 }
 
 .upload__file-preview,
@@ -348,125 +414,100 @@ const getPersonById = async (id: string) => {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-}
-
-.upload__url-container {
-	position: relative;
-	width: 100%;
-	height: 20px;
-	display: flex;
-	align-items: center;
-	margin-bottom: 20px;
-}
-
-.upload__url-input {
-	width: 500px;
-	height: 100%;
-	padding: 8px 40px 8px 12px;
-	border: $border-width solid #513d3d;
-	border-radius: $border-radius;
-	outline: none;
-	text-align: center;
-	transition: border-color 0.2s ease;
-	background-color: $color-bg;
-	justify-content: center;
-
-	&:focus {
-		border-color: $border-color;
-	}
-
-	&::placeholder {
-		color: #333;
-
-		&:hover {
-			border-color: $border-color;
-		}
-
-		&:disabled {
-			background-color: #f2f2f2;
-			border-color: #ccc;
-			color: #aaa;
-			cursor: not-allowed;
-			pointer-events: none;
-		}
-		&:disabled::placeholder {
-			color: #aaa;
-		}
-	}
-	.upload__clear-btn {
-		position: absolute;
-		right: 10px;
-		background: none;
-		border: none;
-		cursor: pointer;
-		font-size: 15px;
-		top: 50%;
-		transform: translateY(-50%);
-
-		&:disabled {
-			pointer-events: none;
-			opacity: 0.5;
-		}
-	}
-}
-
-.upload__image-group {
-	display: flex;
-	gap: 20px;
-	align-items: center;
-	justify-content: center;
-	width: 1000px;
-}
-
-.upload__file-input {
-	opacity: 0;
 	position: absolute;
-	width: 100%;
-	height: 100%;
-	cursor: pointer;
-	z-index: 2;
-	box-sizing: border-box;
+	top: 0;
+	left: 0;
 }
 
-// 		&:disabled {
-// 			cursor: not-allowed;
-// 			background-color: #f2f2f2;
-// 			border-color: #ccc;
-// 			pointer-events: none;
-// 		}
-// 	}
-
-// .upload__file-placeholder {
-// 	position: absolute;
-// 	color: #333;
-// 	font-size: 16px;
-
-// 	&:disabled {
-// 		color: #aaa;
-// 	}
-// }
+//BBOX
 
 .upload__bbox {
 	position: absolute;
-	border: 1.5px solid red;
+	border: $border-width solid red;
 	box-sizing: border-box;
 }
 
-.upload__table {
-	width: 100%;
+//Кнопка Поиска
+
+.upload__button {
+	width: 250px;
+	position: relative;
+	height: 50px;
+	padding: 0 30px;
+	color: #513d3d;
+	border: $border-width solid #513d3d;
+	background-color: $color-bg;
+	border-radius: $border-radius;
+	user-select: none;
+	white-space: nowrap;
+	transition: all 0.05s linear;
+	font-family: inherit;
+	margin: auto;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	margin-top: 20px;
+	margin-bottom: 20px;
+
+	&:hover {
+		cursor: pointer;
+		border-color: $border-color;
+		color: $border-color;
+
+		&:before {
+			height: calc(100% - 32px);
+			top: 16px;
+		}
+
+		&:after {
+			width: calc(100% - 32px);
+			left: 16px;
+		}
+	}
+
+	&:active {
+		transform: scale(0.97);
+	}
+
+	&:disabled {
+		cursor: not-allowed;
+		background-color: #ededed;
+		border-color: #929191;
+		color: #a0a0a0;
+
+		transition: none;
+	}
+
+	.upload__button-text {
+		font-size: 18px;
+		z-index: 3;
+		position: relative;
+		font-weight: 500;
+	}
+}
+//Таблица
+.upload__table {
+	width: 500px;
 	border-collapse: collapse;
+	margin-top: 20px;
+	background: #ffffff;
+	box-shadow:
+		0px 3px 8px -6px rgba(24, 39, 75, 0.05),
+		0px 10px 36px -4px rgba(17, 24, 41, 0.1);
 }
 
 .upload__table th,
 .upload__table td {
-	border: 1px solid #513d3d;
-	padding: 8px;
+	height: 30px;
+	border: 1px solid #ccc;
+	padding: 5px;
 	text-align: center;
+	vertical-align: middle;
 }
 
 .upload__table-head {
 	background-color: #f0f0f0;
+	font-size: 15px;
 }
 
 .upload__table-body tr:hover {
