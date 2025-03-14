@@ -83,7 +83,7 @@
 		<button type="submit" class="upload__button" :disabled="isDisabled" @click="searchFaces">
 			<span class="upload__button-text">Поиск</span>
 		</button>
-		<div v-if="errorMessage.message" :class="['upload__error-msg', errorMessage.class]">
+		<div v-if="errorMessage" :class="['upload__error-msg', errorMessage.class]">
 			<span>{{ errorMessage.message }}</span>
 		</div>
 	</div>
@@ -101,7 +101,7 @@ const props = defineProps<{
 	messageTypes: MessageType[];
 	status: string;
 }>();
-const errorMessage = ref<{ message: string; class: string }>({ message: '', class: '' });
+const errorMessage = ref<{ class: string; message: string } | null>(null);
 const imageUrl = ref<string>('');
 const selectedFile = ref<File | null>(null);
 const previewImage = ref<string | null>(null);
@@ -175,7 +175,7 @@ const clearUpload = () => {
 	previewImage.value = null;
 	isInvalidUrl.value = false;
 	foundPeople.value = [];
-	errorMessage.value = { message: '', class: '' };
+	errorMessage.value = null;
 };
 
 const Base64Image = (base64String: string) =>
@@ -256,6 +256,12 @@ const getPersonById = async (id: string) => {
 <style lang="scss" scoped>
 @import '../../styles/main.scss';
 // @import '../ComparisonOfTwoPhotos/Style/UploadStyle.scss';
+
+.upload {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
 
 .upload__error-msg {
 	position: relative;
@@ -379,119 +385,68 @@ const getPersonById = async (id: string) => {
 			opacity: 0.5;
 		}
 	}
+}
 
-	.upload__error-message {
-		position: absolute;
-		top: 10px;
-		left: 50%;
-		transform: translateX(-50%);
-		width: 100%;
-		text-align: center;
-		color: $color-error;
-	}
+.upload__image-group {
+	display: flex;
+	gap: 20px;
+	align-items: center;
+	justify-content: center;
+	width: 1000px;
+}
 
-	.upload__image-group {
-		display: flex;
-		gap: 20px;
-		align-items: center;
-		justify-content: center;
-		width: 1000px;
-	}
+.upload__file-input {
+	opacity: 0;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	cursor: pointer;
+	z-index: 2;
+	box-sizing: border-box;
+}
 
-	.upload {
-		display: flex;
-	}
+// 		&:disabled {
+// 			cursor: not-allowed;
+// 			background-color: #f2f2f2;
+// 			border-color: #ccc;
+// 			pointer-events: none;
+// 		}
+// 	}
 
-	.upload__file-container {
-		width: 100%;
-		height: 500px;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		border: $border-width solid #513d3d;
-		border-radius: $border-radius;
-		background-color: $color-bg;
-		text-align: center;
-		position: relative;
-		cursor: pointer;
-		overflow: hidden;
-		transition: border-color 0.2s ease;
+// .upload__file-placeholder {
+// 	position: absolute;
+// 	color: #333;
+// 	font-size: 16px;
 
-		.upload__result-container {
-			width: 100%;
-			height: 500px;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			border: $border-width solid #513d3d;
-			border-radius: $border-radius;
-			background-color: $color-bg;
-			text-align: center;
-			position: relative;
-			cursor: pointer;
-			overflow: hidden;
-			transition: border-color 0.2s ease;
-		}
-		.upload__file-input {
-			opacity: 0;
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			cursor: pointer;
-			z-index: 2;
-			box-sizing: border-box;
-		}
+// 	&:disabled {
+// 		color: #aaa;
+// 	}
+// }
 
-		&:disabled {
-			cursor: not-allowed;
-			background-color: #f2f2f2;
-			border-color: #ccc;
-			pointer-events: none;
-		}
-	}
+.upload__bbox {
+	position: absolute;
+	border: 1.5px solid red;
+	box-sizing: border-box;
+}
 
-	.upload__file-placeholder {
-		position: absolute;
-		color: #333;
-		font-size: 16px;
+.upload__table {
+	width: 100%;
+	margin-top: 20px;
+	border-collapse: collapse;
+}
 
-		&:disabled {
-			color: #aaa;
-		}
-	}
+.upload__table th,
+.upload__table td {
+	border: 1px solid #513d3d;
+	padding: 8px;
+	text-align: center;
+}
 
-	.upload__file-preview,
-	.upload__result-image {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
+.upload__table-head {
+	background-color: #f0f0f0;
+}
 
-	.upload__bbox {
-		position: absolute;
-		border: 1.5px solid red;
-		box-sizing: border-box;
-	}
-
-	.upload__table {
-		width: 100%;
-		margin-top: 20px;
-		border-collapse: collapse;
-	}
-
-	.upload__table th,
-	.upload__table td {
-		border: 1px solid #513d3d;
-		padding: 8px;
-		text-align: center;
-	}
-
-	.upload__table-head {
-		background-color: #f0f0f0;
-	}
-
-	.upload__table-body tr:hover {
-		background-color: #f9f9f9;
-	}
+.upload__table-body tr:hover {
+	background-color: #f9f9f9;
 }
 </style>
