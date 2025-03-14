@@ -6,45 +6,34 @@
       "photoUrl": "https://ybis.ru/wp-content/uploads/2023/09/leonardo-di-kaprio-emotsii-1.webp"
     },
     {
-<<<<<<< HEAD
-      "id": "2089b73a-7571-44c9-a887-738f9cb01322",
-      "name": "David",
-      "photoUrl": "https://oldboybarbershop.com/sites/default/files/2020-02/blog-kak-podobrat-pravilnuyu-strizhku-po-forme-lica-4.jpg"
-    },
-    {
-      "id": "f9598ccb-5b4f-495b-8ed2-819cb80a4dfc",
-      "name": "Егор",
-      "photoUrl": "https://i.pinimg.com/236x/5f/11/ac/5f11ac8761ad69695d36ea4281c4c41e.jpg"
-    },
-    {
-      "id": "3ece7082-6108-430f-8fa9-dadd7db734d7",
-      "name": "Михаил",
-      "photoUrl": "https://img.freepik.com/free-photo/portrait-handsome-brunet-unshaven-adult-man-looks-with-calm-confident-expression-has-serious-look-wears-casual-jumper-poses-making-photo-against-white-background-being-hard-impress_273609-57668.jpg?semt=ais_hybrid"
-    },
-    {
-      "id": "f9d7f058-6734-45f3-b539-6086020ffc90",
-      "name": "Денис",
-      "photoUrl": "https://img.freepik.com/premium-photo/caucasian-young-mans-close-up-portrait-blue-studio-background-beautiful-male-model_489646-6899.jpg?semt=ais_hybrid"
-    },
-    {
-      "id": "1f582349-365a-4291-a497-835926f6faa3",
-      "name": "Дмитрий",
-      "photoUrl": "https://s14.stc.all.kpcdn.net/woman/wp-content/uploads/2023/07/krop-barber-roman-vito.jpg"
-    },
-    {
-      "id": "0d6dffb2-8f3e-4810-9956-3fc75d9ad031",
-      "name": "Олег",
-      "photoUrl": "https://blog.edutop.pro/wp-content/uploads/2015/09/nachesannaya-cheska-Besthairstyles-2015.jpg"
-    },
-    {
-      "id": "ee22434a-8a14-47f0-be8a-89a3ddf35086",
-      "name": "Евгений",
-      "photoUrl": "https://img.freepik.com/free-photo/close-up-portrait-young-bearded-man-face_171337-2887.jpg"
-=======
       "id": "22e82028-7579-4860-9f2c-39d09e22b457",
       "name": "Василий",
       "photoUrl": "https://img.freepik.com/premium-photo/adult-man-serene-face-expression-studio-portrait_53876-75438.jpg"
->>>>>>> 1d75916fb92ee808555c5b9428cb5164bfd0fb35
+    },
+    {
+      "id": "38ccb4fd-eef3-4541-94f0-6ded8b74d4ef",
+      "name": "Евгений",
+      "photoUrl": "https://img.freepik.com/free-photo/close-up-portrait-young-bearded-man-face_171337-2887.jpg"
+    },
+    {
+      "id": "22473c84-71b4-41b0-baf3-80a4f67a6030",
+      "name": "Михаил",
+      "photoUrl": "https://www.simushka.ru/upload/medialibrary/cf5/IMG_1798_1_642x642.jpg"
+    },
+    {
+      "id": "b1365fad-f803-4286-b50d-9e99e09880fc",
+      "name": "Егор",
+      "photoUrl": "https://images.techinsider.ru/upload/img_cache/876/876021f4353849ca2aaee7b0bdccd6e1_cropped_510x510.webp"
+    },
+    {
+      "id": "4da844f9-ddfa-42d6-9d58-dce503f305bf",
+      "name": "Test Face",
+      "photoUrl": "https://i.ytimg.com/vi/YTPvtaehj14/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLAZqzjeR0c7tCLR5Y6HYX-woq4rVQ"
+    },
+    {
+      "id": "08d31f07-8903-4c9e-8c02-2f773a1719d8",
+      "name": "David",
+      "photoUrl": "https://news.store.rambler.ru/img/3f712a0c0839de56e137438a377cf3a3?img-1-resize=width%3A1280%2Cheight%3A1280%2Cfit%3Acover&img-format=auto"
     }
   ]
 }
