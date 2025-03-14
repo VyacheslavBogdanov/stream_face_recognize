@@ -228,6 +228,7 @@ const getPersonById = async (id: string) => {
 		const response = await fetch(DB);
 		if (!response.ok) throw new Error(`Ошибка загрузки данных для ID: ${id}`);
 
+
 		const dbData: { id: string; name: string; photoUrl: string }[] = await response.json();
 		const person = dbData.find((p) => p.id === id);
 
@@ -239,6 +240,28 @@ const getPersonById = async (id: string) => {
 
 			foundPeople.value = [];
 			return null;
+
+		const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+
+		const response = await fetch(`${HOST}/recognize_many`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				request_id: uuidv4(),
+				rec_threshold: 1,
+				image: imageBase64,
+			}),
+		});
+
+		const data = await response.json();
+		console.log('data', data);
+
+		if (data.detected_faces && data.detected_faces.length > 0) {
+			const foundId = data.detected_faces[0].id;
+			foundImageUrl.value = `${DB}/${foundId}.jpg`;
+		} else {
+			foundImageUrl.value = null;
+
 		}
 
 		return person;

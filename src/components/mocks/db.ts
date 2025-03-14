@@ -3,13 +3,11 @@ import type { MessageType, MockAPIResponse } from '../utils/types';
 export const messageTypes: MessageType[] = [
 	{ class: 'health--success', message: 'Детектор работает корректно' },
 	{ class: 'health--warning', message: 'Обнаружен сбой детектора' },
-
-
-	{ class: 'error-server', message: 'Ошибка при запросе'},
-    { class: 'compare--photo', message: 'Загрузите оба изображения'},
-    { class: 'compare--info', message: 'Загрузите оба изображения'},
+	{ class: 'error-server', message: 'Ошибка при запросе' },
+	{ class: 'compare--photo', message: 'Загрузите оба изображения' },
+	{ class: 'compare--info', message: 'Загрузите оба изображения' },
 	{ class: 'compare--error', message: 'На одной из фотографий лиц не обнаружено' },
-	{ class: 'compare--fake-face', message: 'Попытка обмана системы' },
+	{ class: 'compare--error', message: 'Попытка обмана системы' },
 	{ class: 'compare--warning', message: 'Скорее всего, это один и тот же человек' },
 	{ class: 'compare--success', message: 'Это разные люди' },
 	{ class: 'compare--validation-error', message: 'Ошибка валидации, 422'},
