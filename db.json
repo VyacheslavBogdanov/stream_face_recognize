@@ -1,39 +1,14 @@
 {
   "people": [
     {
-      "id": "ec257866-895b-4254-a130-ddf64e7adbeb",
-      "name": "Test Face",
-      "photoUrl": "https://babycolor.ru/raskraski/raskraska-litco-008.jpg"
+      "id": "8607ca7a-6e6b-43db-91d4-36c26ff8bd66",
+      "name": "Leonardo",
+      "photoUrl": "https://ybis.ru/wp-content/uploads/2023/09/leonardo-di-kaprio-emotsii-1.webp"
     },
     {
-      "id": "2089b73a-7571-44c9-a887-738f9cb01322",
-      "name": "David",
-      "photoUrl": "https://oldboybarbershop.com/sites/default/files/2020-02/blog-kak-podobrat-pravilnuyu-strizhku-po-forme-lica-4.jpg"
-    },
-    {
-      "id": "f9598ccb-5b4f-495b-8ed2-819cb80a4dfc",
-      "name": "Егор",
-      "photoUrl": "https://i.pinimg.com/236x/5f/11/ac/5f11ac8761ad69695d36ea4281c4c41e.jpg"
-    },
-    {
-      "id": "3ece7082-6108-430f-8fa9-dadd7db734d7",
-      "name": "Михаил",
-      "photoUrl": "https://img.freepik.com/free-photo/portrait-handsome-brunet-unshaven-adult-man-looks-with-calm-confident-expression-has-serious-look-wears-casual-jumper-poses-making-photo-against-white-background-being-hard-impress_273609-57668.jpg?semt=ais_hybrid"
-    },
-    {
-      "id": "f9d7f058-6734-45f3-b539-6086020ffc90",
-      "name": "Денис",
-      "photoUrl": "https://img.freepik.com/premium-photo/caucasian-young-mans-close-up-portrait-blue-studio-background-beautiful-male-model_489646-6899.jpg?semt=ais_hybrid"
-    },
-    {
-      "id": "1f582349-365a-4291-a497-835926f6faa3",
-      "name": "Дмитрий",
-      "photoUrl": "https://s14.stc.all.kpcdn.net/woman/wp-content/uploads/2023/07/krop-barber-roman-vito.jpg"
-    },
-    {
-      "id": "0d6dffb2-8f3e-4810-9956-3fc75d9ad031",
-      "name": "Олег",
-      "photoUrl": "https://blog.edutop.pro/wp-content/uploads/2015/09/nachesannaya-cheska-Besthairstyles-2015.jpg"
+      "id": "22e82028-7579-4860-9f2c-39d09e22b457",
+      "name": "Василий",
+      "photoUrl": "https://img.freepik.com/premium-photo/adult-man-serene-face-expression-studio-portrait_53876-75438.jpg"
     }
   ]
 }

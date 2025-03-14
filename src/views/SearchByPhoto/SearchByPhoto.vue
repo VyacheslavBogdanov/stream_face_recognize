@@ -100,7 +100,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import { MessageType } from '../../components/mocks/db';
+import type { MessageType } from '../../components/utils/types';
 
 const HOST = import.meta.env.VITE_SERVER_HOST;
 const DB = import.meta.env.VITE_SERVER_DB;
@@ -242,7 +242,8 @@ const getPersonById = async (id: string) => {
 
 		if (!person) {
 			errorMessage.value = {
-				message: props.messageTypes.find((msg) => msg.class === 'search-error')?.message,
+				message: props.messageTypes.find((msg) => msg.class === 'search-error')
+					?.message as string,
 				class: 'upload__error-msg--error',
 			};
 			foundPeople.value = [];
@@ -253,7 +254,7 @@ const getPersonById = async (id: string) => {
 		console.error(error);
 		errorMessage.value = {
 			message: 'Ошибка при загрузке данных',
-			class: 'upload__error-msg-error',
+			class: 'upload__error-msg--error',
 		};
 		return null;
 	}

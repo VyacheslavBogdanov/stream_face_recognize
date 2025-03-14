@@ -39,7 +39,7 @@ import { v4 as uuidv4 } from 'uuid';
 import UploadSource from './UploadSource.vue';
 import UploadTarget from './UploadTarget.vue';
 import ButtonCompareFace from './ButtonCompareFace.vue';
-import { MessageType } from '../../components/mocks/db';
+import type { MessageType } from '../../components/utils/types';
 import type { Face } from '../../components/utils/types';
 
 const props = defineProps<{
@@ -69,7 +69,8 @@ const comparePhotos = async () => {
 	if (!targetImageBase64.value || !sourceImageBase64.value) {
 		comparisonResult.value = {
 			class: 'comparison__message--photo',
-			message: props.messageTypes.find((msg) => msg.class === 'compare--photo')?.message,
+			message: props.messageTypes.find((msg) => msg.class === 'compare--photo')
+				?.message as string,
 		};
 		infoCompare.value = null;
 		setTimeout(() => {
@@ -96,7 +97,8 @@ const comparePhotos = async () => {
 		if (response.status === 424) {
 			comparisonResult.value = {
 				class: 'comparison__message--error',
-				message: props.messageTypes.find((msg) => msg.class === 'compare--error')?.message,
+				message: props.messageTypes.find((msg) => msg.class === 'compare--error')
+					?.message as string,
 			};
 			infoCompare.value = null;
 			return;
@@ -109,7 +111,7 @@ const comparePhotos = async () => {
 			comparisonResult.value = {
 				class: 'comparison__message--error',
 				message: props.messageTypes.find((msg) => msg.class === 'compare--validation-error')
-					?.message,
+					?.message as string,
 			};
 			infoCompare.value = null;
 			return;
@@ -118,12 +120,15 @@ const comparePhotos = async () => {
 		if (!response.ok) throw new Error();
 
 		const result = await response.json();
-		comparisonResult.value = processComparisonResult(result.detected_faces || []);
+		comparisonResult.value = processComparisonResult(
+			result.detected_faces || [],
+		) as MessageType;
 		targetBboxes.value = result.detected_faces?.[0]?.bbox || [];
 	} catch {
 		comparisonResult.value = {
 			class: 'comparison__message--error',
-			message: props.messageTypes.find((msg) => msg.class === 'error-server')?.message,
+			message: props.messageTypes.find((msg) => msg.class === 'error-server')
+				?.message as string,
 		};
 		infoCompare.value = null;
 	}
