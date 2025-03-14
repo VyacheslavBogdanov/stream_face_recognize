@@ -1,20 +1,21 @@
 <template>
 	<div id="app">
 		<div class="app">
-			<CheckHealth :messageTypes="messageTypes" :status="status" />
-			<FireDetection :messageTypes="messageTypes" :status="status" />
+			<Header :messageTypes="messageTypes" :status="status" />
+			<router-view :messageTypes="messageTypes" :status="status" :HOST="HOST" :DB="DB" />
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import CheckHealth from '@/components/CheckHealth/CheckHealth.vue';
-import FireDetection from '@/components/FireDetection/FireDetection.vue';
+import Header from './components/Header/Header.vue';
 import { ref, onMounted } from 'vue';
 import { fetchData } from './components/mocks/db';
 import { useHealthCheck } from './components/utils/useHealthCheck';
 import type { MessageType } from './components/utils/types.ts';
 
+const HOST = import.meta.env.HOST;
+const DB = import.meta.env.DB;
 const { status } = useHealthCheck();
 const messageTypes = ref<MessageType[]>([]);
 
@@ -32,25 +33,12 @@ onMounted(loadMessageTypes);
 <style lang="scss" scoped>
 @import './styles/main.scss';
 
-#app {
-	min-width: 1550px;
-	height: 800px;
+.app {
+	width: 100%;
+	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-
-	.app {
-		width: 50%;
-		height: 100%;
-		display: flex;
-		align-items: center;
-		flex-direction: column;
-		font-family: sans-serif;
-		background-color: $color-bg;
-		margin: 1%;
-		padding: 20px;
-		border: $border-width solid $border-color;
-		border-radius: $border-radius;
-	}
+	background: $background-color;
 }
 </style>

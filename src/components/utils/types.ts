@@ -7,3 +7,15 @@ export interface MockAPIResponse {
 	status?: number;
 	data?: MessageType[];
 }
+
+export interface Face {
+	bbox: number[];
+	dist: number;
+	real: boolean;
+}
+
+export interface FaceDB {
+	id: string;
+	name: string;
+	photoUrl: string;
+}

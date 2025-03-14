@@ -1,0 +1,39 @@
+{
+  "people": [
+    {
+      "id": "8607ca7a-6e6b-43db-91d4-36c26ff8bd66",
+      "name": "Leonardo",
+      "photoUrl": "https://ybis.ru/wp-content/uploads/2023/09/leonardo-di-kaprio-emotsii-1.webp"
+    },
+    {
+      "id": "22e82028-7579-4860-9f2c-39d09e22b457",
+      "name": "Василий",
+      "photoUrl": "https://img.freepik.com/premium-photo/adult-man-serene-face-expression-studio-portrait_53876-75438.jpg"
+    },
+    {
+      "id": "38ccb4fd-eef3-4541-94f0-6ded8b74d4ef",
+      "name": "Евгений",
+      "photoUrl": "https://img.freepik.com/free-photo/close-up-portrait-young-bearded-man-face_171337-2887.jpg"
+    },
+    {
+      "id": "22473c84-71b4-41b0-baf3-80a4f67a6030",
+      "name": "Михаил",
+      "photoUrl": "https://www.simushka.ru/upload/medialibrary/cf5/IMG_1798_1_642x642.jpg"
+    },
+    {
+      "id": "b1365fad-f803-4286-b50d-9e99e09880fc",
+      "name": "Егор",
+      "photoUrl": "https://images.techinsider.ru/upload/img_cache/876/876021f4353849ca2aaee7b0bdccd6e1_cropped_510x510.webp"
+    },
+    {
+      "id": "4da844f9-ddfa-42d6-9d58-dce503f305bf",
+      "name": "Test Face",
+      "photoUrl": "https://i.ytimg.com/vi/YTPvtaehj14/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLAZqzjeR0c7tCLR5Y6HYX-woq4rVQ"
+    },
+    {
+      "id": "08d31f07-8903-4c9e-8c02-2f773a1719d8",
+      "name": "David",
+      "photoUrl": "https://news.store.rambler.ru/img/3f712a0c0839de56e137438a377cf3a3?img-1-resize=width%3A1280%2Cheight%3A1280%2Cfit%3Acover&img-format=auto"
+    }
+  ]
+}
