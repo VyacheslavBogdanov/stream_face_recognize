@@ -1,5 +1,5 @@
 <template>
-	<div class="comparison">
+	<div :class="{ comparison: true, 'comparison--disabled': isDisabled }">
 		<div class="comparison__upload">
 			<UploadTarget
 				@update:imageData="updateTargetImage"
@@ -181,6 +181,11 @@ const clearMessages = () => {
 	display: flex;
 	flex-direction: column;
 	gap: 20px;
+
+	&--disabled {
+		pointer-events: none;
+		opacity: 0.5;
+	}
 
 	&__upload {
 		display: flex;

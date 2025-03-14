@@ -19,8 +19,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import type { MessageType } from '../utils/types';
+import { useRouter } from 'vue-router';
 
 const props = defineProps<{
 	messageTypes: MessageType[];
@@ -32,6 +33,14 @@ const filteredMessageTypes = computed(() => {
 		return props.messageTypes.filter((type) => type.class === 'health--success');
 	}
 	return props.messageTypes.filter((type) => type.class === 'health--warning');
+});
+
+const router = useRouter();
+
+onMounted(() => {
+	if (props.status === 'inactive') {
+		router.push('/data-base');
+	}
 });
 </script>
 
@@ -53,6 +62,8 @@ const filteredMessageTypes = computed(() => {
 		0px 10px 36px -4px rgba(17, 24, 41, 0.1);
 
 	&__nav {
+		display: flex;
+		flex-direction: row-reverse;
 		font-size: 25px;
 		position: relative;
 

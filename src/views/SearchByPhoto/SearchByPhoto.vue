@@ -1,5 +1,5 @@
 <template>
-	<div class="upload">
+	<div :class="{ upload: true, 'upload--disabled': isDisabled }">
 		<div v-if="isInvalidUrl" class="upload__error-message">
 			<span>Неверный URL</span>
 		</div>
@@ -270,6 +270,11 @@ const getPersonById = async (id: string) => {
 	flex-direction: column;
 	align-items: center;
 	padding-top: 30px;
+
+	&--disabled {
+		pointer-events: none;
+		opacity: 0.5;
+	}
 }
 .upload__error-message {
 	position: absolute;
