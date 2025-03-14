@@ -12,7 +12,8 @@ export const messageTypes: MessageType[] = [
 	{ class: 'compare--fake-face', message: 'Попытка обмана системы' },
 	{ class: 'compare--warning', message: 'Скорее всего, это один и тот же человек' },
 	{ class: 'compare--success', message: 'Это разные люди' },
-	{ class: 'compare--validation-error', message: 'Ошибка валидации, 422'}
+	{ class: 'compare--validation-error', message: 'Ошибка валидации, 422'},
+	{ class: 'search-error', message:'Данного человека в базе нет'}
 ];
 
 const mockAPI = (endpoint: string): Promise<MockAPIResponse> => {
