@@ -122,6 +122,9 @@ const hideTooltip = () => {
 		color: $color-warning;
 		cursor: pointer;
 		margin-left: 25px;
+		@media (max-width: 1800px) {
+			left: 0;
+		}
 	}
 
 	&__warning:hover {
