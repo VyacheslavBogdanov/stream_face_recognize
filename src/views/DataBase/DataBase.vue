@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
+import { urlToBase64 } from './utils/convert-to-base64';
 import type { FaceDB } from '../../components/utils/types';
 import DBSync from './DBSync/DBSync.vue';
 import DBForm from './DBForm/DBForm.vue';
@@ -14,24 +15,6 @@ const faces = ref<FaceDB[]>([]);
 const newFace = ref<FaceDB>({ id: '', name: '', photoUrl: '' });
 const vectors = ref<string[]>([]);
 const isSync = ref<boolean>(false);
-
-const urlToBase64 = async (imageUrl: string): Promise<string> => {
-	try {
-		const response = await fetch(imageUrl);
-		if (!response.ok)
-			throw new Error(`Не удалось загрузить изображение: ${response.statusText}`);
-		const blob = await response.blob();
-		return await new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onloadend = () => resolve(reader.result as string);
-			reader.onerror = () => reject(new Error('Ошибка чтения файла'));
-			reader.readAsDataURL(blob);
-		});
-	} catch (error) {
-		console.error('Ошибка конвертации URL в base64:', error);
-		throw error;
-	}
-};
 
 const fetchFaces = async () => {
 	try {
@@ -63,19 +46,19 @@ const addFace = async () => {
 	if (!newFace.value.name || !newFace.value.photoUrl) return;
 	const id = uuidv4();
 	try {
-		const base64Image = await urlToBase64(newFace.value.photoUrl);
-		const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+		// const base64Image = await urlToBase64(newFace.value.photoUrl);
+		// const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
 
-		const response = await fetch(`${HOST}/add_new_face`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				request_id: uuidv4(),
-				id: id,
-				image: imageBase64,
-			}),
-		});
-		if (!response.ok) throw new Error('Ошибка добавления вектора');
+		// const response = await fetch(`${HOST}/add_new_face`, {
+		// 	method: 'POST',
+		// 	headers: { 'Content-Type': 'application/json' },
+		// 	body: JSON.stringify({
+		// 		request_id: uuidv4(),
+		// 		id: id,
+		// 		image: imageBase64,
+		// 	}),
+		// });
+		// if (!response.ok) throw new Error('Ошибка добавления вектора');
 
 		const db = await fetch(DB, {
 			method: 'POST',
@@ -98,12 +81,12 @@ const addFace = async () => {
 
 const deleteFace = async (id: string) => {
 	try {
-		const response = await fetch(`${HOST}/delete_face`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ request_id: uuidv4(), items: [id] }),
-		});
-		if (!response.ok) throw new Error('Ошибка удаления вектора');
+		// const response = await fetch(`${HOST}/delete_face`, {
+		// 	method: 'POST',
+		// 	headers: { 'Content-Type': 'application/json' },
+		// 	body: JSON.stringify({ request_id: uuidv4(), items: [id] }),
+		// });
+		// if (!response.ok) throw new Error('Ошибка удаления вектора');
 
 		const db = await fetch(`${DB}/${id}`, { method: 'DELETE' });
 		if (!db.ok) throw new Error('Ошибка удаления объекта из базы данных');
@@ -116,12 +99,12 @@ const deleteFace = async (id: string) => {
 
 const clearDatabase = async () => {
 	try {
-		const response = await fetch(`${HOST}/clear_db`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ request_id: uuidv4() }),
-		});
-		if (!response.ok) throw new Error('Ошибка очистки базы векторов');
+		// const response = await fetch(`${HOST}/clear_db`, {
+		// 	method: 'POST',
+		// 	headers: { 'Content-Type': 'application/json' },
+		// 	body: JSON.stringify({ request_id: uuidv4() }),
+		// });
+		// if (!response.ok) throw new Error('Ошибка очистки базы векторов');
 
 		await Promise.all(
 			faces.value.map((face) => fetch(`${DB}/${face.id}`, { method: 'DELETE' })),
@@ -183,13 +166,17 @@ const syncDB = async () => {
 	isSync.value = false;
 };
 
+const updateNewFace = (val: any) => {
+	newFace.value = val;
+};
+
 onMounted(fetchFaces);
 </script>
 
 <template>
 	<div class="database">
 		<DBSync :vectors="vectors" :faces="faces" @syncDB="syncDB" :isSync="isSync" />
-		<DBForm :newFace="newFace" @update:newFace="(val) => (newFace = val)" @addFace="addFace" />
+		<DBForm :newFace="newFace" @update:newFace="updateNewFace" @addFace="addFace" />
 		<DBTable :faces="faces" :vectors="vectors" @deleteFace="deleteFace" />
 		<DBClear :faces="faces" @clearDatabase="clearDatabase" />
 	</div>

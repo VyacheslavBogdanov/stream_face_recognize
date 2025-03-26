@@ -20,8 +20,23 @@ const emit = defineEmits(['update:newFace', 'addFace']);
 					})
 			"
 		/>
-		<input
+		<!-- <input
 			type="url"
+			placeholder="Введите URL изображения"
+			class="form__input"
+			required
+			:value="props.newFace.photoUrl"
+			@input="
+				(e) =>
+					emit('update:newFace', {
+						...props.newFace,
+						photoUrl: (e.target as HTMLInputElement).value,
+					})
+			"
+		/> -->
+		<input
+			type="file"
+			accept="image/*"
 			placeholder="Введите URL изображения"
 			class="form__input"
 			required
