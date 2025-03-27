@@ -1,7 +1,22 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import type { FaceDB } from '../../../components/utils/types.ts';
 const props = defineProps<{ newFace: FaceDB }>();
 const emit = defineEmits(['update:newFace', 'addFace']);
+
+const onFileChange = (event: Event) => {
+	const target = event.target as HTMLInputElement;
+	if (!target.files?.[0]) return;
+
+	const reader = new FileReader();
+	reader.onload = () => {
+		emit('update:newFace', {
+			...props.newFace,
+			photoUrl: reader.result as string,
+		});
+	};
+	reader.readAsDataURL(target.files[0]);
+};
 </script>
 
 <template>
@@ -20,34 +35,14 @@ const emit = defineEmits(['update:newFace', 'addFace']);
 					})
 			"
 		/>
-		<!-- <input
-			type="url"
-			placeholder="Введите URL изображения"
-			class="form__input"
-			required
-			:value="props.newFace.photoUrl"
-			@input="
-				(e) =>
-					emit('update:newFace', {
-						...props.newFace,
-						photoUrl: (e.target as HTMLInputElement).value,
-					})
-			"
-		/> -->
+
 		<input
 			type="file"
 			accept="image/*"
 			placeholder="Введите URL изображения"
 			class="form__input"
 			required
-			:value="props.newFace.photoUrl"
-			@input="
-				(e) =>
-					emit('update:newFace', {
-						...props.newFace,
-						photoUrl: (e.target as HTMLInputElement).value,
-					})
-			"
+			@change="onFileChange"
 		/>
 		<button type="submit" class="form__button">Добавить в БД</button>
 	</form>
