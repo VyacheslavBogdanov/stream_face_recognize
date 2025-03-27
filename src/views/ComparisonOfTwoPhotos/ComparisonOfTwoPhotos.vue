@@ -1,21 +1,31 @@
 <template>
 	<div :class="{ comparison: true, 'comparison--disabled': isDisabled }">
 		<div class="comparison__upload">
-			<UploadTarget
-				@update:imageData="updateTargetImage"
-				:isDisabled="isDisabled"
-				@clear="clearMessages"
-			/>
+			<UploadTarget @update:imageData="updateTargetImage" @clear="clearMessages" />
 			<UploadSource
 				@update:imageData="updateSourceImage"
-				:isDisabled="isDisabled"
 				:bboxes="targetBboxes"
 				@clear="clearMessages"
 			/>
 		</div>
 
 		<div class="comparison__group">
-			<ButtonCompareFace :isDisabled="isDisabled" @compare="comparePhotos" />
+			<div class="comparison__slider">
+				<label for="threshold">rec_threshold: {{ recThreshold.toFixed(2) }}</label>
+				<input
+					id="threshold"
+					type="range"
+					min="0"
+					max="1.0"
+					step="0.05"
+					v-model.number="recThreshold"
+				/>
+			</div>
+
+			<div class="comparison__button">
+				<ButtonCompareFace :isLoading="isLoading" @compare="comparePhotos" />
+			</div>
+
 			<div v-if="infoCompare" class="comparison__info">
 				<span>{{ infoCompare }}</span>
 			</div>
@@ -36,9 +46,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-import UploadSource from './UploadSource.vue';
-import UploadTarget from './UploadTarget.vue';
-import ButtonCompareFace from './ButtonCompareFace.vue';
+import UploadSource from './UploadSource/UploadSource.vue';
+import UploadTarget from './UploadTarget/UploadTarget.vue';
+import ButtonCompareFace from './ButtonCompareFace/ButtonCompareFace.vue';
 import type { MessageType } from '../../components/utils/types';
 import type { Face } from '../../components/utils/types';
 
@@ -53,13 +63,17 @@ const sourceImageBase64 = ref<string | null>(null);
 const comparisonResult = ref<{ class: string; message: string } | null>(null);
 const targetBboxes = ref<number[]>([]);
 const infoCompare = ref<string | null>(null);
+const recThreshold = ref(0.5);
+const isLoading = ref(false);
 
 const updateTargetImage = (imageData: string) => {
 	targetImageBase64.value = imageData;
+	clearMessages();
 };
 
 const updateSourceImage = (imageData: string) => {
 	sourceImageBase64.value = imageData;
+	clearMessages();
 };
 
 const Base64Image = (base64String: string) =>
@@ -78,7 +92,7 @@ const comparePhotos = async () => {
 		}, 1500);
 		return;
 	}
-
+	isLoading.value = true;
 	const Base64ImageSource = Base64Image(sourceImageBase64.value);
 	const Base64ImageTarget = Base64Image(targetImageBase64.value);
 
@@ -88,7 +102,7 @@ const comparePhotos = async () => {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				request_id: uuidv4(),
-				rec_threshold: 1,
+				rec_threshold: recThreshold.value,
 				source_image: Base64ImageSource,
 				target_image: Base64ImageTarget,
 			}),
@@ -131,6 +145,8 @@ const comparePhotos = async () => {
 				?.message as string,
 		};
 		infoCompare.value = null;
+	} finally {
+		isLoading.value = false;
 	}
 };
 
@@ -143,9 +159,10 @@ const processComparisonResult = (detected_faces: Face[]) => {
 	}
 
 	const face = detected_faces[0];
+	const score = face.score;
 	const dist = face.dist;
 	const isReal = face.real ? 'Real' : 'Fake';
-	infoCompare.value = `${isReal} | Dist: ${dist !== null ? dist.toFixed(2) : 'null'}`;
+	infoCompare.value = `${isReal} | Score: ${score !== null ? score.toFixed(2) : 'null'} | Dist: ${dist !== null ? dist.toFixed(2) : 'null'}`;
 
 	if (!face.real) {
 		return {
@@ -154,7 +171,7 @@ const processComparisonResult = (detected_faces: Face[]) => {
 		};
 	}
 
-	return dist !== null && dist > 0.25
+	return score !== null && score >= 0.5
 		? {
 				class: 'comparison__message--warning',
 				message: props.messageTypes.find((msg) => msg.class === 'compare--warning')
@@ -193,10 +210,21 @@ const clearMessages = () => {
 	}
 
 	&__group {
+		height: 50px;
 		display: flex;
 		align-items: center;
-		gap: 20px;
 		position: relative;
+	}
+	&__slider {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		min-width: 120px;
+	}
+	&__button {
+		position: absolute;
+		left: 50%;
+		transform: translate(-50%);
 	}
 
 	&__info {
