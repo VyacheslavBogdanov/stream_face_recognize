@@ -12,6 +12,7 @@ export interface Face {
 	bbox: number[];
 	dist: number;
 	real: boolean;
+	score: number;
 }
 
 export interface FaceDB {
