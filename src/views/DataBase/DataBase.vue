@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
+import { base64Image } from './utils/convert-to-base64';
 import type { FaceDB } from '../../components/utils/types';
 import DBSync from './DBSync/DBSync.vue';
 import DBForm from './DBForm/DBForm.vue';
@@ -14,24 +15,6 @@ const faces = ref<FaceDB[]>([]);
 const newFace = ref<FaceDB>({ id: '', name: '', photoUrl: '' });
 const vectors = ref<string[]>([]);
 const isSync = ref<boolean>(false);
-
-const urlToBase64 = async (imageUrl: string): Promise<string> => {
-	try {
-		const response = await fetch(imageUrl);
-		if (!response.ok)
-			throw new Error(`Не удалось загрузить изображение: ${response.statusText}`);
-		const blob = await response.blob();
-		return await new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onloadend = () => resolve(reader.result as string);
-			reader.onerror = () => reject(new Error('Ошибка чтения файла'));
-			reader.readAsDataURL(blob);
-		});
-	} catch (error) {
-		console.error('Ошибка конвертации URL в base64:', error);
-		throw error;
-	}
-};
 
 const fetchFaces = async () => {
 	try {
@@ -63,8 +46,7 @@ const addFace = async () => {
 	if (!newFace.value.name || !newFace.value.photoUrl) return;
 	const id = uuidv4();
 	try {
-		const base64Image = await urlToBase64(newFace.value.photoUrl);
-		const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+		const imageBase64 = base64Image(newFace.value.photoUrl);
 
 		const response = await fetch(`${HOST}/add_new_face`, {
 			method: 'POST',
@@ -144,8 +126,7 @@ const syncDB = async () => {
 				faces.value
 					.filter((face) => !vectorIds.has(face.id))
 					.map(async (face) => {
-						const base64Image = await urlToBase64(face.photoUrl);
-						const imageBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+						const imageBase64 = base64Image(face.photoUrl);
 						return fetch(`${HOST}/add_new_face`, {
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
@@ -158,7 +139,7 @@ const syncDB = async () => {
 					}),
 			);
 		} catch (error) {
-			console.error('Ошибка вфыв', error);
+			console.error('Ошибка', error);
 		}
 	} else {
 		const extraVectors = vectors.value.filter((id) => !faceIds.includes(id));
@@ -183,13 +164,18 @@ const syncDB = async () => {
 	isSync.value = false;
 };
 
+const updateNewFace = (val: FaceDB) => {
+	newFace.value = val;
+	console.log('newFace.value', newFace.value);
+};
+
 onMounted(fetchFaces);
 </script>
 
 <template>
 	<div class="database">
 		<DBSync :vectors="vectors" :faces="faces" @syncDB="syncDB" :isSync="isSync" />
-		<DBForm :newFace="newFace" @update:newFace="(val) => (newFace = val)" @addFace="addFace" />
+		<DBForm :newFace="newFace" @update:newFace="updateNewFace" @addFace="addFace" />
 		<DBTable :faces="faces" :vectors="vectors" @deleteFace="deleteFace" />
 		<DBClear :faces="faces" @clearDatabase="clearDatabase" />
 	</div>
