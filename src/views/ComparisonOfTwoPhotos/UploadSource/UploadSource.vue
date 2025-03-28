@@ -1,34 +1,14 @@
 <template>
 	<div class="upload">
-		<div v-if="isInvalidUrl" class="upload__error-message">
-			<span>Неверный URL</span>
-		</div>
-
-		<div class="upload__url-container">
-			<input
-				class="upload__url-input"
-				type="url"
-				v-model="imageUrl"
-				placeholder="Введите URL изображения..."
-				@input="onUrlChange"
-				:disabled="isDisabled"
-			/>
-			<button class="upload__clear-btn" @click="onClearClick" :disabled="isDisabled">
-				🗑
-			</button>
-		</div>
-
+		<button class="upload__clear-btn" @click="onClearClick">Очистить</button>
 		<div
 			class="upload__file-container"
 			:class="{ 'upload__file-container--preview-loaded': previewSrc }"
-			@dragover.prevent
-			@drop.prevent
 		>
 			<div v-if="previewSrc" class="upload__preview">
 				<img
 					ref="imageElement"
 					:src="previewSrc"
-					@error="handleImageError"
 					alt="Не удалось загрузить"
 					class="upload__preview-image"
 				/>
@@ -51,7 +31,6 @@
 				type="file"
 				accept="image/*"
 				@change="onFileChange"
-				:disabled="isDisabled"
 				:title="fileName || 'Выберите файл для загрузки'"
 			/>
 			<span v-if="!previewSrc" class="upload__file-placeholder"> Загрузите изображение </span>
@@ -61,22 +40,16 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, defineEmits, defineProps } from 'vue';
-import { ClearUploadTarget } from '../ComparisonOfTwoPhotos/utils/useClearUpload';
+import { ClearUploadTarget } from '../utils/useClearUpload';
 
 const emit = defineEmits(['update:imageData', 'clear']);
-const props = defineProps<{
-	isDisabled: boolean;
-	bboxes: number[];
-}>();
+const props = defineProps<{ bboxes: number[] }>();
 
 const localBboxes = ref<number[]>(props.bboxes);
-
 const fileName = ref<string | null>(null);
 const previewSrc = ref<string | null>(null);
-const imageUrl = ref<string>('');
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const imageElement = ref<HTMLImageElement | null>(null);
-const isInvalidUrl = ref<boolean>(false);
 const imageBase64 = ref<string>('');
 
 const onClearClick = () => {
@@ -94,7 +67,6 @@ const bboxesArray = computed(() => {
 
 const scaledBboxes = computed(() => {
 	if (!imageElement.value) return [];
-
 	const img = imageElement.value;
 	const scaleX = img.clientWidth / img.naturalWidth;
 	const scaleY = img.clientHeight / img.naturalHeight;
@@ -116,10 +88,8 @@ watch(
 );
 
 const clearUpload = ClearUploadTarget(
-	imageUrl,
 	previewSrc,
 	fileName,
-	isInvalidUrl,
 	imageBase64,
 	fileInputRef,
 	localBboxes,
@@ -137,8 +107,6 @@ const onFileChange = (event: Event) => {
 				const base64 = reader.result.toString();
 				previewSrc.value = base64;
 				fileName.value = file.name;
-				imageUrl.value = '';
-				isInvalidUrl.value = false;
 				imageBase64.value = base64;
 				localBboxes.value = [];
 
@@ -150,54 +118,10 @@ const onFileChange = (event: Event) => {
 		clearUpload();
 	}
 };
-
-const onUrlChange = async () => {
-	if (!imageUrl.value) {
-		clearUpload();
-		return;
-	}
-
-	try {
-		const response = await fetch(imageUrl.value);
-		const blob = await response.blob();
-		const reader = new FileReader();
-
-		reader.onload = async () => {
-			if (reader.result) {
-				const base64 = reader.result.toString();
-				previewSrc.value = base64;
-				fileName.value = null;
-				isInvalidUrl.value = false;
-				imageBase64.value = base64;
-				localBboxes.value = [];
-
-				emit('update:imageData', base64);
-			}
-		};
-		reader.readAsDataURL(blob);
-	} catch {
-		isInvalidUrl.value = true;
-		previewSrc.value = null;
-		fileName.value = null;
-		localBboxes.value = [];
-
-		emit('update:imageData', '');
-	}
-};
-
-const handleImageError = () => {
-	isInvalidUrl.value = true;
-	previewSrc.value = null;
-	fileName.value = null;
-	imageBase64.value = '';
-	localBboxes.value = [];
-
-	emit('update:imageData', '');
-};
 </script>
 
 <style scoped lang="scss">
-@import './Style/UploadStyle.scss';
+@import '../Style/UploadStyle.scss';
 
 .upload__bbox {
 	position: absolute;
