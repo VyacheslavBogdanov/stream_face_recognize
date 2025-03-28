@@ -5,7 +5,10 @@ import type { FaceDB } from '../../../components/utils/types.ts';
 const props = defineProps<{ newFace: FaceDB }>();
 const emit = defineEmits(['update:newFace', 'addFace']);
 
-const fileName = ref<string>('Загрузите файл...');
+const fileName = ref<string>('Загрузите изображение...');
+const isFileFocused = ref<boolean>(false);
+const hasFile = ref<boolean>(false);
+const isTextFocused = ref<boolean>(false);
 
 const onFileChange = (event: Event) => {
 	const target = event.target as HTMLInputElement;
@@ -13,6 +16,7 @@ const onFileChange = (event: Event) => {
 
 	const file = target.files[0];
 	fileName.value = file.name;
+	hasFile.value = true;
 
 	const reader = new FileReader();
 	reader.onload = () => {
@@ -23,14 +27,22 @@ const onFileChange = (event: Event) => {
 	};
 	reader.readAsDataURL(file);
 };
+
+const onSubmitForm = () => {
+	isFileFocused.value = false;
+	hasFile.value = false;
+	emit('addFace');
+	fileName.value = 'Загрузите изображение...';
+};
 </script>
 
 <template>
-	<form class="form" @submit.prevent="$emit('addFace')">
+	<form class="form" @submit.prevent="onSubmitForm">
 		<input
 			type="text"
 			placeholder="Введите имя"
 			class="form__input"
+			:class="{ 'form__input--focused': isTextFocused }"
 			required
 			:value="props.newFace.name"
 			@input="
@@ -40,8 +52,13 @@ const onFileChange = (event: Event) => {
 						name: (e.target as HTMLInputElement).value,
 					})
 			"
+			@focus="isTextFocused = true"
+			@blur="isTextFocused = false"
 		/>
-		<div class="form__file-input">
+		<div
+			class="form__file-input"
+			:class="{ 'form__file-input--focused': isFileFocused || hasFile }"
+		>
 			<label for="fileUpload" class="form__file-label">{{ fileName }}</label>
 			<input
 				id="fileUpload"
@@ -49,6 +66,8 @@ const onFileChange = (event: Event) => {
 				accept="image/*"
 				class="form__file-hidden"
 				@change="onFileChange"
+				@focus="isFileFocused = true"
+				@blur="isFileFocused = false"
 			/>
 		</div>
 		<button type="submit" class="form__button">Добавить в БД</button>
@@ -67,9 +86,15 @@ const onFileChange = (event: Event) => {
 		flex: 1;
 		padding: 8px;
 		border: 1px solid #ccc;
+		outline: none;
 		box-shadow:
 			0px 3px 8px -6px rgba(24, 39, 75, 0.05),
 			0px 10px 36px -4px rgba(17, 24, 41, 0.1);
+
+		&--focused {
+			border-color: #007bff;
+			box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+		}
 	}
 
 	&__file-input {
@@ -82,6 +107,11 @@ const onFileChange = (event: Event) => {
 		box-shadow:
 			0px 3px 8px -6px rgba(24, 39, 75, 0.05),
 			0px 10px 36px -4px rgba(17, 24, 41, 0.1);
+
+		&--focused {
+			border-color: #007bff;
+			box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+		}
 	}
 
 	&__file-hidden {
