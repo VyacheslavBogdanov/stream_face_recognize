@@ -2,7 +2,7 @@
 	<div id="app">
 		<div class="app">
 			<Header :messageTypes="messageTypes" :status="status" />
-			<router-view :messageTypes="messageTypes" :status="status" :HOST="HOST" :DB="DB" />
+			<router-view :messageTypes="messageTypes" :status="status" />
 		</div>
 	</div>
 </template>
@@ -14,8 +14,6 @@ import { fetchData } from './components/mocks/db';
 import { useHealthCheck } from './components/utils/useHealthCheck';
 import type { MessageType } from './components/utils/types.ts';
 
-const HOST = import.meta.env.HOST;
-const DB = import.meta.env.DB;
 const { status } = useHealthCheck();
 const messageTypes = ref<MessageType[]>([]);
 
