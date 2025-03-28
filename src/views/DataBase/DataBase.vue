@@ -46,18 +46,18 @@ const addFace = async () => {
 	if (!newFace.value.name || !newFace.value.photoUrl) return;
 	const id = uuidv4();
 	try {
-		const imageBase64 = base64Image(newFace.value.photoUrl);
+		// const imageBase64 = base64Image(newFace.value.photoUrl);
 
-		const response = await fetch(`${HOST}/add_new_face`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				request_id: uuidv4(),
-				id: id,
-				image: imageBase64,
-			}),
-		});
-		if (!response.ok) throw new Error('Ошибка добавления вектора');
+		// const response = await fetch(`${HOST}/add_new_face`, {
+		// 	method: 'POST',
+		// 	headers: { 'Content-Type': 'application/json' },
+		// 	body: JSON.stringify({
+		// 		request_id: uuidv4(),
+		// 		id: id,
+		// 		image: imageBase64,
+		// 	}),
+		// });
+		// if (!response.ok) throw new Error('Ошибка добавления вектора');
 
 		const db = await fetch(DB, {
 			method: 'POST',

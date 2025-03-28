@@ -1,99 +1,93 @@
 <template>
 	<div :class="{ upload: true, 'upload--disabled': isDisabled }">
-		<div v-if="isInvalidUrl" class="upload__error-message">
-			<span>Неверный URL</span>
-		</div>
-
-		<div class="upload__url-container">
-			<input
-				v-model="imageUrl"
-				type="url"
-				placeholder="Введите URL изображения..."
-				class="upload__url-input"
-				:disabled="isDisabled"
-				@input="onUrlChange"
-			/>
+		<div class="upload__group">
 			<button class="upload__clear-btn" @click="clearUpload" :disabled="isDisabled">
-				🗑
+				Очистить
 			</button>
-		</div>
-
-		<div class="upload__image-group">
-			<div
-				class="upload__file-container"
-				:class="{ 'upload__file-container-loaded': previewImage }"
-			>
-				<div class="upload__file">
-					<span v-if="!previewImage" class="upload__file-placeholder">
-						Загрузить изображение
-					</span>
-					<input
-						type="file"
-						@change="onFileChange"
-						accept="image/*"
-						class="upload__file-input"
-						:disabled="isDisabled"
-					/>
-					<img
-						v-if="previewImage"
-						:src="previewImage"
-						class="upload__file-preview"
-						@error="handleImageError"
-					/>
-				</div>
+			<div class="comparison__slider">
+				<label for="threshold">rec_threshold: {{ recThreshold.toFixed(2) }}</label>
+				<input
+					id="threshold"
+					type="range"
+					min="0"
+					max="1.0"
+					step="0.05"
+					v-model.number="recThreshold"
+				/>
 			</div>
+		</div>
+	</div>
 
-			<div
-				class="upload__result-container"
-				v-if="foundPeople.length"
-				:class="{ 'upload__result-container-loaded': previewImage }"
-			>
-				<div class="upload__result">
-					<img
-						ref="imageElement"
-						:src="foundPeople[0]?.photoUrl"
-						class="upload__result-image"
-						@error="handleImageError"
-						@load="updateBoundingBoxes"
-					/>
-
-					<div
-						v-for="(bbox, index) in scaledBboxes"
-						:key="index"
-						class="upload__bbox"
-						:style="{
-							top: bbox.top + 'px',
-							left: bbox.left + 'px',
-							width: bbox.width + 'px',
-							height: bbox.height + 'px',
-						}"
-					></div>
-				</div>
+	<div class="upload__image-group">
+		<div
+			class="upload__file-container"
+			:class="{ 'upload__file-container-loaded': previewImage }"
+		>
+			<div class="upload__file">
+				<span v-if="!previewImage" class="upload__file-placeholder">
+					Загрузить изображение
+				</span>
+				<input
+					type="file"
+					@change="onFileChange"
+					accept="image/*"
+					class="upload__file-input"
+					:disabled="isDisabled"
+				/>
+				<img v-if="previewImage" :src="previewImage" class="upload__file-preview" />
 			</div>
 		</div>
 
-		<table v-if="foundPeople.length" class="upload__table">
-			<thead class="upload__table-head">
-				<tr>
-					<th>ID</th>
-					<th>Имя</th>
-				</tr>
-			</thead>
-			<tbody class="upload__table-body">
-				<tr v-for="person in foundPeople" :key="person.id">
-					<td>{{ person.id }}</td>
-					<td>{{ person.name }}</td>
-				</tr>
-			</tbody>
-		</table>
+		<div
+			class="upload__result-container"
+			v-if="foundPeople.length"
+			:class="{ 'upload__result-container-loaded': previewImage }"
+		>
+			<div class="upload__result">
+				<img
+					ref="imageElement"
+					:src="foundPeople[0]?.photoUrl"
+					class="upload__result-image"
+					@load="updateBoundingBoxes"
+				/>
 
-		<button type="submit" class="upload__button" :disabled="isDisabled" @click="searchFaces">
-			<span class="upload__button-text">Поиск</span>
-		</button>
-		<div v-if="errorMessage" :class="['upload__error-msg', errorMessage.class]">
-			<div class="upload__icon">ⓘ</div>
-			<span>{{ errorMessage.message }}</span>
+				<div
+					v-for="(bbox, index) in scaledBboxes"
+					:key="index"
+					class="upload__bbox"
+					:style="{
+						top: bbox.top + 'px',
+						left: bbox.left + 'px',
+						width: bbox.width + 'px',
+						height: bbox.height + 'px',
+					}"
+				></div>
+			</div>
 		</div>
+	</div>
+
+	<table v-if="foundPeople.length" class="upload__table">
+		<thead class="upload__table-head">
+			<tr>
+				<th>ID</th>
+				<th>Имя</th>
+			</tr>
+		</thead>
+		<tbody class="upload__table-body">
+			<tr v-for="person in foundPeople" :key="person.id">
+				<td>{{ person.id }}</td>
+				<td>{{ person.name }}</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<button class="upload__button" @click="searchFaces" :disabled="isLoading || isDisabled">
+		<span v-if="!isLoading" class="upload__button-text">Поиск</span>
+		<div v-else class="loader"></div>
+	</button>
+	<div v-if="errorMessage" :class="['upload__error-msg', errorMessage.class]">
+		<div class="upload__icon">ⓘ</div>
+		<span>{{ errorMessage.message }}</span>
 	</div>
 </template>
 
@@ -109,14 +103,15 @@ const props = defineProps<{
 	messageTypes: MessageType[];
 	status: string;
 }>();
+
 const errorMessage = ref<{ class: string; message: string } | null>(null);
-const imageUrl = ref<string>('');
 const selectedFile = ref<File | null>(null);
 const previewImage = ref<string | null>(null);
-const isInvalidUrl = ref<boolean>(false);
 const foundPeople = ref<{ id: string; name: string; photoUrl: string; bbox?: number[] }[]>([]);
 const scaledBboxes = ref<{ left: number; top: number; width: number; height: number }[]>([]);
 const imageElement = ref<HTMLImageElement | null>(null);
+const isLoading = ref(false);
+const recThreshold = ref(0.5);
 
 const isDisabled = computed(() => props.status === 'inactive');
 
@@ -141,10 +136,8 @@ const updateBoundingBoxes = () => {
 const onFileChange = (event: Event) => {
 	const target = event.target as HTMLInputElement;
 	if (!target.files?.[0]) return;
-
+	clearUpload();
 	selectedFile.value = target.files[0];
-	imageUrl.value = '';
-	isInvalidUrl.value = false;
 
 	const reader = new FileReader();
 	reader.onload = () => {
@@ -153,35 +146,9 @@ const onFileChange = (event: Event) => {
 	reader.readAsDataURL(target.files[0]);
 };
 
-const onUrlChange = async () => {
-	if (!imageUrl.value) return clearUpload();
-
-	try {
-		const response = await fetch(imageUrl.value);
-		if (!response.ok) throw new Error();
-
-		const blob = await response.blob();
-		const reader = new FileReader();
-		reader.onload = () => (previewImage.value = reader.result as string);
-		reader.readAsDataURL(blob);
-
-		isInvalidUrl.value = false;
-	} catch {
-		clearUpload();
-		isInvalidUrl.value = true;
-	}
-};
-
-const handleImageError = () => {
-	isInvalidUrl.value = true;
-	previewImage.value = null;
-};
-
 const clearUpload = () => {
-	imageUrl.value = '';
 	selectedFile.value = null;
 	previewImage.value = null;
-	isInvalidUrl.value = false;
 	foundPeople.value = [];
 	errorMessage.value = null;
 };
@@ -190,45 +157,54 @@ const Base64Image = (base64String: string) =>
 	base64String.replace(/^data:image\/[a-zA-Z]+;base64,/, '');
 
 const searchFaces = async () => {
-	if (previewImage.value) {
-		await sendRecognitionRequest(previewImage.value);
-		return;
-	}
+	if (!selectedFile.value) return;
 
-	if (selectedFile.value) {
-		const reader = new FileReader();
-		reader.onloadend = async () => {
-			previewImage.value = reader.result as string;
-			await sendRecognitionRequest(reader.result as string);
-		};
-		reader.readAsDataURL(selectedFile.value);
-	}
+	isLoading.value = true;
+
+	const reader = new FileReader();
+	reader.onloadend = async () => {
+		previewImage.value = reader.result as string;
+		await sendRecognitionRequest(reader.result as string);
+		isLoading.value = false;
+	};
+	reader.readAsDataURL(selectedFile.value);
 };
+
 const sendRecognitionRequest = async (base64Image: string) => {
 	const imageBase64 = Base64Image(base64Image);
 
-	const response = await fetch(`${HOST}/recognize_many`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			request_id: uuidv4(),
-			rec_threshold: 1,
-			image: imageBase64,
-		}),
-	});
+	try {
+		const response = await fetch(`${HOST}/recognize_many`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				request_id: uuidv4(),
+				rec_threshold: recThreshold.value,
+				image: imageBase64,
+			}),
+		});
 
-	if (!response.ok) throw new Error(`Ошибка запроса: ${response.status}`);
-	const data = await response.json();
+		if (!response.ok) throw new Error(`Ошибка запроса: ${response.status}`);
+		const data = await response.json();
 
-	foundPeople.value = [];
+		foundPeople.value = [];
 
-	if (data.detected_faces?.length > 0) {
-		for (const face of data.detected_faces) {
-			const person = await getPersonById(face.id);
-			if (person) {
-				foundPeople.value.push({ ...person, bbox: face.bbox });
+		if (data.detected_faces?.length > 0) {
+			for (const face of data.detected_faces) {
+				const person = await getPersonById(face.id);
+				if (person) {
+					foundPeople.value.push({ ...person, bbox: face.bbox });
+				}
 			}
 		}
+	} catch (error) {
+		console.error(error);
+		errorMessage.value = {
+			message: 'Ошибка при обработке изображения',
+			class: 'upload__error-msg--error',
+		};
+	} finally {
+		isLoading.value = false;
 	}
 };
 
@@ -237,7 +213,7 @@ const getPersonById = async (id: string) => {
 		const response = await fetch(DB);
 		if (!response.ok) throw new Error(`Ошибка загрузки данных для ID: ${id}`);
 
-		const dbData: { id: string; name: string; photoUrl: string }[] = await response.json();
+		const dbData: { id: string; name: string; photoBase64: string }[] = await response.json();
 		const person = dbData.find((p) => p.id === id);
 
 		if (!person) {
@@ -249,7 +225,10 @@ const getPersonById = async (id: string) => {
 			foundPeople.value = [];
 			return null;
 		}
-		return person;
+		return {
+			...person,
+			photoUrl: `data:image/jpeg;base64,${person.photoBase64}`,
+		};
 	} catch (error) {
 		console.error(error);
 		errorMessage.value = {
@@ -269,66 +248,31 @@ const getPersonById = async (id: string) => {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding-top: 30px;
 
 	&--disabled {
 		pointer-events: none;
 		opacity: 0.5;
 	}
 }
-.upload__error-message {
-	position: absolute;
-	top: 10px;
-	left: 50%;
-	transform: translateX(-50%);
-	width: 100%;
-	text-align: center;
-	color: $color-error;
-}
-
-.upload__url-input {
-	width: 500px;
-	height: 20px;
-	padding: 8px 40px 8px 12px;
-	border: $border-width solid #513d3d;
-	border-radius: 8px;
-	outline: none;
-	text-align: center;
-	transition: border-color 0.2s ease;
-	background-color: #f8f8f8;
-
-	&:focus {
-		border-color: $border-color;
-	}
-
-	&::placeholder {
-		color: #333;
-	}
-
-	&:hover {
-		border-color: $border-color;
-	}
-}
-.upload__url-container {
-	width: 500px;
-	display: flex;
-	justify-content: center;
-	margin-bottom: 10px;
-	position: relative;
-}
 
 .upload__clear-btn {
-	position: absolute;
-	right: 10px;
-	top: 50%;
-	transform: translateY(-50%);
-	background: none;
+	margin: 0 auto 10px;
+	padding: 8px 12px;
+	background-color: $button-color-red;
+	margin-top: 10px;
+	color: $background-color;
 	border: none;
 	cursor: pointer;
-	font-size: 15px;
-	color: #513d3d;
 }
-
+.upload__group {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	max-width: 500px;
+	margin-bottom: 10px;
+	gap: 50px;
+}
 .upload__error-msg {
 	position: relative;
 	display: flex;
@@ -475,20 +419,28 @@ const getPersonById = async (id: string) => {
 		transform: scale(0.97);
 	}
 
-	&:disabled {
-		cursor: not-allowed;
-		background-color: #ededed;
-		border-color: #929191;
-		color: #a0a0a0;
-
-		transition: none;
-	}
-
 	.upload__button-text {
 		font-size: 18px;
 		z-index: 3;
 		position: relative;
 		font-weight: 500;
+	}
+	.loader {
+		border: 3px solid #f3f3f3;
+		border-top: 3px solid $border-color;
+		border-radius: 50%;
+		width: 20px;
+		height: 20px;
+		animation: spin 1s linear infinite;
+	}
+
+	@keyframes spin {
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
 	}
 }
 //Таблица
