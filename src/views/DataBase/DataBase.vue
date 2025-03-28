@@ -46,18 +46,18 @@ const addFace = async () => {
 	if (!newFace.value.name || !newFace.value.photoUrl) return;
 	const id = uuidv4();
 	try {
-		// const imageBase64 = base64Image(newFace.value.photoUrl);
+		const imageBase64 = base64Image(newFace.value.photoUrl);
 
-		// const response = await fetch(`${HOST}/add_new_face`, {
-		// 	method: 'POST',
-		// 	headers: { 'Content-Type': 'application/json' },
-		// 	body: JSON.stringify({
-		// 		request_id: uuidv4(),
-		// 		id: id,
-		// 		image: imageBase64,
-		// 	}),
-		// });
-		// if (!response.ok) throw new Error('Ошибка добавления вектора');
+		const response = await fetch(`${HOST}/add_new_face`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				request_id: uuidv4(),
+				id: id,
+				image: imageBase64,
+			}),
+		});
+		if (!response.ok) throw new Error('Ошибка добавления вектора');
 
 		const db = await fetch(DB, {
 			method: 'POST',
@@ -80,12 +80,12 @@ const addFace = async () => {
 
 const deleteFace = async (id: string) => {
 	try {
-		// const response = await fetch(`${HOST}/delete_face`, {
-		// 	method: 'POST',
-		// 	headers: { 'Content-Type': 'application/json' },
-		// 	body: JSON.stringify({ request_id: uuidv4(), items: [id] }),
-		// });
-		// if (!response.ok) throw new Error('Ошибка удаления вектора');
+		const response = await fetch(`${HOST}/delete_face`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ request_id: uuidv4(), items: [id] }),
+		});
+		if (!response.ok) throw new Error('Ошибка удаления вектора');
 
 		const db = await fetch(`${DB}/${id}`, { method: 'DELETE' });
 		if (!db.ok) throw new Error('Ошибка удаления объекта из базы данных');
@@ -98,12 +98,12 @@ const deleteFace = async (id: string) => {
 
 const clearDatabase = async () => {
 	try {
-		// const response = await fetch(`${HOST}/clear_db`, {
-		// 	method: 'POST',
-		// 	headers: { 'Content-Type': 'application/json' },
-		// 	body: JSON.stringify({ request_id: uuidv4() }),
-		// });
-		// if (!response.ok) throw new Error('Ошибка очистки базы векторов');
+		const response = await fetch(`${HOST}/clear_db`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ request_id: uuidv4() }),
+		});
+		if (!response.ok) throw new Error('Ошибка очистки базы векторов');
 
 		await Promise.all(
 			faces.value.map((face) => fetch(`${DB}/${face.id}`, { method: 'DELETE' })),
@@ -166,7 +166,6 @@ const syncDB = async () => {
 
 const updateNewFace = (val: FaceDB) => {
 	newFace.value = val;
-	console.log('newFace.value', newFace.value);
 };
 
 onMounted(fetchFaces);

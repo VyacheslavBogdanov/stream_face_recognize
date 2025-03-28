@@ -31,8 +31,12 @@ const onFileChange = (event: Event) => {
 const onSubmitForm = () => {
 	isFileFocused.value = false;
 	hasFile.value = false;
-	emit('addFace');
 	fileName.value = 'Загрузите изображение...';
+	emit('addFace');
+	emit('update:newFace', {
+		...props.newFace,
+		name: '',
+	});
 };
 </script>
 
