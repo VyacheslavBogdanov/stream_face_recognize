@@ -94,10 +94,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
+import { calculateScaledBboxes } from '../../components/utils/Bbox';
 import type { MessageType } from '../../components/utils/types';
-
-const HOST = import.meta.env.VITE_SERVER_HOST;
-const DB = import.meta.env.VITE_SERVER_DB;
 
 const props = defineProps<{
 	messageTypes: MessageType[];
@@ -116,21 +114,12 @@ const recThreshold = ref(0.5);
 const isDisabled = computed(() => props.status === 'inactive');
 
 const updateBoundingBoxes = () => {
-	if (!imageElement.value || foundPeople.value.length === 0 || !foundPeople.value[0].bbox) return;
+	if (!imageElement.value || !foundPeople.value[0]?.bbox) return;
 
-	const img = imageElement.value;
-	const scaleX = img.clientWidth / img.naturalWidth;
-	const scaleY = img.clientHeight / img.naturalHeight;
-	const [x, y, width, height] = foundPeople.value[0].bbox;
-
-	scaledBboxes.value = [
-		{
-			left: x * scaleX,
-			top: y * scaleY,
-			width: width * scaleX,
-			height: height * scaleY,
-		},
-	];
+	scaledBboxes.value = calculateScaledBboxes(
+		imageElement.value,
+		foundPeople.value.map((p) => p.bbox!).filter(Boolean),
+	);
 };
 
 const onFileChange = (event: Event) => {
@@ -174,7 +163,7 @@ const sendRecognitionRequest = async (base64Image: string) => {
 	const imageBase64 = Base64Image(base64Image);
 
 	try {
-		const response = await fetch(`${HOST}/recognize_many`, {
+		const response = await fetch(`${import.meta.env.VITE_SERVER_HOST}/recognize_many`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -210,7 +199,7 @@ const sendRecognitionRequest = async (base64Image: string) => {
 
 const getPersonById = async (id: string) => {
 	try {
-		const response = await fetch(DB);
+		const response = await fetch(import.meta.env.VITE_SERVER_HOST);
 		if (!response.ok) throw new Error(`Ошибка загрузки данных для ID: ${id}`);
 
 		const dbData: { id: string; name: string; photoBase64: string }[] = await response.json();
