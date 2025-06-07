@@ -19,7 +19,6 @@ const isSync = ref<boolean>(false);
 const fetchFaces = async () => {
 	try {
 		const uuid = uuidv4();
-		console.log('uuid', uuid);
 
 		const response = await fetch(`${HOST}/get_all_keys`, {
 			method: 'POST',
@@ -30,51 +29,58 @@ const fetchFaces = async () => {
 		const allKeys = await response.json();
 		console.log('allKeys', allKeys);
 		vectors.value = allKeys.result;
-		console.log('vectors.value', vectors.value);
 
 		const db = await fetch(DB);
 		if (!db.ok) throw new Error('Ошибка загрузки базы данных');
 		const data = await db.json();
 		faces.value = Array.isArray(data) ? data : [data];
-		console.log('faces.value', faces.value);
 	} catch (error) {
 		console.error(error);
 	}
 };
 
 const addFace = async () => {
-	if (!newFace.value.name || !newFace.value.photoUrl) return;
-	const id = uuidv4();
-	try {
-		const imageBase64 = base64Image(newFace.value.photoUrl);
+	const { name, photoUrl } = newFace.value;
+	if (!name || !photoUrl) return;
 
-		const response = await fetch(`${HOST}/add_new_face`, {
+	const id = uuidv4();
+	let imageBase64: string;
+
+	try {
+		imageBase64 = base64Image(photoUrl);
+		if (!imageBase64) throw new Error('Ошибка при преобразовании изображения');
+	} catch (err) {
+		console.error('Ошибка обработки изображения:', err);
+		return;
+	}
+
+	try {
+		const vectorResponse = await fetch(`${HOST}/add_new_face`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				request_id: uuidv4(),
-				id: id,
+				id,
 				image: imageBase64,
 			}),
 		});
-		if (!response.ok) throw new Error('Ошибка добавления вектора');
 
-		const db = await fetch(DB, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				id: id,
-				name: newFace.value.name,
-				photoUrl: newFace.value.photoUrl,
-			}),
-		});
-		if (!db.ok) throw new Error('Ошибка добавления объекта в базу данных');
-		const data = await db.json();
-		faces.value = Array.isArray(data) ? data : [data];
-		newFace.value = { id: '', name: '', photoUrl: '' };
-		fetchFaces();
+		if (vectorResponse.ok) {
+			const dbResponse = await fetch(DB, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ id, name, photoUrl }),
+			});
+			if (!dbResponse.ok) throw new Error('Ошибка добавления в базу данных');
+
+			newFace.value = { id: '', name: '', photoUrl: '' };
+			fetchFaces();
+		} else {
+			newFace.value = { id: '', name: '', photoUrl: '' };
+			throw new Error('Ошибка добавления вектора');
+		}
 	} catch (error) {
-		console.error(error);
+		console.error('Ошибка при добавлении лица:', error);
 	}
 };
 
