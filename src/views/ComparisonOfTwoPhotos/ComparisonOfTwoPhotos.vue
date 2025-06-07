@@ -95,7 +95,6 @@ const comparePhotos = async () => {
 	isLoading.value = true;
 	const Base64ImageSource = Base64Image(sourceImageBase64.value);
 	const Base64ImageTarget = Base64Image(targetImageBase64.value);
-
 	try {
 		const response = await fetch(`${import.meta.env.VITE_SERVER_HOST}/recognize_one_by_image`, {
 			method: 'POST',
@@ -107,7 +106,6 @@ const comparePhotos = async () => {
 				target_image: Base64ImageTarget,
 			}),
 		});
-
 		if (response.status === 424) {
 			comparisonResult.value = {
 				class: 'comparison__message--error',
@@ -117,11 +115,9 @@ const comparePhotos = async () => {
 			infoCompare.value = null;
 			return;
 		}
-
 		if (response.status === 422) {
 			const errorData = await response.json();
 			console.error('Ошибка 422:', errorData?.detail);
-
 			comparisonResult.value = {
 				class: 'comparison__message--error',
 				message: props.messageTypes.find((msg) => msg.class === 'compare--validation-error')
@@ -130,9 +126,7 @@ const comparePhotos = async () => {
 			infoCompare.value = null;
 			return;
 		}
-
 		if (!response.ok) throw new Error();
-
 		const result = await response.json();
 		comparisonResult.value = processComparisonResult(
 			result.detected_faces || [],
@@ -173,13 +167,13 @@ const processComparisonResult = (detected_faces: Face[]) => {
 
 	return score !== null && score >= 0.5
 		? {
-				class: 'comparison__message--warning',
-				message: props.messageTypes.find((msg) => msg.class === 'compare--warning')
+				class: 'comparison__message--success',
+				message: props.messageTypes.find((msg) => msg.class === 'compare--success')
 					?.message,
 			}
 		: {
-				class: 'comparison__message--success',
-				message: props.messageTypes.find((msg) => msg.class === 'compare--success')
+				class: 'comparison__message--warning',
+				message: props.messageTypes.find((msg) => msg.class === 'compare--warning')
 					?.message,
 			};
 };
