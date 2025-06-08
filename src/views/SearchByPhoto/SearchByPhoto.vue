@@ -45,8 +45,9 @@
 		>
 			<div class="upload__result">
 				<img
+					v-if="resultImageUrl"
 					ref="imageElement"
-					:src="foundPeople[0]?.photoUrl"
+					:src="resultImageUrl"
 					class="upload__result-image"
 					@load="updateBoundingBoxes"
 				/>
@@ -97,6 +98,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { calculateScaledBboxes } from '../../components/utils/Bbox';
 import type { MessageType } from '../../components/utils/types';
 
+const HOST = import.meta.env.VITE_SERVER_HOST;
+const DB = import.meta.env.VITE_SERVER_DB;
+
 const props = defineProps<{
 	messageTypes: MessageType[];
 	status: string;
@@ -110,6 +114,12 @@ const scaledBboxes = ref<{ left: number; top: number; width: number; height: num
 const imageElement = ref<HTMLImageElement | null>(null);
 const isLoading = ref(false);
 const recThreshold = ref(0.5);
+
+const resultImageUrl = computed(() => {
+	return foundPeople.value.length > 0 && foundPeople.value[0].photoUrl
+		? foundPeople.value[0].photoUrl
+		: null;
+});
 
 const isDisabled = computed(() => props.status === 'inactive');
 
@@ -163,7 +173,7 @@ const sendRecognitionRequest = async (base64Image: string) => {
 	const imageBase64 = Base64Image(base64Image);
 
 	try {
-		const response = await fetch(`${import.meta.env.VITE_SERVER_HOST}/recognize_many`, {
+		const response = await fetch(`${HOST}/recognize_many`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -199,7 +209,7 @@ const sendRecognitionRequest = async (base64Image: string) => {
 
 const getPersonById = async (id: string) => {
 	try {
-		const response = await fetch(import.meta.env.VITE_SERVER_HOST);
+		const response = await fetch(DB);
 		if (!response.ok) throw new Error(`Ошибка загрузки данных для ID: ${id}`);
 
 		const dbData: { id: string; name: string; photoBase64: string }[] = await response.json();
@@ -216,7 +226,7 @@ const getPersonById = async (id: string) => {
 		}
 		return {
 			...person,
-			photoUrl: `data:image/jpeg;base64,${person.photoBase64}`,
+			photoUrl: person.photoUrl,
 		};
 	} catch (error) {
 		console.error(error);
