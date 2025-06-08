@@ -40,7 +40,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, defineEmits, defineProps } from 'vue';
-import { ClearUploadTarget } from '../utils/useClearUpload';
+import { ClearUploadTarget } from '../../../components/utils/useClearUpload';
+import { calculateScaledBboxes } from '../../../components/utils/Bbox';
 
 const emit = defineEmits(['update:imageData', 'clear']);
 const props = defineProps<{ bboxes: number[] }>();
@@ -67,16 +68,7 @@ const bboxesArray = computed(() => {
 
 const scaledBboxes = computed(() => {
 	if (!imageElement.value) return [];
-	const img = imageElement.value;
-	const scaleX = img.clientWidth / img.naturalWidth;
-	const scaleY = img.clientHeight / img.naturalHeight;
-
-	return bboxesArray.value.map(([x, y, width, height]) => ({
-		left: x * scaleX,
-		top: y * scaleY,
-		width: width * scaleX,
-		height: height * scaleY,
-	}));
+	return calculateScaledBboxes(imageElement.value, bboxesArray.value);
 });
 
 watch(

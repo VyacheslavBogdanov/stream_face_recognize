@@ -61,21 +61,21 @@ onMounted(() => {
 		0px 3px 8px -6px rgba(24, 39, 75, 0.05),
 		0px 10px 36px -4px rgba(17, 24, 41, 0.1);
 
-	&__nav {
-		display: flex;
-		flex-direction: row-reverse;
-		font-size: 25px;
-		position: relative;
+	// &__nav {
+	// 	display: flex;
+	// 	flex-direction: row-reverse;
+	// 	font-size: 25px;
+	// 	position: relative;
 
-		&--disabled {
-			pointer-events: none;
-			opacity: 0.5;
-		}
+	// 	&--disabled {
+	// 		pointer-events: none;
+	// 		opacity: 0.5;
+	// 	}
 
-		@media (max-width: 1800px) {
-			font-size: 20px;
-		}
-	}
+	// 	@media (max-width: 1800px) {
+	// 		font-size: 20px;
+	// 	}
+	// }
 
 	&__link {
 		color: rgb(0, 0, 0);

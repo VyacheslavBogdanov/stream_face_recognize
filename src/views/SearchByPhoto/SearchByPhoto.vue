@@ -45,8 +45,9 @@
 		>
 			<div class="upload__result">
 				<img
+					v-if="resultImageUrl"
 					ref="imageElement"
-					:src="foundPeople[0]?.photoUrl"
+					:src="resultImageUrl"
 					class="upload__result-image"
 					@load="updateBoundingBoxes"
 				/>
@@ -94,6 +95,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
+import { calculateScaledBboxes } from '../../components/utils/Bbox';
 import type { MessageType } from '../../components/utils/types';
 
 const HOST = import.meta.env.VITE_SERVER_HOST;
@@ -113,24 +115,21 @@ const imageElement = ref<HTMLImageElement | null>(null);
 const isLoading = ref(false);
 const recThreshold = ref(0.5);
 
+const resultImageUrl = computed(() => {
+	return foundPeople.value.length > 0 && foundPeople.value[0].photoUrl
+		? foundPeople.value[0].photoUrl
+		: null;
+});
+
 const isDisabled = computed(() => props.status === 'inactive');
 
 const updateBoundingBoxes = () => {
-	if (!imageElement.value || foundPeople.value.length === 0 || !foundPeople.value[0].bbox) return;
+	if (!imageElement.value || !foundPeople.value[0]?.bbox) return;
 
-	const img = imageElement.value;
-	const scaleX = img.clientWidth / img.naturalWidth;
-	const scaleY = img.clientHeight / img.naturalHeight;
-	const [x, y, width, height] = foundPeople.value[0].bbox;
-
-	scaledBboxes.value = [
-		{
-			left: x * scaleX,
-			top: y * scaleY,
-			width: width * scaleX,
-			height: height * scaleY,
-		},
-	];
+	scaledBboxes.value = calculateScaledBboxes(
+		imageElement.value,
+		foundPeople.value.map((p) => p.bbox!).filter(Boolean),
+	);
 };
 
 const onFileChange = (event: Event) => {
@@ -227,7 +226,7 @@ const getPersonById = async (id: string) => {
 		}
 		return {
 			...person,
-			photoUrl: `data:image/jpeg;base64,${person.photoBase64}`,
+			photoUrl: person.photoUrl,
 		};
 	} catch (error) {
 		console.error(error);

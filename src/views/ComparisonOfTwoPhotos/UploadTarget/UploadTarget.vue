@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { ref, defineEmits } from 'vue';
-import { ClearUploadSource } from '../utils/useClearUpload';
+import { ClearUploadSource } from '../../../components/utils/useClearUpload';
 
 const emit = defineEmits(['update:imageData', 'clear']);
 
