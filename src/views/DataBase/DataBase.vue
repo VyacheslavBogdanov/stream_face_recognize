@@ -27,7 +27,6 @@ const fetchFaces = async () => {
 		});
 		if (!response.ok) throw new Error('Ошибка получения ключей');
 		const allKeys = await response.json();
-		console.log('allKeys', allKeys);
 		vectors.value = allKeys.result;
 
 		const db = await fetch(DB);
