@@ -34,7 +34,24 @@
 					class="upload__file-input"
 					:disabled="isDisabled"
 				/>
-				<img v-if="previewImage" :src="previewImage" class="upload__file-preview" />
+				<img
+					v-if="previewImage"
+					:src="previewImage"
+					class="upload__file-preview"
+					ref="imagePreviewElement"
+				/>
+
+				<div
+					v-for="(bbox, index) in scaledRecognizedBboxes"
+					:key="index"
+					class="upload__bbox"
+					:style="{
+						top: bbox.top + 'px',
+						left: bbox.left + 'px',
+						width: bbox.width + 'px',
+						height: bbox.height + 'px',
+					}"
+				></div>
 			</div>
 		</div>
 
@@ -45,8 +62,9 @@
 		>
 			<div class="upload__result">
 				<img
+					v-if="resultImageUrl"
 					ref="imageElement"
-					:src="foundPeople[0]?.photoUrl"
+					:src="resultImageUrl"
 					class="upload__result-image"
 					@load="updateBoundingBoxes"
 				/>
@@ -94,7 +112,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
+import { calculateScaledBboxes } from '../../components/utils/Bbox';
 import type { MessageType } from '../../components/utils/types';
+import type { DetectedFace } from '../../components/utils/types';
 
 const HOST = import.meta.env.VITE_SERVER_HOST;
 const DB = import.meta.env.VITE_SERVER_DB;
@@ -108,29 +128,42 @@ const errorMessage = ref<{ class: string; message: string } | null>(null);
 const selectedFile = ref<File | null>(null);
 const previewImage = ref<string | null>(null);
 const foundPeople = ref<{ id: string; name: string; photoUrl: string; bbox?: number[] }[]>([]);
+const recognizedBboxes = ref<number[][]>([]);
+const imagePreviewElement = ref<HTMLImageElement | null>(null);
+
 const scaledBboxes = ref<{ left: number; top: number; width: number; height: number }[]>([]);
 const imageElement = ref<HTMLImageElement | null>(null);
+const scaledRecognizedBboxes = ref<{ left: number; top: number; width: number; height: number }[]>(
+	[],
+);
+
 const isLoading = ref(false);
 const recThreshold = ref(0.5);
 
+const resultImageUrl = computed(() => {
+	return foundPeople.value.length > 0 && foundPeople.value[0].photoUrl
+		? foundPeople.value[0].photoUrl
+		: null;
+});
+
 const isDisabled = computed(() => props.status === 'inactive');
 
+const updateRecognizedBoundingBoxes = () => {
+	if (!imagePreviewElement.value || !recognizedBboxes.value.length) return;
+
+	scaledRecognizedBboxes.value = calculateScaledBboxes(
+		imagePreviewElement.value,
+		recognizedBboxes.value,
+	);
+};
+
 const updateBoundingBoxes = () => {
-	if (!imageElement.value || foundPeople.value.length === 0 || !foundPeople.value[0].bbox) return;
+	if (!imageElement.value || !foundPeople.value[0]?.bbox) return;
 
-	const img = imageElement.value;
-	const scaleX = img.clientWidth / img.naturalWidth;
-	const scaleY = img.clientHeight / img.naturalHeight;
-	const [x, y, width, height] = foundPeople.value[0].bbox;
-
-	scaledBboxes.value = [
-		{
-			left: x * scaleX,
-			top: y * scaleY,
-			width: width * scaleX,
-			height: height * scaleY,
-		},
-	];
+	scaledBboxes.value = calculateScaledBboxes(
+		imageElement.value,
+		foundPeople.value.map((p) => p.bbox!).filter(Boolean),
+	);
 };
 
 const onFileChange = (event: Event) => {
@@ -151,6 +184,7 @@ const clearUpload = () => {
 	previewImage.value = null;
 	foundPeople.value = [];
 	errorMessage.value = null;
+	scaledRecognizedBboxes.value = [];
 };
 
 const Base64Image = (base64String: string) =>
@@ -190,13 +224,19 @@ const sendRecognitionRequest = async (base64Image: string) => {
 		foundPeople.value = [];
 
 		if (data.detected_faces?.length > 0) {
+			const detectedFaces = data.detected_faces as DetectedFace[];
+			recognizedBboxes.value = detectedFaces
+				.filter((face) => face.bbox)
+				.map((face) => face.bbox!);
 			for (const face of data.detected_faces) {
 				const person = await getPersonById(face.id);
 				if (person) {
-					foundPeople.value.push({ ...person, bbox: face.bbox });
+					foundPeople.value.push({ ...person });
 				}
 			}
 		}
+
+		updateRecognizedBoundingBoxes();
 	} catch (error) {
 		console.error(error);
 		errorMessage.value = {
@@ -213,7 +253,8 @@ const getPersonById = async (id: string) => {
 		const response = await fetch(DB);
 		if (!response.ok) throw new Error(`Ошибка загрузки данных для ID: ${id}`);
 
-		const dbData: { id: string; name: string; photoBase64: string }[] = await response.json();
+		const dbData: { id: string; name: string; photoUrl: string; bbox: number[] }[] =
+			await response.json();
 		const person = dbData.find((p) => p.id === id);
 
 		if (!person) {
@@ -227,7 +268,6 @@ const getPersonById = async (id: string) => {
 		}
 		return {
 			...person,
-			photoUrl: `data:image/jpeg;base64,${person.photoBase64}`,
 		};
 	} catch (error) {
 		console.error(error);

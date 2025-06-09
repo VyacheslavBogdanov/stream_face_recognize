@@ -20,3 +20,8 @@ export interface FaceDB {
 	name: string;
 	photoUrl: string;
 }
+
+export interface DetectedFace {
+	id: string;
+	bbox?: number[];
+  }

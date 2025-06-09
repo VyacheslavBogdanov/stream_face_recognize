@@ -27,7 +27,6 @@ const fetchFaces = async () => {
 		});
 		if (!response.ok) throw new Error('Ошибка получения ключей');
 		const allKeys = await response.json();
-		console.log('allKeys', allKeys);
 		vectors.value = allKeys.result;
 
 		const db = await fetch(DB);
@@ -65,11 +64,14 @@ const addFace = async () => {
 			}),
 		});
 
+		const vector = await vectorResponse.json();
+		const bbox = vector.bbox;
+
 		if (vectorResponse.ok) {
 			const dbResponse = await fetch(DB, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ id, name, photoUrl }),
+				body: JSON.stringify({ id, name, photoUrl, bbox }),
 			});
 			if (!dbResponse.ok) throw new Error('Ошибка добавления в базу данных');
 
