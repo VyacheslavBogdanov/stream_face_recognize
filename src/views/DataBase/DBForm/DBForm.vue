@@ -3,7 +3,11 @@ import { ref } from 'vue';
 import type { FaceDB } from '../../../components/utils/types.ts';
 
 const props = defineProps<{ newFace: FaceDB }>();
-const emit = defineEmits(['update:newFace', 'addFace']);
+
+const emit = defineEmits<{
+	(e: 'update:newFace', val: FaceDB): void;
+	(e: 'addFace', payload: { name: string; photoUrl: string }): void;
+}>();
 
 const fileName = ref<string>('Загрузите изображение...');
 const isFileFocused = ref<boolean>(false);
@@ -29,14 +33,11 @@ const onFileChange = (event: Event) => {
 };
 
 const onSubmitForm = () => {
+	emit('addFace', { name: props.newFace.name, photoUrl: props.newFace.photoUrl });
+
 	isFileFocused.value = false;
 	hasFile.value = false;
 	fileName.value = 'Загрузите изображение...';
-	emit('addFace');
-	emit('update:newFace', {
-		...props.newFace,
-		name: '',
-	});
 };
 </script>
 

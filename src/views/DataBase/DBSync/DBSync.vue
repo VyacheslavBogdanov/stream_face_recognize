@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { FaceDB } from '../../../components/utils/types.ts';
-const syncRequired = computed(() => props.faces.length !== props.vectors.length);
+
 const props = defineProps<{
 	vectors: string[];
 	faces: FaceDB[];
 	isSync: boolean;
 }>();
+
 const emit = defineEmits(['syncDB']);
+const syncRequired = computed(() => props.faces.length !== props.vectors.length);
 </script>
 
 <template>
