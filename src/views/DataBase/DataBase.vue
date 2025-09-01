@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { base64Image } from './utils/convert-to-base64';
 import type { FaceDB } from '../../components/utils/types';
@@ -38,8 +38,13 @@ const fetchFaces = async () => {
 	}
 };
 
-const addFace = async () => {
-	const { name, photoUrl } = newFace.value;
+// Принимаем снапшот имени и фото из формы
+type AddFacePayload = { name: string; photoUrl: string };
+
+const addFace = async (payload?: AddFacePayload) => {
+	const name = payload?.name ?? newFace.value.name;
+	const photoUrl = payload?.photoUrl ?? newFace.value.photoUrl;
+
 	if (!name || !photoUrl) return;
 
 	const id = uuidv4();
@@ -78,7 +83,6 @@ const addFace = async () => {
 			newFace.value = { id: '', name: '', photoUrl: '' };
 			fetchFaces();
 		} else {
-			newFace.value = { id: '', name: '', photoUrl: '' };
 			throw new Error('Ошибка добавления вектора');
 		}
 	} catch (error) {
